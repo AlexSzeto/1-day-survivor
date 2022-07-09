@@ -146,7 +146,7 @@ function choose_upgrade (title: string) {
     }
 }
 function create_new_aura () {
-    aura_weapon = sprites.create(assets.image`blank`, SpriteKind.Visuals)
+    aura_weapon = sprites.create(assets.image`area32x32`, SpriteKind.Visuals)
     animation.runImageAnimation(
     aura_weapon,
     assets.animation`divine-aura`,
@@ -469,13 +469,13 @@ game.onUpdateInterval(30000, function () {
     }
 })
 game.onUpdateInterval(500, function () {
-    for (let value5 of sprites.allOfKind(SpriteKind.Enemy)) {
-        sprites.setDataBoolean(value5, "attack_cooldown", false)
+    if (custom.game_state_is(GameState.normal)) {
+        spawn_enemy_wave()
     }
 })
 game.onUpdateInterval(500, function () {
-    if (custom.game_state_is(GameState.normal)) {
-        spawn_enemy_wave()
+    for (let value5 of sprites.allOfKind(SpriteKind.Enemy)) {
+        sprites.setDataBoolean(value5, "attack_cooldown", false)
     }
 })
 game.onUpdateInterval(orbit_refresh_rate, function () {
@@ -483,7 +483,7 @@ game.onUpdateInterval(orbit_refresh_rate, function () {
         sprites.destroyAllSpritesOfKind(SpriteKind.Orbital)
         spawn_angle_spacing = 360 / orbit_spawn_count
         for (let index2 = 0; index2 <= orbit_spawn_count - 1; index2++) {
-            new_weapon = sprites.create(assets.image`orbiter`, SpriteKind.Orbital)
+            new_weapon = sprites.create(assets.image`weapon-bible`, SpriteKind.Orbital)
             new_weapon.lifespan = orbit_duration
             sprites.setDataNumber(new_weapon, "angle", spawn_angle_spacing * index2)
             custom.aim_projectile_at_angle(
