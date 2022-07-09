@@ -83,7 +83,7 @@ namespace custom {
     //% group="Upgrades"
     //% block="obtain upgrade $menu_description"
     export function get_upgrade(menu_description: string): string {
-        const next_upgrade_name = menu_description.split(':')[0]
+        const next_upgrade_name = menu_description.indexOf(':') >= 0 ? menu_description.split(':')[0] : menu_description
         const upgrade_item = upgrade_master_list.find(upgrade => upgrade.name == next_upgrade_name)
         upgrades_obtained.push(upgrade_item)
         upgrade_master_list.removeElement(upgrade_item)

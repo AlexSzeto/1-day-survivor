@@ -73,10 +73,8 @@ function choose_upgrade (title: string) {
     upgrade_menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
     upgrade_menu.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Padding, 4)
     upgrade_menu.setPosition(10, (scene.screenHeight() - upgrade_menu.height) / 2)
-    upgrade_menu.setFrame(assets.image`dark dialog frame`)
     upgrade_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
         next_upgrade = custom.get_upgrade(selection)
-        console.log(next_upgrade)
         perform_upgrade(next_upgrade)
         custom.set_game_state(GameState.normal)
     })
@@ -130,6 +128,10 @@ sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
     sprites.setDataNumber(new_drop, "xp", sprites.readDataNumber(sprite, "xp"))
     custom.move_sprite_on_top_of_another(new_drop, sprite)
 })
+sprites.onOverlap(SpriteKind.Orbital, SpriteKind.Enemy, function (sprite, otherSprite) {
+    deal_enemy_damage(otherSprite, sprites.readDataNumber(sprite, "damage"))
+    sprite.destroy()
+})
 function create_upgrade_menu () {
     default_weapon_duration = 1000
     custom.add_upgrade_to_list("Daggers", "throw 3 daggers")
@@ -161,10 +163,10 @@ function create_upgrade_menu () {
     aura_tick_damage = 5
     custom.add_upgrade_to_list("Holy Water", "toss and burn")
     molotov_spawn_count = 0
-    molotov_speed = 200
+    molotov_speed = 100
     molotov_damage = 10
-    molotov_duration_min = 150
-    molotov_duration_max = 350
+    molotov_duration_min = 300
+    molotov_duration_max = 700
     molotov_flame_duration = 5000
     molotov_firing_rate = 8000
     molotov_tick_rate = 500
@@ -172,7 +174,7 @@ function create_upgrade_menu () {
 }
 function create_enemy_waves () {
     custom.reset_wave_data()
-    custom.add_wave_data(4, 1, "zombie")
+    custom.add_wave_data(4, 5, "zombie")
 }
 function setup_game () {
     tiles.setCurrentTilemap(tilemap`dungeon`)
@@ -193,6 +195,7 @@ function setup_game () {
     hero_xp.max = 10
     hero_xp.value = 0
     hero_xp.setColor(9, 15)
+    hero_xp.setStatusBarFlag(StatusBarFlag.SmoothTransition, false)
     controller.moveSprite(hero)
     create_upgrade_menu()
     create_enemy_waves()
@@ -251,7 +254,7 @@ let new_enemy: Sprite = null
 let list: string[] = []
 let hero_xp: StatusBarSprite = null
 setup_game()
-perform_upgrade("Daggers")
+perform_upgrade(custom.get_upgrade("Daggers"))
 game.onUpdate(function () {
     if (aura_spawn_count > 0) {
         aura_weapon.setPosition(hero.x, hero.y)
