@@ -126,7 +126,7 @@ namespace custom {
      * aim projectile at another sprite with a set velocity
      */
     //% group="Sprite"
-    //% block="aim projectile $projectile at $target with $aim_type $value"
+    //% block="aim $projectile at $target with $aim_type $value"
     //% projectile.shadow=variables_get
     //% target.shadow=variables_get
     export function aim_projectile_at_sprite(projectile: Sprite, target: Sprite, aim_type: AimType = AimType.velocity, value: number = 100): void {
@@ -156,6 +156,39 @@ namespace custom {
         }
     }
 
+    /**
+     * aim projectile at a specific angle
+     */
+    //% group="Sprite"
+    //% block="aim $projectile at angle $angle and set $aim_type $value || away from $target"
+    //% projectile.shadow=variables_get
+    //% target.shadow=variables_get
+    export function aim_projectile_at_angle(projectile: Sprite, target: Sprite, angle: number = 0, aim_type: AimType = AimType.velocity, value: number = 100): void {
+        if(target) {
+            projectile.x = target.x
+            projectile.y = target.y
+        }
+        const aim_x = value * Math.cos(angle)
+        const aim_y = value * Math.sin(angle)
+        switch (aim_type) {
+            case AimType.position:
+                projectile.x += aim_x
+                projectile.y += aim_y
+                break;
+            case AimType.velocity:
+                projectile.vx = aim_x
+                projectile.vy = aim_y
+                break;
+            case AimType.acceleration:
+                projectile.ax = aim_x
+                projectile.ay = aim_y
+                break;
+            case AimType.friction:
+                projectile.fx = aim_x
+                projectile.fy = aim_y
+                break;
+        }
+    }
 
     /**
      * pause game for menus
@@ -178,7 +211,73 @@ namespace custom {
         game.popScene()
     }
 
-    export function game_state(): GameState {
-        return current_game_state
-    }    
+    /**
+     * check current game state
+     */
+    //% group="Game"
+    //% block="current game state is $state"
+    export function game_state_is(state: GameState): boolean {
+        return current_game_state == state
+    }
+
+
+    type SpawnData = {
+        name: string
+        count: number
+    }
+    type WaveData = SpawnData[]
+
+    let spawn_waves: WaveData[] = []
+    let current_wave: number = 0
+
+    /**
+     * reset wave data
+     */
+    //% group="Spawn Waves"
+    //% block="reset spawn wave data"
+    export function reset_wave_data(): void {
+        spawn_waves = []
+        current_wave = 0
+    }
+
+    /**
+     * add wave data
+     */
+    //% group="Spawn Waves"
+    //% block="insert $count of $name into wave $wave"
+    export function add_wave_data(wave: number = 0, count: number = 1, name:string, ): void {
+        while(spawn_waves.length < wave) {
+            spawn_waves.push([])
+        }
+        spawn_waves[wave].push({
+            name,
+            count
+        })
+    }
+
+    /**
+     * advance to the next wave
+     */
+    //% group="Spawn Waves"
+    //% block="advance to the next wave"
+    export function advance_wave(): void {
+        current_wave = (current_wave + 1) % spawn_waves.length
+    }
+
+
+    /**
+     * get a linear list of enemy names to spawn from the next spawn wave
+     */
+    //% group="Spawn Waves"
+    //% block="list of current spawn wave enemies"
+    export function get_wave_enemy_list(): string[]
+    {
+        const list: string[] = []        
+        spawn_waves[current_wave].forEach(spawn => {
+            for(let i=0; i<spawn.count; i++) {
+                list.push(spawn.name)
+            }
+        })
+        return list
+    }
 }
