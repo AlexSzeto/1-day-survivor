@@ -23,7 +23,7 @@
             "sprites.dungeon.greenOuterSouthWest",
             "sprites.dungeon.greenOuterSouth0",
             "sprites.dungeon.floorDark3",
-            "sprites.castle.tileDarkGrass3"
+            "sprites.dungeon.floorLight0"
         ],
         "displayName": "dungeon"
     },

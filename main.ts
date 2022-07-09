@@ -64,7 +64,7 @@ function spawn_enemy_wave () {
     custom.advance_wave()
 }
 sprites.onDestroyed(SpriteKind.Molotov, function (sprite) {
-    flame_weapon = sprites.create(assets.image`flame`, SpriteKind.Aura)
+    flame_weapon = sprites.create(assets.image`area32x32`, SpriteKind.Aura)
     animation.runImageAnimation(
     flame_weapon,
     assets.animation`myAnim`,
@@ -85,24 +85,7 @@ function deal_enemy_damage (enemy: Sprite, damage: number) {
             sprites.setDataNumber(new_drop, "xp", 2)
             custom.move_sprite_on_top_of_another(new_drop, enemy)
         } else if (sprites.readDataNumber(enemy, "drop_type") == 2) {
-            new_drop = sprites.create(img`
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                `, SpriteKind.Pickup)
+            new_drop = sprites.create(assets.image`area32x32`, SpriteKind.Pickup)
             sprites.setDataNumber(new_drop, "xp", 4)
             custom.move_sprite_on_top_of_another(new_drop, enemy)
         } else {
@@ -163,7 +146,13 @@ function choose_upgrade (title: string) {
     }
 }
 function create_new_aura () {
-    aura_weapon = sprites.create(assets.image`aura`, SpriteKind.Visuals)
+    aura_weapon = sprites.create(assets.image`blank`, SpriteKind.Visuals)
+    animation.runImageAnimation(
+    aura_weapon,
+    assets.animation`divine-aura`,
+    500,
+    true
+    )
     custom.move_sprite_on_top_of_another(aura_weapon, hero)
     sprites.setDataNumber(aura_weapon, "damage", aura_tick_damage)
 }
@@ -229,7 +218,7 @@ scene.onHitWall(SpriteKind.Projectile, function (sprite, location) {
     sprite.destroy()
 })
 sprites.onDestroyed(SpriteKind.Explosion, function (sprite) {
-    flame_weapon = sprites.create(assets.image`explosion`, SpriteKind.Visuals)
+    flame_weapon = sprites.create(assets.image`area32x32`, SpriteKind.Visuals)
     animation.runImageAnimation(
     flame_weapon,
     assets.animation`explosion-anim`,
@@ -273,7 +262,7 @@ orbit_spawn_count = 0
     custom.add_upgrade_to_list("Divine Aura", assets.image`icon-aura`, "damage aura")
 aura_spawn_count = 0
     aura_tick_rate = 500
-    aura_tick_damage = 5
+    aura_tick_damage = 4
     custom.add_upgrade_to_list("Holy Water", assets.image`icon-water`, "toss and burn")
 molotov_spawn_count = 0
     molotov_speed = 100
@@ -517,24 +506,8 @@ game.onUpdateInterval(molotov_tick_rate, function () {
 })
 game.onUpdateInterval(tracer_firing_rate, function () {
     if (custom.game_state_is(GameState.normal) && tracer_spawn_count > 0) {
-        new_weapon = sprites.create(img`
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `, SpriteKind.Projectile)
+        new_weapon = sprites.create(assets.image`spark`, SpriteKind.Projectile)
+        new_weapon.startEffect(effects.trail)
         custom.aim_projectile_at_angle(
         new_weapon,
         randint(0, 360),
