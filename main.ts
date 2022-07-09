@@ -4,13 +4,20 @@ namespace SpriteKind {
     export const Molotov = SpriteKind.create()
     export const Explosion = SpriteKind.create()
     export const Aura = SpriteKind.create()
+    export const MiniMenu = SpriteKind.create()
 }
 namespace StatusBarKind {
     export const Experience = StatusBarKind.create()
 }
+controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
+	
+})
 sprites.onOverlap(SpriteKind.Explosion, SpriteKind.Enemy, function (sprite, otherSprite) {
     deal_enemy_damage(otherSprite, sprites.readDataNumber(sprite, "damage"))
     sprite.destroy()
+})
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    custom.set_game_state(GameState.menu)
 })
 scene.onHitWall(SpriteKind.Explosion, function (sprite, location) {
     sprite.destroy()
@@ -50,10 +57,13 @@ statusbars.onZero(StatusBarKind.Health, function (status) {
     	
     }
 })
+controller.A.onEvent(ControllerButtonEvent.Released, function () {
+    custom.set_game_state(GameState.normal)
+})
 function damage_enemies_in_aura (aura: Sprite) {
-    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
-        if (value.overlapsWith(aura)) {
-            deal_enemy_damage(value, sprites.readDataNumber(aura, "damage"))
+    for (let value2 of sprites.allOfKind(SpriteKind.Enemy)) {
+        if (value2.overlapsWith(aura)) {
+            deal_enemy_damage(value2, sprites.readDataNumber(aura, "damage"))
         }
     }
 }
@@ -143,7 +153,7 @@ function setup_game () {
     controller.moveSprite(hero)
     create_upgrade_menu()
     create_enemy_waves()
-    game_is_ready = 1
+    custom.set_game_state(GameState.normal)
 }
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
     deal_enemy_damage(otherSprite, sprites.readDataNumber(sprite, "damage"))
@@ -155,7 +165,6 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
 })
 let spawn_angle_spacing = 0
 let new_weapon: Sprite = null
-let game_is_ready = 0
 let hero_xp: StatusBarSprite = null
 let molotov_firing_rate = 0
 let molotov_duration_max = 0
@@ -195,6 +204,7 @@ let orbit_damage = 0
 let exploder_projectile_damage = 0
 let exploder_explosion_damage = 0
 let tracer_damage = 0
+let game_is_ready = 0
 tracer_damage = 0
 exploder_explosion_damage = 0
 exploder_projectile_damage = 0
@@ -210,7 +220,7 @@ game.onUpdate(function () {
     }
 })
 game.onUpdateInterval(exploder_firing_rate, function () {
-    if (game_is_ready == 1 && exploder_spawn_count > 0) {
+    if (custom.game_state_is(GameState.normal) && exploder_spawn_count > 0) {
         new_weapon = sprites.create(assets.image`fireball`, SpriteKind.Explosion)
         custom.aim_projectile_at_angle(
         new_weapon,
@@ -236,12 +246,12 @@ game.onUpdateInterval(50, function () {
     }
 })
 game.onUpdateInterval(aura_tick_rate, function () {
-    if (game_is_ready == 1 && aura_spawn_count > 0) {
+    if (custom.game_state_is(GameState.normal) && aura_spawn_count > 0) {
         damage_enemies_in_aura(aura_weapon)
     }
 })
 game.onUpdateInterval(molotov_firing_rate, function () {
-    if (game_is_ready == 1 && molotov_spawn_count > 0) {
+    if (custom.game_state_is(GameState.normal) && molotov_spawn_count > 0) {
         new_weapon = sprites.create(assets.image`molotov`, SpriteKind.Molotov)
         new_weapon.lifespan = randint(molotov_duration_min, molotov_duration_max)
         custom.aim_projectile_at_angle(
@@ -254,7 +264,7 @@ game.onUpdateInterval(molotov_firing_rate, function () {
     }
 })
 game.onUpdateInterval(spray_firing_rate, function () {
-    if (game_is_ready == 1 && spray_spawn_count > 0) {
+    if (custom.game_state_is(GameState.normal) && spray_spawn_count > 0) {
         for (let index = 0; index < spray_spawn_count; index++) {
             new_weapon = sprites.create(assets.image`dagger`, SpriteKind.Projectile)
             custom.aim_projectile_at_angle(
@@ -270,12 +280,12 @@ game.onUpdateInterval(spray_firing_rate, function () {
     }
 })
 game.onUpdateInterval(500, function () {
-    if (game_is_ready == 1) {
+    if (custom.game_state_is(GameState.normal)) {
         spawn_enemy_wave()
     }
 })
 game.onUpdateInterval(orbit_refresh_rate, function () {
-    if (game_is_ready == 1 && orbit_spawn_count > 0) {
+    if (custom.game_state_is(GameState.normal) && orbit_spawn_count > 0) {
         sprites.destroyAllSpritesOfKind(SpriteKind.Orbital)
         spawn_angle_spacing = 360 / orbit_spawn_count
         for (let index2 = 0; index2 <= orbit_spawn_count - 1; index2++) {
@@ -294,14 +304,14 @@ game.onUpdateInterval(orbit_refresh_rate, function () {
     }
 })
 game.onUpdateInterval(molotov_tick_rate, function () {
-    if (game_is_ready == 1 && aura_spawn_count > 0) {
-        for (let value of sprites.allOfKind(SpriteKind.Aura)) {
-            damage_enemies_in_aura(value)
+    if (custom.game_state_is(GameState.normal) && aura_spawn_count > 0) {
+        for (let value3 of sprites.allOfKind(SpriteKind.Aura)) {
+            damage_enemies_in_aura(value3)
         }
     }
 })
 game.onUpdateInterval(tracer_firing_rate, function () {
-    if (game_is_ready == 1 && tracer_spawn_count > 0) {
+    if (custom.game_state_is(GameState.normal) && tracer_spawn_count > 0) {
         new_weapon = sprites.create(assets.image`tracer`, SpriteKind.Projectile)
         custom.aim_projectile_at_angle(
         new_weapon,

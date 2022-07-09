@@ -12,6 +12,7 @@ enum AimType {
 }
 
 enum GameState {
+    setup,
     normal,
     menu
 }
@@ -55,7 +56,7 @@ namespace custom {
     //% group="Upgrades"
     //% blockId="get_upgrade_choices"
     //% block="list of eligible upgrades up to $max"
-    export function get_upgrade_choices(max: number): miniMenu.MenuItem[] {
+    export function get_upgrade_choices(max: number): string[] {
         const eligible_list = upgrade_master_list
            .filter(upgrade => !(upgrade.prerequisite) || upgrades_obtained.some(existing_upgrade => existing_upgrade.name == upgrade.prerequisite))
         let choices: UpgradeData[] = []
@@ -72,7 +73,7 @@ namespace custom {
             }
         }
 
-        return choices.map(upgrade => miniMenu.createMenuItem(`${upgrade.name}: (${upgrade.description})`))
+        return choices.map(upgrade => `${upgrade.name}: (${upgrade.description})`)
     }
 
     /**
@@ -193,24 +194,12 @@ namespace custom {
     }
 
     /**
-     * pause game for menus
+     * change game state
      */
     //% group="Game"
-    //% block="pause game for menus"
-    export function pause_game_for_menus(): void {
-        current_game_state = GameState.menu
-        game.pushScene()
-    }
-
-
-    /**
-     * unpause game from menus
-     */
-    //% group="Game"
-    //% block="unpause game from menus"
-    export function pause_game_from_menus(): void {
-        current_game_state = GameState.normal
-        game.popScene()
+    //% block="set game state to $state"
+    export function set_game_state(state: GameState): void {
+        current_game_state = state
     }
 
     /**
@@ -218,7 +207,7 @@ namespace custom {
      */
     //% group="Game"
     //% block="current game state is $state"
-    export function game_state_is(state: GameState): boolean {
+    export function game_state_is(state: GameState = GameState.normal): boolean {
         return current_game_state == state
     }
 
