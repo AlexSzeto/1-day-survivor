@@ -163,7 +163,7 @@ namespace custom {
     //% group="Game"
     //% block="pause game for menus"
     export function pause_game_for_menus(): void {
-        // game_is_running = 0
+        current_game_state = GameState.menu
         game.pushScene()
     }
 
@@ -174,11 +174,11 @@ namespace custom {
     //% group="Game"
     //% block="unpause game from menus"
     export function pause_game_from_menus(): void {
-        // game_is_running = 1
+        current_game_state = GameState.normal
         game.popScene()
     }
 
     export function game_state(): GameState {
         return current_game_state
-    }
+    }    
 }
