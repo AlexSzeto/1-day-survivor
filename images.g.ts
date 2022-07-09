@@ -417,6 +417,17 @@ bbdccccccccccccccccccdbb
 .bbbbbbbbbbbbbbbbbbbbbb.
 ..bbbbbbbbbbbbbbbbbbbb..
 `;
+            case "image13":
+            case "xp gem":return img`
+. . . 7 6 . . . 
+. . 7 7 6 6 . . 
+. 7 7 7 6 6 6 . 
+7 7 7 7 6 6 6 6 
+6 6 6 6 8 8 8 8 
+. 6 6 6 8 8 8 . 
+. . 6 6 8 8 . . 
+. . . 6 8 . . . 
+`;
         }
         return null;
     })

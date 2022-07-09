@@ -4,10 +4,15 @@ namespace SpriteKind {
     export const Molotov = SpriteKind.create()
     export const Explosion = SpriteKind.create()
     export const Aura = SpriteKind.create()
+    export const Pickup = SpriteKind.create()
 }
 namespace StatusBarKind {
     export const Experience = StatusBarKind.create()
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Pickup, function (sprite, otherSprite) {
+    hero_xp.value += sprites.readDataNumber(otherSprite, "xp")
+    otherSprite.destroy()
+})
 sprites.onOverlap(SpriteKind.Explosion, SpriteKind.Enemy, function (sprite, otherSprite) {
     deal_enemy_damage(otherSprite, sprites.readDataNumber(sprite, "damage"))
     sprite.destroy()
@@ -20,7 +25,7 @@ function spawn_enemy_wave () {
     for (let value of list) {
         if (value == "zombie") {
             new_enemy = sprites.create(assets.image`ghost`, SpriteKind.Enemy)
-            setup_enemy(new_enemy, value, 10, 1, 20)
+            setup_enemy(new_enemy, value, 10, 1, 20, 1)
             custom.move_sprite_off_camera(new_enemy)
         }
     }
@@ -39,12 +44,54 @@ function deal_enemy_damage (enemy: Sprite, damage: number) {
         enemy.destroy()
     }
 }
+function perform_upgrade (name: string) {
+    if (name == "Daggers") {
+        spray_spawn_count += 3
+    } else if (name == "Spark") {
+        tracer_spawn_count += 1
+    } else if (name == "Fireball") {
+        exploder_spawn_count += 1
+    } else if (name == "Bible") {
+        orbit_spawn_count += 1
+    } else if (name == "Garlic") {
+        aura_spawn_count += 1
+        create_new_aura()
+    } else if (name == "Holy Water") {
+        molotov_spawn_count += 1
+    } else {
+    	
+    }
+}
+function choose_upgrade (title: string) {
+    custom.set_game_state(GameState.menu)
+    scene.setBackgroundImage(assets.image`castle background`)
+    upgrade_menu = miniMenu.createMenuFromArray(custom.convert_string_array_to_mini_menu_items(custom.get_upgrade_choices(4)))
+    upgrade_menu.setTitle(title)
+    upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, scene.screenWidth() - 20)
+    upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, 80)
+    upgrade_menu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
+    upgrade_menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
+    upgrade_menu.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Padding, 4)
+    upgrade_menu.setPosition(10, (scene.screenHeight() - upgrade_menu.height) / 2)
+    upgrade_menu.setFrame(assets.image`dark dialog frame`)
+    upgrade_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
+        next_upgrade = custom.get_upgrade(selection)
+        console.log(next_upgrade)
+        perform_upgrade(next_upgrade)
+        custom.set_game_state(GameState.normal)
+    })
+}
 function create_new_aura () {
     aura_weapon = sprites.create(assets.image`aura`, SpriteKind.Visuals)
     aura_weapon.setPosition(hero.x, hero.y)
     aura_weapon.z = hero.z - 2
     sprites.setDataNumber(aura_weapon, "damage", aura_tick_damage)
 }
+statusbars.onStatusReached(StatusBarKind.Experience, statusbars.StatusComparison.GTE, statusbars.ComparisonType.Percentage, 100, function (status) {
+    status.value = 0
+    status.max += 10
+    choose_upgrade("Pick Upgrade")
+})
 statusbars.onZero(StatusBarKind.Health, function (status) {
     if (status == hero_health) {
     	
@@ -60,38 +107,28 @@ function damage_enemies_in_aura (aura: Sprite) {
 scene.onHitWall(SpriteKind.Molotov, function (sprite, location) {
     sprite.destroy()
 })
-function setup_enemy (enemy: Sprite, name: string, health: number, damage: number, speed: number) {
+function setup_enemy (enemy: Sprite, name: string, health: number, damage: number, speed: number, xp: number) {
     sprites.setDataString(enemy, "name", name)
     sprites.setDataNumber(enemy, "health", health)
     sprites.setDataNumber(enemy, "damage", damage)
+    sprites.setDataNumber(enemy, "xp", xp)
     enemy.follow(hero, speed)
     enemy.z = 50
 }
 scene.onHitWall(SpriteKind.Projectile, function (sprite, location) {
     sprite.destroy()
 })
-function pickup_upgrade (title: string) {
-    custom.set_game_state(GameState.menu)
-    scene.setBackgroundImage(assets.image`castle background`)
-    myMenu = miniMenu.createMenuFromArray(custom.convert_string_array_to_mini_menu_items(custom.get_upgrade_choices(4)))
-    myMenu.setTitle(title)
-    myMenu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, scene.screenWidth() - 20)
-    myMenu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, 80)
-    myMenu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
-    myMenu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
-    myMenu.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Padding, 4)
-    myMenu.setPosition(10, (scene.screenHeight() - myMenu.height) / 2)
-    myMenu.setFrame(assets.image`dark dialog frame`)
-    myMenu.onButtonPressed(controller.A, function (selection, selectedIndex) {
-        custom.get_upgrade(selection)
-    })
-}
 sprites.onDestroyed(SpriteKind.Explosion, function (sprite) {
     flame_weapon = sprites.create(assets.image`explosion`, SpriteKind.Visuals)
     flame_weapon.setPosition(sprite.x, sprite.y)
     flame_weapon.lifespan = 500
     sprites.setDataNumber(flame_weapon, "damage", exploder_explosion_damage)
     damage_enemies_in_aura(flame_weapon)
+})
+sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
+    new_drop = sprites.create(assets.image`xp gem`, SpriteKind.Pickup)
+    sprites.setDataNumber(new_drop, "xp", sprites.readDataNumber(sprite, "xp"))
+    custom.move_sprite_on_top_of_another(new_drop, sprite)
 })
 function create_upgrade_menu () {
     default_weapon_duration = 1000
@@ -106,7 +143,7 @@ function create_upgrade_menu () {
     tracer_firing_rate = 500
     tracer_damage = 10
     custom.add_upgrade_to_list("Fireball", "explode on impact")
-    exploder_spawn_count = 1
+    exploder_spawn_count = 0
     exploder_speed = 100
     exploder_firing_rate = 1000
     exploder_projectile_damage = 10
@@ -171,48 +208,50 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
 })
 let spawn_angle_spacing = 0
 let new_weapon: Sprite = null
-let hero_xp: StatusBarSprite = null
 let molotov_tick_rate = 0
 let molotov_firing_rate = 0
 let molotov_duration_max = 0
 let molotov_duration_min = 0
 let molotov_damage = 0
 let molotov_speed = 0
-let molotov_spawn_count = 0
 let aura_tick_rate = 0
-let aura_spawn_count = 0
 let orbit_damage = 0
 let orbit_refresh_rate = 0
 let orbit_duration = 0
 let orbit_distance = 0
 let orbit_angular_speed = 0
-let orbit_spawn_count = 0
 let exploder_projectile_damage = 0
 let exploder_firing_rate = 0
 let exploder_speed = 0
-let exploder_spawn_count = 0
 let tracer_damage = 0
 let tracer_firing_rate = 0
 let tracer_speed = 0
-let tracer_spawn_count = 0
 let spray_damage = 0
 let spray_firing_rate = 0
 let spray_speed = 0
-let spray_spawn_count = 0
 let default_weapon_duration = 0
+let new_drop: Sprite = null
 let exploder_explosion_damage = 0
-let myMenu: miniMenu.MenuSprite = null
 let hero_health: StatusBarSprite = null
 let aura_tick_damage = 0
 let hero: Sprite = null
 let aura_weapon: Sprite = null
+let next_upgrade = ""
+let upgrade_menu: miniMenu.MenuSprite = null
+let molotov_spawn_count = 0
+let aura_spawn_count = 0
+let orbit_spawn_count = 0
+let exploder_spawn_count = 0
+let tracer_spawn_count = 0
+let spray_spawn_count = 0
 let molotov_tick_damage = 0
 let molotov_flame_duration = 0
 let flame_weapon: Sprite = null
 let new_enemy: Sprite = null
 let list: string[] = []
+let hero_xp: StatusBarSprite = null
 setup_game()
-pickup_upgrade("Starting Weapon")
+perform_upgrade("Daggers")
 game.onUpdate(function () {
     if (aura_spawn_count > 0) {
         aura_weapon.setPosition(hero.x, hero.y)

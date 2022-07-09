@@ -64,6 +64,11 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "dark dialog frame"
     },
+    "image13": {
+        "data": "hwQIAAgAAAAAcAYAAHdmAHB3ZgZ3d2ZmZmaIiGBmiAgAZogAAGAIAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "xp gem"
+    },
     "*": {
         "mimeType": "image/x-mkcd-f4",
         "dataEncoding": "base64",

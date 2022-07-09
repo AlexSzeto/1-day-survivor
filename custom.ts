@@ -82,11 +82,12 @@ namespace custom {
      */
     //% group="Upgrades"
     //% block="obtain upgrade $menu_description"
-    export function get_upgrade(menu_description: string): void {
+    export function get_upgrade(menu_description: string): string {
         const next_upgrade_name = menu_description.split(':')[0]
         const upgrade_item = upgrade_master_list.find(upgrade => upgrade.name == next_upgrade_name)
         upgrades_obtained.push(upgrade_item)
         upgrade_master_list.removeElement(upgrade_item)
+        return next_upgrade_name
     }
 
     /**
@@ -109,6 +110,18 @@ namespace custom {
     //% block="convert text array $list into mini menu items"
     export function convert_string_array_to_mini_menu_items(list: string[]): miniMenu.MenuItem[] {
         return list.map(text => miniMenu.createMenuItem(text))
+    }
+
+    /**
+     * place one sprite on top of another
+     */
+    //% group="Sprite"
+    //% block="place $source on top of $target"
+    //% source.shadow=variables_get
+    //% target.shadow=variables_get
+    export function move_sprite_on_top_of_another(source: Sprite, target: Sprite): void {
+        source.x = target.x
+        source.y = target.y
     }
 
     /**
