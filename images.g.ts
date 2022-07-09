@@ -106,6 +106,16 @@ bbdccccccccccccccccccdbb
 . . . . . . . . . . . . . . . . 
 . . . . . . . . . . . . . . . . 
 `;
+            case "image6":
+            case "tracer":return img`
+. . 6 6 6 . . 
+. 6 9 9 9 6 . 
+6 9 9 9 9 9 6 
+6 9 9 9 9 9 6 
+6 9 9 9 9 9 6 
+. 6 9 9 9 6 . 
+. . 6 6 6 . . 
+`;
         }
         return null;
     })

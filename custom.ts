@@ -162,8 +162,7 @@ namespace custom {
     //% group="Sprite"
     //% block="aim $projectile at angle $angle and set $aim_type $value || away from $target"
     //% projectile.shadow=variables_get
-    //% target.shadow=variables_get
-    export function aim_projectile_at_angle(projectile: Sprite, target: Sprite, angle: number = 0, aim_type: AimType = AimType.velocity, value: number = 100): void {
+    export function aim_projectile_at_angle(projectile: Sprite, angle: number = 0, aim_type: AimType = AimType.velocity, value: number = 100, target: Sprite = null): void {
         if(target) {
             projectile.x = target.x
             projectile.y = target.y
