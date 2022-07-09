@@ -1,6 +1,22 @@
 namespace StatusBarKind {
     export const Experience = StatusBarKind.create()
 }
+function spawn_enemy_wave () {
+    list = custom.get_wave_enemy_list()
+    for (let value of list) {
+        if (value == "zombie") {
+            new_enemy = sprites.create(assets.image`ghost`, SpriteKind.Enemy)
+            setup_enemy(new_enemy, value, 10, 1, 20)
+            custom.move_sprite_off_camera(new_enemy)
+        }
+    }
+}
+function setup_enemy (enemy: Sprite, name: string, health: number, damage: number, speed: number) {
+    sprites.setDataString(enemy, "name", name)
+    sprites.setDataNumber(enemy, "health", health)
+    sprites.setDataNumber(enemy, "damage", damage)
+    enemy.follow(hero, speed)
+}
 function create_upgrade_menu () {
     custom.add_upgrade_to_list("Daggers", "throw 3 daggers")
     spray_throw_count = 3
@@ -44,10 +60,12 @@ function setup_game () {
     hero_xp.value = 0
     hero_xp.setColor(9, 15)
     controller.moveSprite(hero)
+    create_upgrade_menu()
+    create_enemy_waves()
 }
+let new_weapon: Sprite = null
 let hero_xp: StatusBarSprite = null
 let hero_health: StatusBarSprite = null
-let hero: Sprite = null
 let molotov_duration = 0
 let molotov_speed = 0
 let molotov_throw_count = 0
@@ -61,4 +79,22 @@ let tracer_speed = 0
 let spray_firing_rate = 0
 let spray_speed = 0
 let spray_throw_count = 0
+let hero: Sprite = null
+let new_enemy: Sprite = null
+let list: string[] = []
 setup_game()
+game.onUpdateInterval(spray_firing_rate, function () {
+    for (let index = 0; index < spray_throw_count; index++) {
+        new_weapon = sprites.create(assets.image`dagger`, SpriteKind.Projectile)
+        custom.aim_projectile_at_angle(
+        new_weapon,
+        hero,
+        randint(0, 360),
+        AimType.velocity,
+        spray_speed
+        )
+    }
+})
+game.onUpdateInterval(500, function () {
+    spawn_enemy_wave()
+})

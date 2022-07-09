@@ -246,7 +246,7 @@ namespace custom {
     //% group="Spawn Waves"
     //% block="insert $count of $name into wave $wave"
     export function add_wave_data(wave: number = 0, count: number = 1, name:string, ): void {
-        while(spawn_waves.length < wave) {
+        while(spawn_waves.length <= wave) {
             spawn_waves.push([])
         }
         spawn_waves[wave].push({
