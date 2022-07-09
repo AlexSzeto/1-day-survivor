@@ -4,20 +4,13 @@ namespace SpriteKind {
     export const Molotov = SpriteKind.create()
     export const Explosion = SpriteKind.create()
     export const Aura = SpriteKind.create()
-    export const MiniMenu = SpriteKind.create()
 }
 namespace StatusBarKind {
     export const Experience = StatusBarKind.create()
 }
-controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
-	
-})
 sprites.onOverlap(SpriteKind.Explosion, SpriteKind.Enemy, function (sprite, otherSprite) {
     deal_enemy_damage(otherSprite, sprites.readDataNumber(sprite, "damage"))
     sprite.destroy()
-})
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    custom.set_game_state(GameState.menu)
 })
 scene.onHitWall(SpriteKind.Explosion, function (sprite, location) {
     sprite.destroy()
@@ -57,9 +50,6 @@ statusbars.onZero(StatusBarKind.Health, function (status) {
     	
     }
 })
-controller.A.onEvent(ControllerButtonEvent.Released, function () {
-    custom.set_game_state(GameState.normal)
-})
 function damage_enemies_in_aura (aura: Sprite) {
     for (let value2 of sprites.allOfKind(SpriteKind.Enemy)) {
         if (value2.overlapsWith(aura)) {
@@ -80,6 +70,22 @@ function setup_enemy (enemy: Sprite, name: string, health: number, damage: numbe
 scene.onHitWall(SpriteKind.Projectile, function (sprite, location) {
     sprite.destroy()
 })
+function pickup_upgrade (title: string) {
+    custom.set_game_state(GameState.menu)
+    scene.setBackgroundImage(assets.image`castle background`)
+    myMenu = miniMenu.createMenuFromArray(custom.convert_string_array_to_mini_menu_items(custom.get_upgrade_choices(4)))
+    myMenu.setTitle(title)
+    myMenu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, scene.screenWidth() - 20)
+    myMenu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, 80)
+    myMenu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
+    myMenu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
+    myMenu.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Padding, 4)
+    myMenu.setPosition(10, (scene.screenHeight() - myMenu.height) / 2)
+    myMenu.setFrame(assets.image`dark dialog frame`)
+    myMenu.onButtonPressed(controller.A, function (selection, selectedIndex) {
+        custom.get_upgrade(selection)
+    })
+}
 sprites.onDestroyed(SpriteKind.Explosion, function (sprite) {
     flame_weapon = sprites.create(assets.image`explosion`, SpriteKind.Visuals)
     flame_weapon.setPosition(sprite.x, sprite.y)
@@ -195,6 +201,7 @@ let spray_speed = 0
 let spray_spawn_count = 0
 let default_weapon_duration = 0
 let exploder_explosion_damage = 0
+let myMenu: miniMenu.MenuSprite = null
 let hero_health: StatusBarSprite = null
 let aura_tick_damage = 0
 let hero: Sprite = null
@@ -205,6 +212,7 @@ let flame_weapon: Sprite = null
 let new_enemy: Sprite = null
 let list: string[] = []
 setup_game()
+pickup_upgrade("Starting Weapon")
 game.onUpdate(function () {
     if (aura_spawn_count > 0) {
         aura_weapon.setPosition(hero.x, hero.y)

@@ -100,6 +100,17 @@ namespace custom {
         return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y))
     }
 
+
+    /**
+     * convert string list to mini menu items
+     * @param list list of menu item texts
+     */
+    //% group="Utility"
+    //% block="convert text array $list into mini menu items"
+    export function convert_string_array_to_mini_menu_items(list: string[]): miniMenu.MenuItem[] {
+        return list.map(text => miniMenu.createMenuItem(text))
+    }
+
     /**
      * move sprite just outside camera
      */
@@ -199,6 +210,11 @@ namespace custom {
     //% group="Game"
     //% block="set game state to $state"
     export function set_game_state(state: GameState): void {
+        if(current_game_state == GameState.normal && state == GameState.menu) {
+            game.pushScene()
+        } else if (current_game_state == GameState.menu && state == GameState.normal) {
+            game.popScene()
+        }
         current_game_state = state
     }
 
