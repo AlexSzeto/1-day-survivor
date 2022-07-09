@@ -1,0 +1,27 @@
+{
+    "image1": {
+        "data": "hwQQABAAAAAAAAAAAAAAAAAAgAgAAAAAAACAiAAAAAAAAACICAAAgAAAAIAIAICIAIAIgAiAiIgAiIiAiIiICICIiIiIiIgAgIiIiIiIiACAiIiAiIiICAAAAICICIiIAAAAgAgAAIgAAACACAAAgAAAAIAIAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "survivor"
+    },
+    "image2": {
+        "data": "hwQQABAAAAAAABABAAAAAAAAEBEAAAAAEBEREREAAAARABAREQEAABEBEQEQEQAAERERAAARAQAREREAABEBABEREQAAEREAEQEQARAREQAQABARERERARAREREBABEBAAAAEQEAEAEAAAARAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "ghost"
+    },
+    "image3": {
+        "data": "hwQQABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAiAgAAAAAAQkQkAAAAACBEVUUCAAAAIERVRQIAAAAiRFVFAgAAACJCRCQAAAAAIiAiAgAAACACAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "fireball"
+    },
+    "image4": {
+        "data": "hwQYABgAAAAAu7u7u7u7u7u7uwCwzczMzMzMzMzMvQvb3Lu7u7u7u7u73LvLvc3MzMzMzMzcy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLu8zMzMzMzMzMy7vLvc3MzMzMzMzcy7vb3Lu7u7u7u7u73LuwzczMzMzMzMzMvQsAu7u7u7u7u7u7uwA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "dark dialog frame"
+    },
+    "*": {
+        "mimeType": "image/x-mkcd-f4",
+        "dataEncoding": "base64",
+        "namespace": "myImages"
+    }
+}
