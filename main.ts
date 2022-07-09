@@ -6,9 +6,20 @@ namespace SpriteKind {
     export const Aura = SpriteKind.create()
     export const Pickup = SpriteKind.create()
     export const Treasure = SpriteKind.create()
+    export const UpgradeIcons = SpriteKind.create()
 }
 namespace StatusBarKind {
     export const Experience = StatusBarKind.create()
+}
+function get_random_upgrade (message: string) {
+    upgrade_list = custom.get_upgrade_choices(1)
+    if (upgrade_list.length > 0) {
+        next_upgrade = upgrade_list.pop()
+        game.setDialogFrame(assets.image`dark dialog frame`)
+        game.showLongText(message, DialogLayout.Bottom)
+        game.showLongText("You obtained " + next_upgrade, DialogLayout.Bottom)
+        perform_upgrade(custom.get_upgrade(next_upgrade))
+    }
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Pickup, function (sprite, otherSprite) {
     hero_xp.value += sprites.readDataNumber(otherSprite, "xp")
@@ -19,8 +30,8 @@ sprites.onOverlap(SpriteKind.Explosion, SpriteKind.Enemy, function (sprite, othe
     sprite.destroy()
 })
 function unpause_the_game () {
-    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
-        value.follow(hero, sprites.readDataNumber(value, "speed"))
+    for (let upgrade_icon of sprites.allOfKind(SpriteKind.Enemy)) {
+        upgrade_icon.follow(hero, sprites.readDataNumber(upgrade_icon, "speed"))
     }
     controller.moveSprite(hero)
     custom.set_game_state(GameState.normal)
@@ -28,8 +39,8 @@ function unpause_the_game () {
 function pause_the_game () {
     custom.set_game_state(GameState.menu)
     sprites.destroyAllSpritesOfKind(SpriteKind.Pickup)
-    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
-        value.follow(hero, 0)
+    for (let value2 of sprites.allOfKind(SpriteKind.Enemy)) {
+        value2.follow(hero, 0)
     }
     sprites.destroyAllSpritesOfKind(SpriteKind.Orbital)
     sprites.destroyAllSpritesOfKind(SpriteKind.Aura)
@@ -47,28 +58,24 @@ scene.onHitWall(SpriteKind.Explosion, function (sprite, location) {
 })
 function spawn_enemy_wave () {
     list = custom.get_wave_enemy_list()
-    for (let value of list) {
-        spawn_enemy(value)
+    for (let value3 of list) {
+        spawn_enemy(value3)
     }
     custom.advance_wave()
 }
 sprites.onDestroyed(SpriteKind.Molotov, function (sprite) {
     flame_weapon = sprites.create(assets.image`flame`, SpriteKind.Aura)
+    animation.runImageAnimation(
+    flame_weapon,
+    assets.animation`myAnim`,
+    150,
+    true
+    )
     flame_weapon.z = 25
     flame_weapon.setPosition(sprite.x, sprite.y)
     flame_weapon.lifespan = molotov_flame_duration
     sprites.setDataNumber(flame_weapon, "damage", molotov_tick_damage)
 })
-function get_random_upgrade (message: string) {
-    upgrade_list = custom.get_upgrade_choices(1)
-    if (upgrade_list.length > 0) {
-        next_upgrade = upgrade_list.pop()
-        game.setDialogFrame(assets.image`dark dialog frame`)
-        game.showLongText(message, DialogLayout.Bottom)
-        game.showLongText("You obtained " + next_upgrade, DialogLayout.Bottom)
-        perform_upgrade(custom.get_upgrade(next_upgrade))
-    }
-}
 function deal_enemy_damage (enemy: Sprite, damage: number) {
     sprites.changeDataNumberBy(enemy, "health", damage * -1)
     enemy.startEffect(effects.fire, 100)
@@ -78,7 +85,24 @@ function deal_enemy_damage (enemy: Sprite, damage: number) {
             sprites.setDataNumber(new_drop, "xp", 2)
             custom.move_sprite_on_top_of_another(new_drop, enemy)
         } else if (sprites.readDataNumber(enemy, "drop_type") == 2) {
-            new_drop = sprites.create(assets.image`xp gem`, SpriteKind.Pickup)
+            new_drop = sprites.create(img`
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                `, SpriteKind.Pickup)
             sprites.setDataNumber(new_drop, "xp", 4)
             custom.move_sprite_on_top_of_another(new_drop, enemy)
         } else {
@@ -106,7 +130,7 @@ function perform_upgrade (name: string) {
         exploder_spawn_count += 1
     } else if (name == "Bible") {
         orbit_spawn_count += 3
-    } else if (name == "Garlic") {
+    } else if (name == "Divine Aura") {
         aura_spawn_count += 1
         create_new_aura()
     } else if (name == "Holy Water") {
@@ -114,6 +138,7 @@ function perform_upgrade (name: string) {
     } else {
     	
     }
+    redraw_upgrades()
 }
 function choose_upgrade (title: string) {
     upgrade_list = custom.get_upgrade_choices(3)
@@ -124,7 +149,7 @@ function choose_upgrade (title: string) {
         upgrade_menu.setTitle(title)
         upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, scene.screenWidth() - 20)
         upgrade_menu.setFrame(assets.image`dark dialog frame`)
-        upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, 32 + 12 * upgrade_list.length)
+        upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, 32 + 14 * upgrade_list.length)
         upgrade_menu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
         upgrade_menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
         upgrade_menu.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Padding, 4)
@@ -162,8 +187,18 @@ function damage_enemies_in_aura (aura: Sprite) {
 scene.onHitWall(SpriteKind.Molotov, function (sprite, location) {
     sprite.destroy()
 })
+function redraw_upgrades () {
+    sprites.destroyAllSpritesOfKind(SpriteKind.UpgradeIcons)
+    icon_position = 7
+    for (let upgrade_icon2 of custom.get_obtained_upgrade_icons()) {
+        upgrade_icon_sprite = sprites.create(upgrade_icon2, SpriteKind.UpgradeIcons)
+        sprites.setDataNumber(upgrade_icon_sprite, "sx", icon_position)
+        sprites.setDataNumber(upgrade_icon_sprite, "sy", 7)
+        upgrade_icon_sprite.z = 1000
+        icon_position += 12
+    }
+}
 function setup_enemy (enemy: Sprite, name: string, health: number, damage: number, speed: number, drop_type: number) {
-    let value: Sprite = null
     sprites.setDataString(enemy, "name", name)
     sprites.setDataNumber(enemy, "health", health)
     sprites.setDataNumber(enemy, "damage", damage)
@@ -171,7 +206,7 @@ function setup_enemy (enemy: Sprite, name: string, health: number, damage: numbe
     sprites.setDataNumber(enemy, "speed", speed)
     enemy.follow(hero, speed)
     sprites.setDataBoolean(enemy, "boss", false)
-    sprites.setDataBoolean(value, "attack_cooldown", false)
+    sprites.setDataBoolean(enemy, "attack_cooldown", false)
     enemy.z = 50
 }
 function spawn_enemy (name: string) {
@@ -195,6 +230,12 @@ scene.onHitWall(SpriteKind.Projectile, function (sprite, location) {
 })
 sprites.onDestroyed(SpriteKind.Explosion, function (sprite) {
     flame_weapon = sprites.create(assets.image`explosion`, SpriteKind.Visuals)
+    animation.runImageAnimation(
+    flame_weapon,
+    assets.animation`explosion-anim`,
+    100,
+    false
+    )
     flame_weapon.setPosition(sprite.x, sprite.y)
     flame_weapon.lifespan = 500
     sprites.setDataNumber(flame_weapon, "damage", exploder_explosion_damage)
@@ -206,35 +247,35 @@ sprites.onOverlap(SpriteKind.Orbital, SpriteKind.Enemy, function (sprite, otherS
 })
 function create_upgrade_menu () {
     default_weapon_duration = 1000
-    custom.add_upgrade_to_list("Daggers", "throw 3 daggers")
-    spray_spawn_count = 0
+    custom.add_upgrade_to_list("Daggers", assets.image`icon-dagger`, "throw 3 daggers")
+spray_spawn_count = 0
     spray_speed = 120
     spray_firing_rate = 2000
     spray_damage = 10
-    custom.add_upgrade_to_list("Spark", "auto aim missile")
-    tracer_spawn_count = 0
+    custom.add_upgrade_to_list("Spark", assets.image`icon-spark`, "auto aim missile")
+tracer_spawn_count = 0
     tracer_speed = 100
     tracer_firing_rate = 1500
     tracer_damage = 8
-    custom.add_upgrade_to_list("Fireball", "explode on impact")
-    exploder_spawn_count = 0
+    custom.add_upgrade_to_list("Fireball", assets.image`icon-fireball`, "explode on impact")
+exploder_spawn_count = 0
     exploder_speed = 80
     exploder_firing_rate = 1500
     exploder_projectile_damage = 10
     exploder_explosion_damage = 10
-    custom.add_upgrade_to_list("Bible", "circles the player")
-    orbit_spawn_count = 0
+    custom.add_upgrade_to_list("Bible", assets.image`icon-bible`, "circles to protect")
+orbit_spawn_count = 0
     orbit_angular_speed = 6
     orbit_distance = 30
     orbit_duration = 3000
     orbit_refresh_rate = 5000
     orbit_damage = 10
-    custom.add_upgrade_to_list("Garlic", "damage aura")
-    aura_spawn_count = 0
+    custom.add_upgrade_to_list("Divine Aura", assets.image`icon-aura`, "damage aura")
+aura_spawn_count = 0
     aura_tick_rate = 500
     aura_tick_damage = 5
-    custom.add_upgrade_to_list("Holy Water", "toss and burn")
-    molotov_spawn_count = 0
+    custom.add_upgrade_to_list("Holy Water", assets.image`icon-water`, "toss and burn")
+molotov_spawn_count = 0
     molotov_speed = 100
     molotov_damage = 10
     molotov_duration_min = 300
@@ -332,6 +373,8 @@ let spray_speed = 0
 let default_weapon_duration = 0
 let exploder_explosion_damage = 0
 let new_enemy: Sprite = null
+let upgrade_icon_sprite: Sprite = null
+let icon_position = 0
 let hero_health: StatusBarSprite = null
 let aura_tick_damage = 0
 let aura_weapon: Sprite = null
@@ -343,16 +386,26 @@ let exploder_spawn_count = 0
 let tracer_spawn_count = 0
 let spray_spawn_count = 0
 let new_drop: Sprite = null
-let next_upgrade = ""
-let upgrade_list: string[] = []
 let molotov_tick_damage = 0
 let molotov_flame_duration = 0
 let flame_weapon: Sprite = null
 let list: string[] = []
 let hero: Sprite = null
 let hero_xp: StatusBarSprite = null
+let next_upgrade = ""
+let upgrade_list: string[] = []
 setup_game()
 choose_upgrade("Starting Weapon")
+game.onUpdate(function () {
+    for (let upgrade_icon_sprite2 of sprites.allOfKind(SpriteKind.UpgradeIcons)) {
+        custom.move_sprite_relative_to_camera(
+        upgrade_icon_sprite2,
+        sprites.readDataNumber(upgrade_icon_sprite2, "sx"),
+        sprites.readDataNumber(upgrade_icon_sprite2, "sy"),
+        hero
+        )
+    }
+})
 game.onUpdate(function () {
     for (let moving_orbital of sprites.allOfKind(SpriteKind.Orbital)) {
         sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed)
@@ -391,7 +444,7 @@ game.onUpdateInterval(aura_tick_rate, function () {
 })
 game.onUpdateInterval(molotov_firing_rate, function () {
     if (custom.game_state_is(GameState.normal) && molotov_spawn_count > 0) {
-        new_weapon = sprites.create(assets.image`molotov`, SpriteKind.Molotov)
+        new_weapon = sprites.create(assets.image`weapon-water`, SpriteKind.Molotov)
         new_weapon.lifespan = randint(molotov_duration_min, molotov_duration_max)
         custom.aim_projectile_at_angle(
         new_weapon,
@@ -406,7 +459,7 @@ game.onUpdateInterval(spray_firing_rate, function () {
     if (custom.game_state_is(GameState.normal) && spray_spawn_count > 0) {
         spray_angle = randint(0, 360)
         for (let index = 0; index < spray_spawn_count; index++) {
-            new_weapon = sprites.create(assets.image`dagger`, SpriteKind.Projectile)
+            new_weapon = sprites.create(assets.image`weapon-dagger`, SpriteKind.Projectile)
             custom.aim_projectile_at_angle(
             new_weapon,
             spray_angle,
@@ -427,13 +480,13 @@ game.onUpdateInterval(30000, function () {
     }
 })
 game.onUpdateInterval(500, function () {
-    if (custom.game_state_is(GameState.normal)) {
-        spawn_enemy_wave()
+    for (let value5 of sprites.allOfKind(SpriteKind.Enemy)) {
+        sprites.setDataBoolean(value5, "attack_cooldown", false)
     }
 })
 game.onUpdateInterval(500, function () {
-    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
-        sprites.setDataBoolean(value, "attack_cooldown", false)
+    if (custom.game_state_is(GameState.normal)) {
+        spawn_enemy_wave()
     }
 })
 game.onUpdateInterval(orbit_refresh_rate, function () {
@@ -464,7 +517,24 @@ game.onUpdateInterval(molotov_tick_rate, function () {
 })
 game.onUpdateInterval(tracer_firing_rate, function () {
     if (custom.game_state_is(GameState.normal) && tracer_spawn_count > 0) {
-        new_weapon = sprites.create(assets.image`tracer`, SpriteKind.Projectile)
+        new_weapon = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.Projectile)
         custom.aim_projectile_at_angle(
         new_weapon,
         randint(0, 360),
