@@ -31,7 +31,18 @@ namespace custom {
     const upgrade_master_list: UpgradeData[] = []
     const upgrades_obtained: UpgradeData[] = []
 
+    let max_basic_weapons: number = 3
     let current_game_state: GameState = GameState.normal
+
+
+    /**
+     * set maximum number of weapon types
+     */
+    //% group="Upgrades"
+    //% block="set maximum types of weapons to $num"
+    export function set_max_basic_weapons(num: number): void {
+        max_basic_weapons = num
+    }
 
     /**
      * add upgrade to the master list
@@ -57,8 +68,13 @@ namespace custom {
     //% blockId="get_upgrade_choices"
     //% block="list of eligible upgrades up to $max"
     export function get_upgrade_choices(max: number): string[] {
+        const basic_weapons_count = upgrades_obtained.reduce((count, upgrade) => !(upgrade.prerequisite) ? count + 1 : count, 0)
         const eligible_list = upgrade_master_list
-           .filter(upgrade => !(upgrade.prerequisite) || upgrades_obtained.some(existing_upgrade => existing_upgrade.name == upgrade.prerequisite))
+           .filter(upgrade =>
+                !(upgrade.prerequisite && basic_weapons_count < max_basic_weapons)
+                || upgrades_obtained.some(existing_upgrade => existing_upgrade.name == upgrade.prerequisite)
+            )
+        
         let choices: UpgradeData[] = []
 
         if (eligible_list.length <= max) {
@@ -223,11 +239,14 @@ namespace custom {
     //% group="Game"
     //% block="set game state to $state"
     export function set_game_state(state: GameState): void {
+        // no need to pause since we're eliminating all interactive sprites
+        /*
         if(current_game_state == GameState.normal && state == GameState.menu) {
             game.pushScene()
         } else if (current_game_state == GameState.menu && state == GameState.normal) {
             game.popScene()
         }
+        */
         current_game_state = state
     }
 
