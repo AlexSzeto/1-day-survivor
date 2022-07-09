@@ -5,6 +5,7 @@ namespace SpriteKind {
     export const Explosion = SpriteKind.create()
     export const Aura = SpriteKind.create()
     export const Pickup = SpriteKind.create()
+    export const Treasure = SpriteKind.create()
 }
 namespace StatusBarKind {
     export const Experience = StatusBarKind.create()
@@ -17,17 +18,37 @@ sprites.onOverlap(SpriteKind.Explosion, SpriteKind.Enemy, function (sprite, othe
     deal_enemy_damage(otherSprite, sprites.readDataNumber(sprite, "damage"))
     sprite.destroy()
 })
+function unpause_the_game () {
+    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
+        value.follow(hero, sprites.readDataNumber(value, "speed"))
+    }
+    controller.moveSprite(hero)
+    custom.set_game_state(GameState.normal)
+}
+function pause_the_game () {
+    custom.set_game_state(GameState.menu)
+    sprites.destroyAllSpritesOfKind(SpriteKind.Pickup)
+    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
+        value.follow(hero, 0)
+    }
+    sprites.destroyAllSpritesOfKind(SpriteKind.Orbital)
+    sprites.destroyAllSpritesOfKind(SpriteKind.Aura)
+    sprites.destroyAllSpritesOfKind(SpriteKind.Molotov)
+    sprites.destroyAllSpritesOfKind(SpriteKind.Explosion)
+    sprites.destroyAllSpritesOfKind(SpriteKind.Projectile)
+    controller.moveSprite(hero, 0, 0)
+}
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, otherSprite) {
+    get_random_upgrade("Congrats! You found a treasure!")
+    otherSprite.destroy()
+})
 scene.onHitWall(SpriteKind.Explosion, function (sprite, location) {
     sprite.destroy()
 })
 function spawn_enemy_wave () {
     list = custom.get_wave_enemy_list()
     for (let value of list) {
-        if (value == "zombie") {
-            new_enemy = sprites.create(assets.image`ghost`, SpriteKind.Enemy)
-            setup_enemy(new_enemy, value, 10, 1, 20, 1)
-            custom.move_sprite_off_camera(new_enemy)
-        }
+        spawn_enemy(value)
     }
     custom.advance_wave()
 }
@@ -53,13 +74,25 @@ function deal_enemy_damage (enemy: Sprite, damage: number) {
     enemy.startEffect(effects.fire, 100)
     if (sprites.readDataNumber(enemy, "health") <= 0) {
         if (sprites.readDataNumber(enemy, "drop_type") == 1) {
-            new_drop = sprites.create(assets.image`xp gem`, SpriteKind.Pickup)
-            sprites.setDataNumber(new_drop, "xp", 1)
+            new_drop = sprites.create(assets.image`blue gem`, SpriteKind.Pickup)
+            sprites.setDataNumber(new_drop, "xp", 2)
             custom.move_sprite_on_top_of_another(new_drop, enemy)
         } else if (sprites.readDataNumber(enemy, "drop_type") == 2) {
             new_drop = sprites.create(assets.image`xp gem`, SpriteKind.Pickup)
+            sprites.setDataNumber(new_drop, "xp", 4)
+            custom.move_sprite_on_top_of_another(new_drop, enemy)
         } else {
-        	
+            new_drop = sprites.create(assets.image`red gem`, SpriteKind.Pickup)
+            sprites.setDataNumber(new_drop, "xp", 8)
+            custom.aim_projectile_at_angle(
+            new_drop,
+            randint(0, 360),
+            AimType.position,
+            randint(10, 20),
+            enemy
+            )
+            new_drop = sprites.create(assets.image`treasure`, SpriteKind.Treasure)
+            custom.move_sprite_on_top_of_another(new_drop, enemy)
         }
         enemy.destroy()
     }
@@ -85,8 +118,7 @@ function perform_upgrade (name: string) {
 function choose_upgrade (title: string) {
     upgrade_list = custom.get_upgrade_choices(3)
     if (upgrade_list.length > 0) {
-        controller.moveSprite(hero, 0, 0)
-        custom.set_game_state(GameState.menu)
+        pause_the_game()
         upgrade_menu = miniMenu.createMenuFromArray(custom.convert_string_array_to_mini_menu_items(upgrade_list))
         upgrade_menu.z = 1000
         upgrade_menu.setTitle(title)
@@ -99,10 +131,9 @@ function choose_upgrade (title: string) {
         custom.move_sprite_on_top_of_another(upgrade_menu, hero)
         upgrade_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
             upgrade_menu.close()
-            custom.set_game_state(GameState.normal)
             next_upgrade = custom.get_upgrade(selection)
             perform_upgrade(next_upgrade)
-            controller.moveSprite(hero)
+            unpause_the_game()
         })
     }
 }
@@ -114,8 +145,6 @@ function create_new_aura () {
 statusbars.onStatusReached(StatusBarKind.Experience, statusbars.StatusComparison.GTE, statusbars.ComparisonType.Percentage, 100, function (status) {
     status.value = 0
     status.max += 10
-    sprites.destroyAllSpritesOfKind(SpriteKind.Pickup)
-    sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
     choose_upgrade("Pick Upgrade")
 })
 statusbars.onZero(StatusBarKind.Health, function (status) {
@@ -134,15 +163,32 @@ scene.onHitWall(SpriteKind.Molotov, function (sprite, location) {
     sprite.destroy()
 })
 function setup_enemy (enemy: Sprite, name: string, health: number, damage: number, speed: number, drop_type: number) {
+    let value: Sprite = null
     sprites.setDataString(enemy, "name", name)
     sprites.setDataNumber(enemy, "health", health)
     sprites.setDataNumber(enemy, "damage", damage)
     sprites.setDataNumber(enemy, "drop_type", drop_type)
+    sprites.setDataNumber(enemy, "speed", speed)
     enemy.follow(hero, speed)
+    sprites.setDataBoolean(enemy, "boss", false)
+    sprites.setDataBoolean(value, "attack_cooldown", false)
     enemy.z = 50
 }
-function spawn_boss (name: string) {
-	
+function spawn_enemy (name: string) {
+    if (name == "zombie") {
+        new_enemy = sprites.create(assets.image`zombie`, SpriteKind.Enemy)
+        setup_enemy(new_enemy, name, 10, 10, 20, 1)
+    } else if (name == "skeleton") {
+        new_enemy = sprites.create(assets.image`skeleton`, SpriteKind.Enemy)
+        setup_enemy(new_enemy, name, 20, 10, 30, 2)
+    } else if (name == "troll") {
+        new_enemy = sprites.create(assets.image`troll`, SpriteKind.Enemy)
+        setup_enemy(new_enemy, name, 150, 15, 25, 3)
+        sprites.setDataBoolean(new_enemy, "boss", true)
+    } else {
+    	
+    }
+    custom.move_sprite_off_camera(new_enemy)
 }
 scene.onHitWall(SpriteKind.Projectile, function (sprite, location) {
     sprite.destroy()
@@ -203,13 +249,16 @@ function create_enemy_waves () {
         custom.reset_wave_data()
         custom.add_wave_data(4, 2, "zombie")
     } else if (level_enemy_phase == 1) {
-        custom.add_wave_data(2, 2, "zombie")
+    	
     } else if (level_enemy_phase == 2) {
+        custom.add_wave_data(2, 2, "zombie")
+    } else if (level_enemy_phase == 3) {
         custom.add_wave_data(1, 1, "skeleton")
         custom.add_wave_data(3, 1, "skeleton")
-    } else if (level_enemy_phase == 3) {
+    } else if (level_enemy_phase == 4) {
         custom.reset_wave_data()
         custom.add_wave_data(4, 2, "zombie")
+        spawn_enemy("troll")
     } else {
     	
     }
@@ -222,8 +271,8 @@ function setup_game () {
     scene.cameraFollowSprite(hero)
     hero_health = statusbars.create(20, 4, StatusBarKind.Health)
     hero_health.attachToSprite(hero, 4, 0)
-    hero_health.max = 10
-    hero_health.value = 10
+    hero_health.max = 200
+    hero_health.value = 200
     hero_health.setColor(7, 2)
     hero_health.z = hero.z + 1
     hero_xp = statusbars.create(scene.screenWidth() - 40, 5, StatusBarKind.Experience)
@@ -245,8 +294,15 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, oth
     sprite.destroy()
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
-    hero_health.value += sprites.readDataNumber(otherSprite, "damage") * -1
-    otherSprite.destroy()
+    if (sprites.readDataBoolean(otherSprite, "boss")) {
+        if (!(sprites.readDataBoolean(otherSprite, "attack_cooldown"))) {
+            hero_health.value += sprites.readDataNumber(otherSprite, "damage") * -1
+            sprites.setDataBoolean(otherSprite, "attack_cooldown", true)
+        }
+    } else {
+        hero_health.value += sprites.readDataNumber(otherSprite, "damage") * -1
+        otherSprite.destroy()
+    }
 })
 let spawn_angle_spacing = 0
 let spray_angle = 0
@@ -275,11 +331,11 @@ let spray_firing_rate = 0
 let spray_speed = 0
 let default_weapon_duration = 0
 let exploder_explosion_damage = 0
+let new_enemy: Sprite = null
 let hero_health: StatusBarSprite = null
 let aura_tick_damage = 0
 let aura_weapon: Sprite = null
 let upgrade_menu: miniMenu.MenuSprite = null
-let hero: Sprite = null
 let molotov_spawn_count = 0
 let aura_spawn_count = 0
 let orbit_spawn_count = 0
@@ -292,8 +348,8 @@ let upgrade_list: string[] = []
 let molotov_tick_damage = 0
 let molotov_flame_duration = 0
 let flame_weapon: Sprite = null
-let new_enemy: Sprite = null
 let list: string[] = []
+let hero: Sprite = null
 let hero_xp: StatusBarSprite = null
 setup_game()
 choose_upgrade("Starting Weapon")
@@ -375,6 +431,11 @@ game.onUpdateInterval(500, function () {
         spawn_enemy_wave()
     }
 })
+game.onUpdateInterval(500, function () {
+    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
+        sprites.setDataBoolean(value, "attack_cooldown", false)
+    }
+})
 game.onUpdateInterval(orbit_refresh_rate, function () {
     if (custom.game_state_is(GameState.normal) && orbit_spawn_count > 0) {
         sprites.destroyAllSpritesOfKind(SpriteKind.Orbital)
@@ -397,8 +458,6 @@ game.onUpdateInterval(orbit_refresh_rate, function () {
 game.onUpdateInterval(molotov_tick_rate, function () {
     if (custom.game_state_is(GameState.normal) && molotov_spawn_count > 0) {
         for (let molotov_fire_weapon of sprites.allOfKind(SpriteKind.Aura)) {
-            console.log("molotov tick")
-            console.log(sprites.readDataNumber(molotov_fire_weapon, "damage"))
             damage_enemies_in_aura(molotov_fire_weapon)
         }
     }
