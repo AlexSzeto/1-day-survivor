@@ -41,6 +41,9 @@ sprites.onDestroyed(SpriteKind.Molotov, function (sprite) {
 function deal_enemy_damage (enemy: Sprite, damage: number) {
     sprites.changeDataNumberBy(enemy, "health", damage * -1)
     if (sprites.readDataNumber(enemy, "health") <= 0) {
+        new_drop = sprites.create(assets.image`xp gem`, SpriteKind.Pickup)
+        sprites.setDataNumber(new_drop, "xp", sprites.readDataNumber(enemy, "xp"))
+        custom.move_sprite_on_top_of_another(new_drop, enemy)
         enemy.destroy()
     }
 }
@@ -52,7 +55,7 @@ function perform_upgrade (name: string) {
     } else if (name == "Fireball") {
         exploder_spawn_count += 1
     } else if (name == "Bible") {
-        orbit_spawn_count += 1
+        orbit_spawn_count += 3
     } else if (name == "Garlic") {
         aura_spawn_count += 1
         create_new_aura()
@@ -63,26 +66,28 @@ function perform_upgrade (name: string) {
     }
 }
 function choose_upgrade (title: string) {
-    custom.set_game_state(GameState.menu)
-    scene.setBackgroundImage(assets.image`castle background`)
-    upgrade_menu = miniMenu.createMenuFromArray(custom.convert_string_array_to_mini_menu_items(custom.get_upgrade_choices(4)))
-    upgrade_menu.setTitle(title)
-    upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, scene.screenWidth() - 20)
-    upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, 80)
-    upgrade_menu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
-    upgrade_menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
-    upgrade_menu.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Padding, 4)
-    upgrade_menu.setPosition(10, (scene.screenHeight() - upgrade_menu.height) / 2)
-    upgrade_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
-        next_upgrade = custom.get_upgrade(selection)
-        perform_upgrade(next_upgrade)
-        custom.set_game_state(GameState.normal)
-    })
+    upgrade_list = custom.get_upgrade_choices(4)
+    if (upgrade_list.length > 0) {
+        custom.set_game_state(GameState.menu)
+        scene.setBackgroundImage(assets.image`castle background`)
+        upgrade_menu = miniMenu.createMenuFromArray(custom.convert_string_array_to_mini_menu_items(upgrade_list))
+        upgrade_menu.setTitle(title)
+        upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, scene.screenWidth() - 20)
+        upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, 80)
+        upgrade_menu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
+        upgrade_menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
+        upgrade_menu.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Padding, 4)
+        upgrade_menu.setPosition(10, (scene.screenHeight() - upgrade_menu.height) / 2)
+        upgrade_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
+            custom.set_game_state(GameState.normal)
+            next_upgrade = custom.get_upgrade(selection)
+            perform_upgrade(next_upgrade)
+        })
+    }
 }
 function create_new_aura () {
     aura_weapon = sprites.create(assets.image`aura`, SpriteKind.Visuals)
-    aura_weapon.setPosition(hero.x, hero.y)
-    aura_weapon.z = hero.z - 2
+    custom.move_sprite_on_top_of_another(aura_weapon, hero)
     sprites.setDataNumber(aura_weapon, "damage", aura_tick_damage)
 }
 statusbars.onStatusReached(StatusBarKind.Experience, statusbars.StatusComparison.GTE, statusbars.ComparisonType.Percentage, 100, function (status) {
@@ -123,11 +128,6 @@ sprites.onDestroyed(SpriteKind.Explosion, function (sprite) {
     sprites.setDataNumber(flame_weapon, "damage", exploder_explosion_damage)
     damage_enemies_in_aura(flame_weapon)
 })
-sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
-    new_drop = sprites.create(assets.image`xp gem`, SpriteKind.Pickup)
-    sprites.setDataNumber(new_drop, "xp", sprites.readDataNumber(sprite, "xp"))
-    custom.move_sprite_on_top_of_another(new_drop, sprite)
-})
 sprites.onOverlap(SpriteKind.Orbital, SpriteKind.Enemy, function (sprite, otherSprite) {
     deal_enemy_damage(otherSprite, sprites.readDataNumber(sprite, "damage"))
     sprite.destroy()
@@ -136,25 +136,25 @@ function create_upgrade_menu () {
     default_weapon_duration = 1000
     custom.add_upgrade_to_list("Daggers", "throw 3 daggers")
     spray_spawn_count = 0
-    spray_speed = 100
-    spray_firing_rate = 500
+    spray_speed = 80
+    spray_firing_rate = 2000
     spray_damage = 10
     custom.add_upgrade_to_list("Spark", "auto aim missile")
     tracer_spawn_count = 0
     tracer_speed = 100
-    tracer_firing_rate = 500
+    tracer_firing_rate = 1500
     tracer_damage = 10
     custom.add_upgrade_to_list("Fireball", "explode on impact")
     exploder_spawn_count = 0
-    exploder_speed = 100
+    exploder_speed = 80
     exploder_firing_rate = 1000
     exploder_projectile_damage = 10
-    exploder_explosion_damage = 10
+    exploder_explosion_damage = 5
     custom.add_upgrade_to_list("Bible", "circles the player")
     orbit_spawn_count = 0
     orbit_angular_speed = 5
     orbit_distance = 30
-    orbit_duration = 2000
+    orbit_duration = 2500
     orbit_refresh_rate = 5000
     orbit_damage = 10
     custom.add_upgrade_to_list("Garlic", "damage aura")
@@ -174,7 +174,7 @@ function create_upgrade_menu () {
 }
 function create_enemy_waves () {
     custom.reset_wave_data()
-    custom.add_wave_data(4, 5, "zombie")
+    custom.add_wave_data(4, 2, "zombie")
 }
 function setup_game () {
     tiles.setCurrentTilemap(tilemap`dungeon`)
@@ -233,7 +233,6 @@ let spray_damage = 0
 let spray_firing_rate = 0
 let spray_speed = 0
 let default_weapon_duration = 0
-let new_drop: Sprite = null
 let exploder_explosion_damage = 0
 let hero_health: StatusBarSprite = null
 let aura_tick_damage = 0
@@ -241,12 +240,14 @@ let hero: Sprite = null
 let aura_weapon: Sprite = null
 let next_upgrade = ""
 let upgrade_menu: miniMenu.MenuSprite = null
+let upgrade_list: string[] = []
 let molotov_spawn_count = 0
 let aura_spawn_count = 0
 let orbit_spawn_count = 0
 let exploder_spawn_count = 0
 let tracer_spawn_count = 0
 let spray_spawn_count = 0
+let new_drop: Sprite = null
 let molotov_tick_damage = 0
 let molotov_flame_duration = 0
 let flame_weapon: Sprite = null
@@ -254,7 +255,19 @@ let new_enemy: Sprite = null
 let list: string[] = []
 let hero_xp: StatusBarSprite = null
 setup_game()
-perform_upgrade(custom.get_upgrade("Daggers"))
+perform_upgrade(custom.get_upgrade("Spark"))
+game.onUpdate(function () {
+    for (let moving_orbital of sprites.allOfKind(SpriteKind.Orbital)) {
+        sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed)
+        custom.aim_projectile_at_angle(
+        moving_orbital,
+        sprites.readDataNumber(moving_orbital, "angle"),
+        AimType.position,
+        orbit_distance,
+        hero
+        )
+    }
+})
 game.onUpdate(function () {
     if (aura_spawn_count > 0) {
         aura_weapon.setPosition(hero.x, hero.y)
@@ -272,18 +285,6 @@ game.onUpdateInterval(exploder_firing_rate, function () {
         )
         new_weapon.lifespan = default_weapon_duration
         sprites.setDataNumber(new_weapon, "damage", exploder_projectile_damage)
-    }
-})
-game.onUpdateInterval(50, function () {
-    for (let moving_orbital of sprites.allOfKind(SpriteKind.Orbital)) {
-        sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed)
-        custom.aim_projectile_at_angle(
-        moving_orbital,
-        sprites.readDataNumber(moving_orbital, "angle"),
-        AimType.position,
-        orbit_distance,
-        hero
-        )
     }
 })
 game.onUpdateInterval(aura_tick_rate, function () {
