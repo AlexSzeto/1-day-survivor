@@ -11,6 +11,8 @@ namespace SpriteKind {
 namespace StatusBarKind {
     export const Experience = StatusBarKind.create()
 }
+const MAX_DROPS = 8
+const MAX_ENEMIES = 8
 function get_random_upgrade (message: string) {
     upgrade_list = custom.get_upgrade_choices(1)
     if (upgrade_list.length > 0) {
@@ -77,6 +79,10 @@ sprites.onDestroyed(SpriteKind.Molotov, function (sprite) {
     sprites.setDataNumber(flame_weapon, "damage", molotov_tick_damage)
 })
 function deal_enemy_damage (enemy: Sprite, damage: number) {
+    const drops:Sprite[] = sprites.allOfKind(SpriteKind.Pickup)
+    if(drops.length >= MAX_DROPS) {
+        drops.reduce((farthest, drop) => custom.get_distance_between(drop, hero) > custom.get_distance_between(farthest, hero) ? drop : farthest, drops[0]).destroy()
+    }
     sprites.changeDataNumberBy(enemy, "health", damage * -1)
     if (sprites.readDataNumber(enemy, "health") <= 0) {
         if (sprites.readDataNumber(enemy, "drop_type") == 1) {
@@ -86,10 +92,9 @@ function deal_enemy_damage (enemy: Sprite, damage: number) {
             custom.move_sprite_on_top_of_another(new_drop, enemy)
         } else if (sprites.readDataNumber(enemy, "drop_type") == 2) {
             new_drop = sprites.create(assets.image`green gem`, SpriteKind.Pickup)
-            new_drop.lifespan = 15000
             sprites.setDataNumber(new_drop, "xp", 4)
             custom.move_sprite_on_top_of_another(new_drop, enemy)
-        } else {
+        } else if (sprites.readDataNumber(enemy, "drop_type") == 3) {
             new_drop = sprites.create(assets.image`red gem`, SpriteKind.Pickup)
             sprites.setDataNumber(new_drop, "xp", 8)
             custom.aim_projectile_at_angle(
@@ -200,11 +205,19 @@ function setup_enemy (enemy: Sprite, name: string, health: number, damage: numbe
     enemy.z = 50
 }
 function spawn_enemy (name: string) {
-    const spawn_normal = sprites.allOfKind(SpriteKind.Enemy).length < 20
-    if (name == "zombie" && spawn_normal) {
+    const enemies: Sprite[] = sprites.allOfKind(SpriteKind.Enemy)
+    if (enemies.length >= MAX_ENEMIES) {
+        const destroy_candidate = enemies.reduce((farthest, target) => custom.get_distance_between(target, hero) > custom.get_distance_between(farthest, hero) ? target : farthest, enemies[0])
+        if(sprites.readDataBoolean(destroy_candidate, "boss")) {
+            custom.move_sprite_off_camera(destroy_candidate)
+        } else {
+            destroy_candidate.destroy()
+        }
+    }
+    if (name == "zombie") {
         new_enemy = sprites.create(assets.image`zombie`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 10, 10, 20, 1)
-    } else if (name == "skeleton" && spawn_normal) {
+    } else if (name == "skeleton") {
         new_enemy = sprites.create(assets.image`skeleton`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 20, 10, 30, 2)
     } else if (name == "troll") {
@@ -476,8 +489,6 @@ game.onUpdateInterval(500, function () {
     if (custom.game_state_is(GameState.normal)) {
         spawn_enemy_wave()
     }
-})
-game.onUpdateInterval(500, function () {
     for (let value5 of sprites.allOfKind(SpriteKind.Enemy)) {
         sprites.setDataBoolean(value5, "attack_cooldown", false)
     }
