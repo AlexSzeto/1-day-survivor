@@ -240,12 +240,12 @@ function create_upgrade_menu () {
 spray_spawn_count = 0
     spray_speed = 120
     spray_firing_rate = 2000
-    spray_damage = 10
+    spray_damage = 12
     custom.add_upgrade_to_list("Spark", assets.image`icon-spark`, "auto aim missile")
 tracer_spawn_count = 0
     tracer_speed = 100
     tracer_firing_rate = 1500
-    tracer_damage = 8
+    tracer_damage = 10
     custom.add_upgrade_to_list("Fireball", assets.image`icon-fireball`, "explode on impact")
 exploder_spawn_count = 0
     exploder_speed = 80
@@ -258,7 +258,7 @@ orbit_spawn_count = 0
     orbit_distance = 30
     orbit_duration = 3000
     orbit_refresh_rate = 5000
-    orbit_damage = 10
+    orbit_damage = 15
     custom.add_upgrade_to_list("Divine Aura", assets.image`icon-aura`, "damage aura")
 aura_spawn_count = 0
     aura_tick_rate = 500
