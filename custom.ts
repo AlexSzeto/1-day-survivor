@@ -34,7 +34,7 @@ namespace custom {
     const upgrades_obtained: UpgradeData[] = []
 
     let max_basic_weapons: number = 3
-    let current_game_state: GameState = GameState.normal
+    let current_game_state: GameState = GameState.setup
 
 
     /**
