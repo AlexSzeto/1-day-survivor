@@ -296,6 +296,12 @@ function create_enemy_waves () {
 function setup_game () {
     tiles.setCurrentTilemap(tilemap`dungeon`)
     hero = sprites.create(assets.image`survivor`, SpriteKind.Player)
+    animation.runImageAnimation(
+    hero,
+    assets.animation`hero-anim`,
+    400,
+    true
+    )
     hero.z = 100
     tiles.placeOnRandomTile(hero, sprites.dungeon.floorLightMoss)
     scene.cameraFollowSprite(hero)
