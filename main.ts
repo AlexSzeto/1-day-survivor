@@ -13,16 +13,20 @@ namespace StatusBarKind {
 }
 const MAX_DROPS = 8
 const MAX_ENEMIES = 8
+
+
 function get_random_upgrade (message: string) {
-    upgrade_list = custom.get_upgrade_choices(1)
+    let upgrade_list = custom.get_upgrade_choices(1)
     if (upgrade_list.length > 0) {
-        next_upgrade = upgrade_list.pop()
+        let next_upgrade = upgrade_list.pop()
         game.setDialogFrame(assets.image`dark dialog frame`)
         game.showLongText(message, DialogLayout.Bottom)
         game.showLongText("You obtained " + next_upgrade, DialogLayout.Bottom)
         perform_upgrade(custom.get_upgrade(next_upgrade))
     }
 }
+
+
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Pickup, function (sprite, otherSprite) {
     hero_xp.value += sprites.readDataNumber(otherSprite, "xp")
     otherSprite.destroy()
@@ -59,14 +63,14 @@ scene.onHitWall(SpriteKind.Explosion, function (sprite, location) {
     sprite.destroy()
 })
 function spawn_enemy_wave () {
-    list = custom.get_wave_enemy_list()
-    for (let value3 of list) {
-        spawn_enemy(value3)
+    let list = custom.get_wave_enemy_list()
+    for (let next_enemy of list) {
+        spawn_enemy(next_enemy)
     }
     custom.advance_wave()
 }
 sprites.onDestroyed(SpriteKind.Molotov, function (sprite) {
-    flame_weapon = sprites.create(assets.image`area32x32`, SpriteKind.Aura)
+    let flame_weapon = sprites.create(assets.image`area32x32`, SpriteKind.Aura)
     animation.runImageAnimation(
     flame_weapon,
     assets.animation`myAnim`,
@@ -80,6 +84,7 @@ sprites.onDestroyed(SpriteKind.Molotov, function (sprite) {
 })
 function deal_enemy_damage (enemy: Sprite, damage: number) {
     const drops:Sprite[] = sprites.allOfKind(SpriteKind.Pickup)
+    let new_drop:Sprite = null
     if(drops.length >= MAX_DROPS) {
         drops.reduce((farthest, drop) => custom.get_distance_between(drop, hero) > custom.get_distance_between(farthest, hero) ? drop : farthest, drops[0]).destroy()
     }
@@ -130,7 +135,7 @@ function perform_upgrade (name: string) {
     redraw_upgrades()
 }
 function choose_upgrade (title: string) {
-    upgrade_list = custom.get_upgrade_choices(3)
+    let upgrade_list = custom.get_upgrade_choices(3)
     if (upgrade_list.length > 0) {
         pause_the_game()
         upgrade_menu = miniMenu.createMenuFromArray(custom.convert_string_array_to_mini_menu_items(upgrade_list))
@@ -145,7 +150,7 @@ function choose_upgrade (title: string) {
         custom.move_sprite_on_top_of_another(upgrade_menu, hero)
         upgrade_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
             upgrade_menu.close()
-            next_upgrade = custom.get_upgrade(selection)
+            let next_upgrade = custom.get_upgrade(selection)
             perform_upgrade(next_upgrade)
             unpause_the_game()
         })
@@ -153,6 +158,7 @@ function choose_upgrade (title: string) {
 }
 function create_new_aura () {
     aura_weapon = sprites.create(assets.image`area32x32`, SpriteKind.Visuals)
+    aura_weapon.z = hero.z
     animation.runImageAnimation(
     aura_weapon,
     assets.animation`divine-aura`,
@@ -233,7 +239,7 @@ scene.onHitWall(SpriteKind.Projectile, function (sprite, location) {
     sprite.destroy()
 })
 sprites.onDestroyed(SpriteKind.Explosion, function (sprite) {
-    flame_weapon = sprites.create(assets.image`area32x32`, SpriteKind.Visuals)
+    let flame_weapon = sprites.create(assets.image`area32x32`, SpriteKind.Visuals)
     animation.runImageAnimation(
     flame_weapon,
     assets.animation`explosion-anim`,
@@ -249,7 +255,7 @@ sprites.onOverlap(SpriteKind.Orbital, SpriteKind.Enemy, function (sprite, otherS
     deal_enemy_damage(otherSprite, sprites.readDataNumber(sprite, "damage"))
     sprite.destroy()
 })
-function create_upgrade_menu () {
+function setup_upgrade_menu () {
     default_weapon_duration = 1000
     custom.add_upgrade_to_list("Daggers", assets.image`icon-dagger`, "throw 3 daggers")
 spray_spawn_count = 0
@@ -335,7 +341,7 @@ function setup_game () {
     hero_xp.setColor(9, 15)
     hero_xp.setStatusBarFlag(StatusBarFlag.SmoothTransition, false)
     controller.moveSprite(hero)
-    create_upgrade_menu()
+    setup_upgrade_menu()
     level_enemy_phase = 0
     create_enemy_waves()
     custom.set_game_state(GameState.normal)
@@ -355,9 +361,6 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
         otherSprite.destroy()
     }
 })
-let spawn_angle_spacing = 0
-let spray_angle = 0
-let new_weapon: Sprite = null
 let level_enemy_phase = 0
 let molotov_tick_rate = 0
 let molotov_firing_rate = 0
@@ -395,17 +398,15 @@ let orbit_spawn_count = 0
 let exploder_spawn_count = 0
 let tracer_spawn_count = 0
 let spray_spawn_count = 0
-let new_drop: Sprite = null
 let molotov_tick_damage = 0
 let molotov_flame_duration = 0
-let flame_weapon: Sprite = null
-let list: string[] = []
 let hero: Sprite = null
 let hero_xp: StatusBarSprite = null
-let next_upgrade = ""
-let upgrade_list: string[] = []
+
 setup_game()
 choose_upgrade("Starting Weapon")
+
+
 game.onUpdate(function () {
     for (let upgrade_icon_sprite2 of sprites.allOfKind(SpriteKind.UpgradeIcons)) {
         custom.move_sprite_relative_to_camera(
@@ -431,7 +432,7 @@ game.onUpdate(function () {
 })
 game.onUpdateInterval(exploder_firing_rate, function () {
     if (custom.game_state_is(GameState.normal) && exploder_spawn_count > 0) {
-        new_weapon = sprites.create(assets.image`fireball`, SpriteKind.Explosion)
+        let new_weapon = sprites.create(assets.image`fireball`, SpriteKind.Explosion)
         custom.aim_projectile_at_angle(
         new_weapon,
         randint(0, 360),
@@ -450,7 +451,7 @@ game.onUpdateInterval(aura_tick_rate, function () {
 })
 game.onUpdateInterval(molotov_firing_rate, function () {
     if (custom.game_state_is(GameState.normal) && molotov_spawn_count > 0) {
-        new_weapon = sprites.create(assets.image`weapon-water`, SpriteKind.Molotov)
+        let new_weapon = sprites.create(assets.image`weapon-water`, SpriteKind.Molotov)
         new_weapon.lifespan = randint(molotov_duration_min, molotov_duration_max)
         custom.aim_projectile_at_angle(
         new_weapon,
@@ -463,9 +464,9 @@ game.onUpdateInterval(molotov_firing_rate, function () {
 })
 game.onUpdateInterval(spray_firing_rate, function () {
     if (custom.game_state_is(GameState.normal) && spray_spawn_count > 0) {
-        spray_angle = randint(0, 360)
+        let spray_angle = randint(0, 360)
         for (let index = 0; index < spray_spawn_count; index++) {
-            new_weapon = sprites.create(assets.image`weapon-dagger`, SpriteKind.Projectile)
+            let new_weapon = sprites.create(assets.image`weapon-dagger`, SpriteKind.Projectile)
             custom.aim_projectile_at_angle(
             new_weapon,
             spray_angle,
@@ -496,11 +497,11 @@ game.onUpdateInterval(500, function () {
 game.onUpdateInterval(orbit_refresh_rate, function () {
     if (custom.game_state_is(GameState.normal) && orbit_spawn_count > 0) {
         sprites.destroyAllSpritesOfKind(SpriteKind.Orbital)
-        spawn_angle_spacing = 360 / orbit_spawn_count
-        for (let index2 = 0; index2 <= orbit_spawn_count - 1; index2++) {
-            new_weapon = sprites.create(assets.image`weapon-bible`, SpriteKind.Orbital)
+        let spawn_angle_spacing = 360 / orbit_spawn_count
+        for (let orbit = 0; orbit <= orbit_spawn_count - 1; orbit++) {
+            let new_weapon = sprites.create(assets.image`weapon-bible`, SpriteKind.Orbital)
             new_weapon.lifespan = orbit_duration
-            sprites.setDataNumber(new_weapon, "angle", spawn_angle_spacing * index2)
+            sprites.setDataNumber(new_weapon, "angle", spawn_angle_spacing * orbit)
             custom.aim_projectile_at_angle(
             new_weapon,
             sprites.readDataNumber(new_weapon, "angle"),
@@ -521,7 +522,7 @@ game.onUpdateInterval(molotov_tick_rate, function () {
 })
 game.onUpdateInterval(tracer_firing_rate, function () {
     if (custom.game_state_is(GameState.normal) && tracer_spawn_count > 0) {
-        new_weapon = sprites.create(assets.image`spark`, SpriteKind.Projectile)
+        let new_weapon = sprites.create(assets.image`spark`, SpriteKind.Projectile)
         new_weapon.startEffect(effects.trail)
         custom.aim_projectile_at_angle(
         new_weapon,
