@@ -78,14 +78,15 @@ sprites.onDestroyed(SpriteKind.Molotov, function (sprite) {
 })
 function deal_enemy_damage (enemy: Sprite, damage: number) {
     sprites.changeDataNumberBy(enemy, "health", damage * -1)
-    enemy.startEffect(effects.fire, 100)
     if (sprites.readDataNumber(enemy, "health") <= 0) {
         if (sprites.readDataNumber(enemy, "drop_type") == 1) {
             new_drop = sprites.create(assets.image`blue gem`, SpriteKind.Pickup)
+            new_drop.lifespan = 8000
             sprites.setDataNumber(new_drop, "xp", 2)
             custom.move_sprite_on_top_of_another(new_drop, enemy)
         } else if (sprites.readDataNumber(enemy, "drop_type") == 2) {
-            new_drop = sprites.create(assets.image`area32x32`, SpriteKind.Pickup)
+            new_drop = sprites.create(assets.image`green gem`, SpriteKind.Pickup)
+            new_drop.lifespan = 15000
             sprites.setDataNumber(new_drop, "xp", 4)
             custom.move_sprite_on_top_of_another(new_drop, enemy)
         } else {
@@ -199,10 +200,11 @@ function setup_enemy (enemy: Sprite, name: string, health: number, damage: numbe
     enemy.z = 50
 }
 function spawn_enemy (name: string) {
-    if (name == "zombie") {
+    const spawn_normal = sprites.allOfKind(SpriteKind.Enemy).length < 20
+    if (name == "zombie" && spawn_normal) {
         new_enemy = sprites.create(assets.image`zombie`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 10, 10, 20, 1)
-    } else if (name == "skeleton") {
+    } else if (name == "skeleton" && spawn_normal) {
         new_enemy = sprites.create(assets.image`skeleton`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 20, 10, 30, 2)
     } else if (name == "troll") {
@@ -400,8 +402,6 @@ game.onUpdate(function () {
         hero
         )
     }
-})
-game.onUpdate(function () {
     for (let moving_orbital of sprites.allOfKind(SpriteKind.Orbital)) {
         sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed)
         custom.aim_projectile_at_angle(
@@ -412,8 +412,6 @@ game.onUpdate(function () {
         hero
         )
     }
-})
-game.onUpdate(function () {
     if (aura_spawn_count > 0) {
         aura_weapon.setPosition(hero.x, hero.y)
     }
