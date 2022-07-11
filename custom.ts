@@ -41,20 +41,11 @@ namespace custom {
     const upgrades_obtained: UpgradeData[] = []
 
     let max_basic_weapons: number = 3
+    let max_basic_armors: number = 3
     let current_game_state: GameState = GameState.setup
 
-    let spawn_waves: WaveData[] = []
+    let spawn_waves: WaveData[] = [[],[],[],[],[]]
     let current_wave: number = 0
-
-
-    /**
-     * set maximum number of weapon types
-     */
-    //% group="Upgrades"
-    //% block="set maximum types of weapons to $num"
-    export function set_max_basic_weapons(num: number): void {
-        max_basic_weapons = num
-    }
 
     /**
      * add upgrade to the master list
@@ -83,10 +74,12 @@ namespace custom {
     //% blockId="get_upgrade_choices"
     //% block="list of eligible upgrades up to $max"
     export function get_upgrade_choices(max: number): string[] {
-        const basic_weapons_count = upgrades_obtained.reduce((count, upgrade) => !(upgrade.prerequisite) ? count + 1 : count, 0)
+        const basic_weapons_count = upgrades_obtained.reduce((count, upgrade) => (upgrade.prerequisite == "Weapon") ? count + 1 : count, 0)
+        const basic_armors_count = upgrades_obtained.reduce((count, upgrade) => (upgrade.prerequisite == "Armor") ? count + 1 : count, 0)
         const eligible_list = upgrades_available_list
            .filter(upgrade =>
-                (!(upgrade.prerequisite) && basic_weapons_count < max_basic_weapons)
+                ((upgrade.prerequisite == "Weapon") && basic_weapons_count < max_basic_weapons)
+               || ((upgrade.prerequisite == "Armor") && basic_armors_count < max_basic_armors)
                 || upgrades_obtained.some(existing_upgrade => existing_upgrade.name == upgrade.prerequisite)
             )
         
@@ -114,7 +107,9 @@ namespace custom {
     //% group="Upgrades"
     //% block="icon list for obtained upgrades"
     export function get_obtained_upgrade_icons(): Image[] {
-        return upgrades_obtained.map(upgrade => get_upgrade_icon(upgrade.name))
+        return upgrades_obtained
+            .filter(upgrade => upgrade.prerequisite == "Weapon" || upgrade.prerequisite == "Armor")
+            .map(upgrade => get_upgrade_icon(upgrade.name))
     }
     
     /**
@@ -313,7 +308,7 @@ namespace custom {
     //% group="Spawn Waves"
     //% block="reset spawn wave data"
     export function reset_wave_data(): void {
-        spawn_waves = []
+        spawn_waves = [[], [], [], [], []]
         current_wave = 0
     }
 
@@ -322,10 +317,8 @@ namespace custom {
      */
     //% group="Spawn Waves"
     //% block="insert $count of $name into wave $wave"
-    export function add_wave_data(wave: number = 0, count: number = 1, name:string, ): void {
-        while(spawn_waves.length <= wave) {
-            spawn_waves.push([])
-        }
+    export function add_wave_data(wave: number = 1, count: number = 1, name:string, ): void {
+        wave-= 1
         spawn_waves[wave].push({
             name,
             count

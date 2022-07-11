@@ -53,10 +53,12 @@ let molotov_damage = 0
 let molotov_speed = 0
 let molotov_tick_damage = 0
 let molotov_flame_duration = 0
+let molotov_flame_scale = 0
 
 let aura_spawn_count = 0
 let aura_aoe_tick: TickTracking = start_tick_track(aura_aoe)
 let aura_tick_damage = 0
+let aura_scale = 0
 
 let orbit_spawn_count = 0
 let orbit_spawn_tick: TickTracking = start_tick_track(spawn_orbit)
@@ -71,6 +73,7 @@ let exploder_spawn_tick: TickTracking = start_tick_track(spawn_exploder)
 let exploder_projectile_damage = 0
 let exploder_speed = 0
 let exploder_explosion_damage = 0
+let exploder_explosion_scale = 0
 
 let tracer_spawn_count = 0
 let tracer_spawn_tick: TickTracking = start_tick_track(spawn_tracer)
@@ -83,7 +86,7 @@ let spray_damage = 0
 let spray_speed = 0
 
 let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave)
-enemy_spawn_tick.rate = 2
+enemy_spawn_tick.rate = 4
 let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase)
 enemy_phase_tick.rate = 120
 let enemy_phase = 0
@@ -133,22 +136,180 @@ function choose_upgrade(title: string) {
     }
 }
 
-function perform_upgrade(name: string) {
-    if (name == "Daggers") {
-        spray_spawn_count += 3
-    } else if (name == "Spark") {
-        tracer_spawn_count += 1
-    } else if (name == "Fireball") {
-        exploder_spawn_count += 1
-    } else if (name == "Bible") {
-        orbit_spawn_count += 3
-    } else if (name == "Divine Aura") {
-        aura_spawn_count += 1
-        create_new_aura()
-    } else if (name == "Holy Water") {
-        molotov_spawn_count += 1
-    } else {
+// CONTAINS GAME DESIGN
+function setup_upgrade_menu() {
+    custom.add_upgrade_to_list("Daggers", assets.image`icon-dagger`, "throw 3 daggers", "Weapon")
+    spray_spawn_count = 0
+    spray_speed = 120
+    spray_spawn_tick.rate = 8
+    spray_damage = 12
+    custom.add_upgrade_to_list("Daggers 2", assets.image`icon-dagger`, "+50% damage", "Daggers")
+    custom.add_upgrade_to_list("Daggers 3", assets.image`icon-dagger`, "+1 dagger", "Daggers 2")
+    custom.add_upgrade_to_list("Daggers 4", assets.image`icon-dagger`, "+50% speed", "Daggers 3")
+    custom.add_upgrade_to_list("Daggers 5", assets.image`icon-dagger`, "+1 dagger", "Daggers 4")
 
+    custom.add_upgrade_to_list("Spark", assets.image`icon-spark`, "auto aim missile", "Weapon")
+    tracer_spawn_count = 0
+    tracer_speed = 100
+    tracer_spawn_tick.rate = 6
+    tracer_damage = 10
+    custom.add_upgrade_to_list("Spark 2", assets.image`icon-spark`, "+50% speed", "Spark")
+    custom.add_upgrade_to_list("Spark 3", assets.image`icon-spark`, "x2 attacks", "Spark 2")
+    custom.add_upgrade_to_list("Spark 4", assets.image`icon-spark`, "+50% damage", "Spark 3")
+    custom.add_upgrade_to_list("Spark 5", assets.image`icon-spark`, "+1 spark", "Spark 4")
+
+    custom.add_upgrade_to_list("Fireball", assets.image`icon-fireball`, "explode on impact", "Weapon")
+    exploder_spawn_count = 0
+    exploder_speed = 80
+    exploder_spawn_tick.rate = 6
+    exploder_projectile_damage = 10
+    exploder_explosion_damage = 10
+    exploder_explosion_scale = 1.0
+    custom.add_upgrade_to_list("Fireball 2", assets.image`icon-fireball`, "+25% radius", "Fireball")
+    custom.add_upgrade_to_list("Fireball 3", assets.image`icon-fireball`, "+100% damage", "Fireball 2")
+    custom.add_upgrade_to_list("Fireball 4", assets.image`icon-fireball`, "+% radius", "Fireball 3")
+    custom.add_upgrade_to_list("Fireball 5", assets.image`icon-fireball`, "x2 attacks", "Fireball 4")
+
+    custom.add_upgrade_to_list("Bible", assets.image`icon-bible`, "circles to protect", "Weapon")
+    orbit_spawn_count = 0
+    orbit_spawn_tick.rate = 20
+    orbit_angular_speed = 6
+    orbit_distance = 30
+    orbit_duration = 3000
+    orbit_damage = 16
+    custom.add_upgrade_to_list("Bible 2", assets.image`icon-bible`, "+25% damage", "Bible")
+    custom.add_upgrade_to_list("Bible 3", assets.image`icon-bible`, "+2 book", "Bible 2")
+    custom.add_upgrade_to_list("Bible 4", assets.image`icon-bible`, "+50% speed", "Bible 3")
+    custom.add_upgrade_to_list("Bible 5", assets.image`icon-bible`, "x2 attacks", "Bible 4")
+
+    custom.add_upgrade_to_list("Divine Aura", assets.image`icon-aura`, "damage aura", "Weapon")
+    aura_spawn_count = 0
+    aura_aoe_tick.rate = 2
+    aura_tick_damage = 4
+    aura_scale = 1.0
+    custom.add_upgrade_to_list("Divine Aura 2", assets.image`icon-aura`, "+50% damage", "Divine Aura")
+    custom.add_upgrade_to_list("Divine Aura 3", assets.image`icon-aura`, "+25% radius", "Divine Aura 2")
+    custom.add_upgrade_to_list("Divine Aura 4", assets.image`icon-aura`, "+50% damage", "Divine Aura 3")
+    custom.add_upgrade_to_list("Divine Aura 5", assets.image`icon-aura`, "x2 attacks", "Divine Aura 4")
+
+    custom.add_upgrade_to_list("Holy Water", assets.image`icon-water`, "toss and burn", "Weapon")
+    molotov_spawn_count = 0
+    molotov_speed = 100
+    molotov_damage = 10
+    molotov_duration_min = 300
+    molotov_duration_max = 700
+    molotov_flame_duration = 5000
+    molotov_spawn_tick.rate = 32
+    molotov_aoe_tick.rate = 2
+    molotov_tick_damage = 6
+    molotov_flame_scale = 1.0
+    custom.add_upgrade_to_list("Holy Water 2", assets.image`icon-water`, "+25% damage", "Holy Water")
+    custom.add_upgrade_to_list("Holy Water 3", assets.image`icon-water`, "+50% duration", "Holy Water 2")
+    custom.add_upgrade_to_list("Holy Water 4", assets.image`icon-water`, "x2 attacks", "Holy Water 3")
+    custom.add_upgrade_to_list("Holy Water 5", assets.image`icon-water`, "+1 vial", "Holy Water 4")
+}
+
+// CONTAINS GAME DESIGN
+function perform_upgrade(name: string) {
+    switch(name) {
+        case "Daggers":
+            spray_spawn_count += 3
+            break
+        case "Daggers 2":
+            spray_damage *= 1.5
+            break
+        case "Daggers 3":
+            spray_spawn_count += 1
+            break
+        case "Daggers 4":
+            spray_speed *= 1.5
+            break
+        case "Daggers 5":
+            spray_spawn_count += 1
+            break
+
+        case "Spark":
+            tracer_spawn_count += 1
+            break
+        case "Spark 2":
+            tracer_speed *= 1.5
+            break
+        case "Spark 3":
+            tracer_spawn_tick.rate *= 0.5
+            break
+        case "Spark 4":
+            tracer_damage *= 1.5
+            break
+        case "Spark 5":
+            tracer_spawn_count += 1
+            break
+
+        case "Fireball":
+            exploder_spawn_count += 1
+            break
+        case "Fireball 2":
+            exploder_explosion_scale += 0.25
+            break
+        case "Fireball 3":
+            exploder_projectile_damage *= 2
+            exploder_explosion_damage *= 2
+            break
+        case "Fireball 4":
+            exploder_explosion_scale += 0.25
+            break
+        case "Fireball 5":
+            exploder_spawn_tick.rate *= 0.5
+            break
+
+        case "Bible":
+            orbit_spawn_count += 3
+            break
+        case "Bible 2":
+            orbit_damage *= 1.25
+            break
+        case "Bible 3":
+            orbit_spawn_count += 2
+            break
+        case "Bible 4":
+            orbit_angular_speed *= 1.5
+            break
+        case "Bible 5":
+            orbit_spawn_tick.rate *= 0.5
+            break
+
+        case "Divine Aura":
+            aura_spawn_count += 1
+            create_new_aura()
+            break
+        case "Divine Aura 2":
+            aura_tick_damage *= 1.5
+            break
+        case "Divine Aura 3":
+            aura_scale += 0.25
+            adjust_aura_scale()
+            break
+        case "Divine Aura 4":
+            aura_tick_damage *= 1.5
+            break
+        case "Divine Aura 5":
+            aura_aoe_tick.rate *= 0.5
+            break
+
+        case "Holy Water":
+            molotov_spawn_count += 1
+            break
+        case "Holy Water 2":
+            molotov_damage *= 1.25
+            break
+        case "Holy Water 3":
+            molotov_flame_duration *= 1.5
+            break
+        case "Holy Water 4":
+            molotov_aoe_tick.rate *= 0.5
+            break
+        case "Holy Water 5":
+            molotov_spawn_count += 1
+            break
     }
     redraw_upgrades()
 }
@@ -171,7 +332,7 @@ HERO EVENTS
 
 statusbars.onStatusReached(StatusBarKind.Experience, statusbars.StatusComparison.GTE, statusbars.ComparisonType.Percentage, 100, function (status) {
     status.value = 0
-    status.max += 10
+    status.max = Math.floor(status.max * 1.5)
     choose_upgrade("Pick Upgrade")
 })
 
@@ -184,36 +345,25 @@ statusbars.onZero(StatusBarKind.Health, function (status) {
 /*
 ENEMY SPAWNING
 */
+// CONTAINS GAME DESIGN
 function setup_enemy_phase() {
-    if (enemy_phase == 0) {
-        custom.reset_wave_data()
-        custom.add_wave_data(4, 2, "zombie")
-    } else if (enemy_phase == 1) {
-
-    } else if (enemy_phase == 2) {
-        custom.add_wave_data(2, 2, "zombie")
-    } else if (enemy_phase == 3) {
-        custom.add_wave_data(1, 1, "skeleton")
-        custom.add_wave_data(3, 1, "skeleton")
-    } else if (enemy_phase == 4) {
-        custom.reset_wave_data()
-        custom.add_wave_data(4, 2, "zombie")
-        spawn_enemy("troll")
-    } else {
-
+    switch(enemy_phase) {
+        case 0:
+            custom.reset_wave_data()
+            custom.add_wave_data(2, 2, "zombie")
+            break
+        case 1:
+            custom.add_wave_data(4, 2, "zombie")
+            break
+        case 2:
+            custom.add_wave_data(3, 1, "skeleton")
+            break
+        case 3:
+            custom.reset_wave_data()
+            custom.add_wave_data(3, 2, "zombie")
+            spawn_enemy("troll")
+            break
     }
-}
-
-function setup_enemy(enemy: Sprite, name: string, health: number, damage: number, speed: number, drop_type: number) {
-    sprites.setDataString(enemy, "name", name)
-    sprites.setDataNumber(enemy, "health", health)
-    sprites.setDataNumber(enemy, "damage", damage)
-    sprites.setDataNumber(enemy, "drop_type", drop_type)
-    sprites.setDataNumber(enemy, "speed", speed)
-    enemy.follow(hero, speed)
-    sprites.setDataBoolean(enemy, "boss", false)
-    sprites.setDataBoolean(enemy, "attack_cooldown", false)
-    enemy.z = 50
 }
 
 function spawn_enemy(name: string) {
@@ -227,6 +377,7 @@ function spawn_enemy(name: string) {
         }
     }
 
+    // CONTAINS GAME DESIGN
     let new_enemy: Sprite = null
     if (name == "zombie") {
         new_enemy = sprites.create(assets.image`zombie`, SpriteKind.Enemy)
@@ -242,6 +393,18 @@ function spawn_enemy(name: string) {
 
     }
     custom.move_sprite_off_camera(new_enemy)
+}
+
+function setup_enemy(enemy: Sprite, name: string, health: number, damage: number, speed: number, drop_type: number) {
+    sprites.setDataString(enemy, "name", name)
+    sprites.setDataNumber(enemy, "health", health)
+    sprites.setDataNumber(enemy, "damage", damage)
+    sprites.setDataNumber(enemy, "drop_type", drop_type)
+    sprites.setDataNumber(enemy, "speed", speed)
+    enemy.follow(hero, speed)
+    sprites.setDataBoolean(enemy, "boss", false)
+    sprites.setDataBoolean(enemy, "attack_cooldown", false)
+    enemy.z = 50
 }
 
 /*
@@ -283,51 +446,6 @@ scene.onHitWall(SpriteKind.Explosive, function (sprite, location) {
 /*
 GAME SETUP
 */
-
-function setup_upgrade_menu () {
-    custom.add_upgrade_to_list("Daggers", assets.image`icon-dagger`, "throw 3 daggers")
-    spray_spawn_count = 0
-    spray_speed = 120
-    spray_spawn_tick.rate = 8
-    spray_damage = 12
-
-    custom.add_upgrade_to_list("Spark", assets.image`icon-spark`, "auto aim missile")
-    tracer_spawn_count = 0
-    tracer_speed = 100
-    tracer_spawn_tick.rate = 6
-    tracer_damage = 10
-
-    custom.add_upgrade_to_list("Fireball", assets.image`icon-fireball`, "explode on impact")
-    exploder_spawn_count = 0
-    exploder_speed = 80
-    exploder_spawn_tick.rate = 6
-    exploder_projectile_damage = 10
-    exploder_explosion_damage = 10
-
-    custom.add_upgrade_to_list("Bible", assets.image`icon-bible`, "circles to protect")
-    orbit_spawn_count = 0
-    orbit_spawn_tick.rate = 20
-    orbit_angular_speed = 6
-    orbit_distance = 30
-    orbit_duration = 3000
-    orbit_damage = 15
-
-    custom.add_upgrade_to_list("Divine Aura", assets.image`icon-aura`, "damage aura")
-    aura_spawn_count = 0
-    aura_aoe_tick.rate = 2
-    aura_tick_damage = 4
-
-    custom.add_upgrade_to_list("Holy Water", assets.image`icon-water`, "toss and burn")
-    molotov_spawn_count = 0
-    molotov_speed = 100
-    molotov_damage = 10
-    molotov_duration_min = 300
-    molotov_duration_max = 700
-    molotov_flame_duration = 5000
-    molotov_spawn_tick.rate = 32
-    molotov_aoe_tick.rate = 2
-    molotov_tick_damage = 5
-}
 
 function setup_game () {
     tiles.setCurrentTilemap(tilemap`dungeon`)
@@ -428,6 +546,7 @@ function deal_enemy_damage(enemy: Sprite, damage: number) {
 function create_new_aura() {
     aura_weapon = sprites.create(assets.image`area32x32`, SpriteKind.NonInteractive)
     aura_weapon.z = hero.z
+    aura_weapon.scale = aura_scale
     animation.runImageAnimation(
         aura_weapon,
         assets.animation`divine-aura`,
@@ -444,6 +563,10 @@ function damage_enemies_in_aura(aura: Sprite) {
             deal_enemy_damage(aura_target, sprites.readDataNumber(aura, "damage"))
         }
     }
+}
+
+function adjust_aura_scale() {
+    aura_weapon.scale = aura_scale
 }
 
 /*
@@ -470,6 +593,7 @@ sprites.onDestroyed(SpriteKind.Molotov, function (sprite) {
     )
     flame_weapon.z = 25
     flame_weapon.setPosition(sprite.x, sprite.y)
+    flame_weapon.scale = molotov_flame_scale
     flame_weapon.lifespan = molotov_flame_duration
     sprites.setDataNumber(flame_weapon, "damage", molotov_tick_damage)
 })
@@ -488,6 +612,7 @@ sprites.onDestroyed(SpriteKind.Explosive, function (sprite) {
         false
     )
     flame_weapon.setPosition(sprite.x, sprite.y)
+    flame_weapon.scale = exploder_explosion_scale
     flame_weapon.lifespan = 500
     sprites.setDataNumber(flame_weapon, "damage", exploder_explosion_damage)
     damage_enemies_in_aura(flame_weapon)
@@ -508,7 +633,7 @@ TICK EVENTS
 */
 
 function spawn_exploder() {
-    if (exploder_spawn_count > 0) {
+    for (let index = 0; index < exploder_spawn_count; index++) {
         let new_weapon = sprites.create(assets.image`fireball`, SpriteKind.Explosive)
         custom.aim_projectile_at_angle(
         new_weapon,
@@ -529,7 +654,7 @@ function aura_aoe() {
 }
 
 function spawn_molotov() {
-    if (molotov_spawn_count > 0) {
+    for (let index = 0; index < molotov_spawn_count; index++) {
         let new_weapon = sprites.create(assets.image`weapon-water`, SpriteKind.Molotov)
         new_weapon.lifespan = randint(molotov_duration_min, molotov_duration_max)
         custom.aim_projectile_at_angle(
@@ -543,26 +668,25 @@ function spawn_molotov() {
 }
 
 function spawn_spray() {
-    if (spray_spawn_count > 0) {
-        let spray_angle = randint(0, 360)
-        for (let index = 0; index < spray_spawn_count; index++) {
-            let new_weapon = sprites.create(assets.image`weapon-dagger`, SpriteKind.Projectile)
-            custom.aim_projectile_at_angle(
-            new_weapon,
-            spray_angle,
-            AimType.velocity,
-            spray_speed,
-            hero
-            )
-            new_weapon.lifespan = DEFAULT_WEAPON_LIFESPAN
-            sprites.setDataNumber(new_weapon, "damage", spray_damage)
-            spray_angle += 15
-        }
+    let spray_angle = randint(0, 360)
+    for (let index = 0; index < spray_spawn_count; index++) {
+        let new_weapon = sprites.create(assets.image`weapon-dagger`, SpriteKind.Projectile)
+        custom.aim_projectile_at_angle(
+        new_weapon,
+        spray_angle,
+        AimType.velocity,
+        spray_speed,
+        hero
+        )
+        new_weapon.lifespan = DEFAULT_WEAPON_LIFESPAN
+        sprites.setDataNumber(new_weapon, "damage", spray_damage)
+        spray_angle += 15
     }
 }
 
 
 function spawn_orbit() {
+    // this check is necessary to prevent a divided by 0 error
     if (orbit_spawn_count > 0) {
         sprites.destroyAllSpritesOfKind(SpriteKind.Orbital)
         let spawn_angle_spacing = 360 / orbit_spawn_count
@@ -591,7 +715,7 @@ function molotov_aoe() {
 }
 
 function spawn_tracer() {
-    if (tracer_spawn_count > 0) {
+    for (let index=0; index < tracer_spawn_count; index++) {
         let new_weapon = sprites.create(assets.image`spark`, SpriteKind.Projectile)
         new_weapon.startEffect(effects.trail)
         custom.aim_projectile_at_angle(
