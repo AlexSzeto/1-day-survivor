@@ -238,27 +238,6 @@ c a b 3 3 3 3 3 3 3 b b a a c c
 . c a a a a a a a a a a c c c . 
 . . c c c c c c c c c c c c . . 
 `;
-            case "image2":
-            case "zombie":return img`
-. . . . 8 8 8 8 8 8 . . . . 
-. . . 8 6 7 7 7 7 6 8 . . . 
-. . 8 6 7 7 7 7 7 7 6 8 . . 
-. . 8 6 c c 7 7 c c 6 8 . . 
-. . 8 c 2 4 7 7 4 2 c 8 . . 
-. . c 6 6 7 7 7 7 6 6 c . . 
-. . c 6 7 7 2 2 7 7 6 c . . 
-. . f c 6 7 6 6 7 6 c f . . 
-. 8 8 8 8 6 6 6 6 8 8 8 8 . 
-8 7 7 7 8 e e e e 8 7 7 7 8 
-8 7 7 6 8 4 4 4 4 8 6 7 7 8 
-f 6 6 8 c 4 b b 4 c 8 6 6 f 
-. f f c c 4 e e 4 c c f f . 
-. . . . c e b b e c . . . . 
-. . . . c 4 b c e c . . . . 
-. . . . c e e c 6 c . . . . 
-. . . . 8 7 7 8 6 8 . . . . 
-. . . . 8 8 8 8 8 8 . . . . 
-`;
             case "image1":
             case "hero":return img`
 ...ffaaaafffff..
@@ -321,33 +300,6 @@ f86668f866999966688c....
 .......fff8ff88ff.......
 ........................
 `;
-            case "image9":
-            case "king-slime":return img`
-................................
-...................ee......ee...
-...................e1eccc.e4e...
-..............ccccce14ecce14e...
-...........cccaaaaaee5ee1154e...
-.........ccabb3bbbbae1511554ec..
-.......ccab333333bbab5555554ecc.
-......cb3333333333babbb55555eeee
-.....cb33333333333bbabdbb551115e
-....cb333111333333bbbabddbbbb4e.
-...cb33311111333333bbbacddaccc..
-..ca333111111333333bbbbaccccccc.
-..cb3311111113333333bbbbaaccccc.
-.ca3331111113333333333bbbaaaaccc
-.ca333111113333333333333bbbaaccc
-caab33311133333333333333bbbaaacc
-caab3333333333333333333bbbbaaacc
-caaab333333333333333333bbbbaaacc
-ccaaa33333333333333333bbbbaaaacc
-cccaaaa3333333333333bbbbbaaaaccc
-ccccaaaa33333bbbbbbbbbbaaaaccccc
-.cccccaaaaaaaaaaaaaaaaaaacccccc.
-..cccccccccccccccccccccccccccc..
-...cccccccccccccccccccccccccc...
-`;
             case "image10":
             case "ghost":return img`
 . . . . c c c c c c . . . . 
@@ -368,27 +320,6 @@ b d 1 b c 1 1 1 1 c b 1 d b
 . . . c d 1 1 1 d c . . . . 
 . . . . c b d d d d c . . . 
 . . . . . c c c c c c c . . 
-`;
-            case "image11":
-            case "fire-zombie":return img`
-. . . . a a a a a a . . . . 
-. . . a 2 4 4 4 4 2 a . . . 
-. . a 2 4 4 4 4 4 4 2 a . . 
-. . a 2 2 2 4 4 2 2 2 a . . 
-. . a a 5 1 4 4 1 5 a a . . 
-. . c 2 4 4 4 4 4 4 2 c . . 
-. . c 2 4 4 5 5 4 4 2 c . . 
-. . f c 2 4 4 4 4 2 c f . . 
-. a a a a 2 2 2 2 a a a a . 
-a 4 4 4 a b c c b a 4 4 4 a 
-a 4 4 2 a d b b b a 2 4 4 a 
-f 2 2 a a b d d d a a 2 2 f 
-. f f c 2 f b d d d f f f . 
-. . . c a 4 f b d d c . . . 
-. . . c a 4 a f b b c . . . 
-. . . a 2 4 2 a f f a . . . 
-. . . a 2 2 2 c 2 2 c . . . 
-. . . . a a a c a c . . . . 
 `;
             case "image7":
             case "captain":return img`
@@ -471,30 +402,120 @@ e4b4f455e41154e.
 ................................
 ................................
 `;
+            case "image9":
+            case "slime-king":return img`
+................................
+...................ee......ee...
+...................e1eccc.e4e...
+..............ccccce14ecce14e...
+...........cccaaaaaee5ee1154e...
+.........ccabb3bbbbae1511554ec..
+.......ccab333333bbab5555554ecc.
+......cb3333333333babbb55555eeee
+.....cb33333333333bbabdbb551115e
+....cb333111333333bbbabddbbbb4e.
+...cb33311111333333bbbacddaccc..
+..ca333111111333333bbbbaccccccc.
+..cb3311111113333333bbbbaaccccc.
+.ca3331111113333333333bbbaaaaccc
+.ca333111113333333333333bbbaaccc
+caab33311133333333333333bbbaaacc
+caab3333333333333333333bbbbaaacc
+caaab333333333333333333bbbbaaacc
+ccaaa33333333333333333bbbbaaaacc
+cccaaaa3333333333333bbbbbaaaaccc
+ccccaaaa33333bbbbbbbbbbaaaaccccc
+.cccccaaaaaaaaaaaaaaaaaaacccccc.
+..cccccccccccccccccccccccccccc..
+...cccccccccccccccccccccccccc...
+`;
+            case "image11":
+            case "lava-zombie":return img`
+. . . . a a a a a a . . . . 
+. . . a 2 4 4 4 4 2 a . . . 
+. . a 2 4 4 4 4 4 4 2 a . . 
+. . a 2 2 2 4 4 2 2 2 a . . 
+. . a a 5 1 4 4 1 5 a a . . 
+. . c 2 4 4 4 4 4 4 2 c . . 
+. . c 2 4 4 5 5 4 4 2 c . . 
+. . f c 2 4 4 4 4 2 c f . . 
+. a a a a 2 2 2 2 a a a a . 
+a 4 4 4 a b c c b a 4 4 4 a 
+a 4 4 2 a d b b b a 2 4 4 a 
+f 2 2 a a b d d d a a 2 2 f 
+. f f c 2 f b d d d f f f . 
+. . . c a 4 f b d d c . . . 
+. . . c a 4 a f b b c . . . 
+. . . a 2 4 2 a f f a . . . 
+. . . a 2 2 2 c 2 2 c . . . 
+. . . . a a a c a c . . . . 
+`;
+            case "image26":
+            case "mourner":return img`
+. . . . . a a a a a a . . . . . 
+. . . . a 3 3 3 3 3 3 a . . . . 
+a . . a 3 3 1 1 1 1 3 3 a . . a 
+3 c . a 3 c c 1 1 c c 3 a . a 3 
+a c . a 3 1 1 1 1 1 1 3 a . a c 
+. . . a 3 1 1 c c 1 1 3 a . . . 
+. c c a 3 1 a 1 1 a 1 3 a c c . 
+. a 1 c 3 1 1 1 1 1 1 3 c 1 a . 
+. a 3 1 c 3 1 1 1 1 3 c 1 3 a . 
+. c a 3 1 c 3 3 3 3 c 1 3 a c . 
+. . c a 3 1 a a a a 1 3 a c . . 
+. . . c a 3 1 1 1 3 3 a c . . . 
+. . . . c a 3 1 1 3 a c . . . . 
+. . . c a 3 1 1 1 3 a c . . . . 
+. . . c a 3 1 1 1 1 a . . . . . 
+. . . . c a 3 1 1 1 a . . . . . 
+. . . . . c a 3 3 3 a c . . . . 
+. . . . . . c c c c c c c . . . 
+`;
             case "image16":
-            case "skeleton":return img`
+            case "skeleton-mage":return img`
 ..ac...eeeeee.....
 .a3ac.ed1111de....
 .caaceb111111be...
-..cc.cb111111bc...
-..54.cbce11ecbc...
-..ec.fd241142df...
-..ec.fb11ee11bf...
+..cc.cbd1111dbc...
+..54.cbcb11bcbc...
+..ec.fd421124df...
+..ec.fb11ce11bf...
 ..ec..cbddddbc....
 ..ec..fd1111df....
 ..ecee.fbbbbf.....
-..cc1dcd1ff1dcc...
-..c11dc1bceb1ce...
-..cddcd11ce11dce..
-...cccdbbeebbdce..
-...ef.ceecceeccdc.
-...ef.68896888cec.
-...ef.86999688cc..
+..cc1dcccffccfc...
+..c11df1dbed1fe...
+..cddc1bb1dbb1ce..
+...ccfd1dbed1dfe..
+...effcbb1dbbcfdc.
+...ef.c1dbed1ccec.
+...ef.8cc99cc8cc..
 ...ec.886996888...
 ......8c8668dc8...
 ......e1c8f1de8...
 ......f1dcf1df....
 .......fff.ff.....
+`;
+            case "image2":
+            case "zombie":return img`
+. . . . 8 8 8 8 8 8 . . . . 
+. . . 8 6 7 7 7 7 6 8 . . . 
+. . 8 6 7 7 7 7 7 7 6 8 . . 
+. . 8 6 c c 7 7 c c 6 8 . . 
+. . 8 c 2 4 7 7 4 2 c 8 . . 
+. . c 6 6 7 7 7 7 6 6 c . . 
+. . c 6 7 7 2 2 7 7 6 c . . 
+. . f c 6 7 6 6 7 6 c f . . 
+. 8 8 8 8 6 6 6 6 8 8 8 8 . 
+8 7 7 7 8 e e e e 8 7 7 7 8 
+8 7 7 6 8 e 4 4 e 8 6 7 7 8 
+f 6 6 8 c 4 4 4 4 e 8 6 6 f 
+. f f c c b b b b c c f f . 
+. . . c b 4 4 e e b c . . . 
+. . . c c e e c c 6 c . . . 
+. . . c 7 c c 8 7 6 c . . . 
+. . . c 7 7 6 8 6 6 c . . . 
+. . . . c 8 8 8 8 c . . . . 
 `;
         }
         return null;

@@ -84,11 +84,6 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "slime"
     },
-    "image2": {
-        "data": "hwQOABIAAAAAAAAAgPgAAAAAAAAAAAAAeGcPAAAAAAAAiMj8eGcPAAAAAACAZmzGeIYMAAAAAABox2JniMjMzIgAAAB4x3R35kTk5IcAAAB4d3di5rS+64cAAAB4d3di5rS+zIgAAAB4x3R35kTkboYAAABox2JniMjMzIgAAACAZmzGeIYMAAAAAAAAiMj8eGcPAAAAAAAAAAAAeGcPAAAAAAAAAAAAgPgAAAAAAAA=",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "zombie"
-    },
     "image1": {
         "data": "hwQQABQAAAAA8P8PAAAAAAAAAAAAv6r6AIiACAAAAADwqvv/z5jYhAAAAACvqvre7pxGhAAAAACv+u8bPfj//IhOAADKur//PZ9pboZOAADKrPvd3ZSGlYnOAACqzOrd3ZSGlekEAACqyq//PZ9pbuYEAADPyu8bPfj//OgMAADPjP7e7mzWhAAAAAD/zOj+z2hIhAAAAAAv////AIiACAAAAACPoqr4DwAAAAAAAADwzMz/AAAAAAAAAAAA//8AAAAAAAAAAAA=",
         "mimeType": "image/x-mkcd-f4",
@@ -99,20 +94,10 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "troll"
     },
-    "image9": {
-        "data": "hwQgABgAAAAAAAAAAAAAwMzMDAAAAAAAAADArKrMzAAAAAAAAMCsqqrKzAwAAAAAAKw7s6uqzMwAAAAAwDszM7OqyswAAAAAvDMzMzOjyswAAADAOzMRMTOjqswAAAC8MxMRETMzqswAAAA8MxERETMzo8wAAMA6ExERETMzo8wAAMA7ExERMTMzo8wAAKwzExERMzMzo8wAALwzMxExMzMzo8wAALwzMzMzMzMzq8wAwDozMzMzMzMzq8wAwLozMzMzMzMzq8wAwLozMzMzMzMzq8wAwLo7MzMzMzMzq8wAwLq7uzMzMzMzq8zg7q6qu7szMzMzq8zgEe67urs7MzOzq8wAThW1q7s7MzOzq8wA7F61vbq7MzO7q8wAzB5V26y7M7u7qswAzBFV2826u7u7qswA4FFVtc2qu7uryswAHlVVtcqsu7uqyszgRERUscysqqqqzMzg7u7uscysqqqqzMwAAMDsQczMrKrKzAwAAADs5cDMzMzMzAAAAADgDgDAzMzMDAA=",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "king-slime"
-    },
     "image10": {
         "data": "hwQOABIAAAAAAADMuwAAAAAAAAAAAAAc0QwAAAAAAAAAzMy7EcvADAAAAADA3d3dvLvczQAAAADcHdwRwd0b0QwAAADcERwREdsREcsAAADcEREkEtsREc0AAADcEREkEtsREc0AAADcERwREdsR3c0AAADcHdwRwd29y80AAADA3d3dvLvMAMwAAAAAzMy7EcsAAMAAAAAAAAAc0QwAAAAAAAAAAADMuwAAAAAAAAA=",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "ghost"
-    },
-    "image11": {
-        "data": "hwQOABIAAAAAAAAAoPoAAAAAAAAAAAAASiQPAAAAAAAAqsr8SiQPAAAAAACgIirCSqLMrAoAAAAqJEUkqqqiKqIAAABKJEFEsr1PRKIAAABKRERFwtv7KqIAAABKRERFwtu9r8wAAABKJEFEstvd+6IAAAAqJEUkqqrd+8IAAACgIirCSqLPrAwAAAAAqsr8SiQPAAAAAAAAAAAASiQPAAAAAAAAAAAAoPoAAAAAAAA=",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "fire-zombie"
     },
     "image7": {
         "data": "hwQQABQAAAAAAAAAhgAAAAAAAABARETubmgIAAAAAABUFRFRRRiJqsoPAADg7u7ubpiJKiLyAADAZsiMhv+IiIj4AABsGYEWYSzKZoaGAACcEYFsEcaiHIGBAACYERHIlsYinIGJAACYmZnIhoj4nMn/AACcmYlsaGamb4aGAABsGYHWmBGZ9miGAADAZshmmJmZ9oz4AAAAzMz/mJmZ9iL6AAAAAAAAaGamL6r6AAAAAAAAgP//yvwPAAAAAAAAAAAAAAAAAAA=",
@@ -129,10 +114,30 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "area32x32"
     },
-    "image16": {
-        "data": "hwQSABYAAAAAAAAAAAAAAAAAAACgDAAAAAAAAAAAAAA6yuXu7swMAAAAAACsysTMzBzN7u4AAADADAAA4BHN/88AAAAAzvwP4N3MAAAAAADgu9vLD8zdbIjoDwDeESyx/R2xjoYc8QAeEU7RsbGxjmnI/QAeERHesc/snJmG/AAeERHese/ubJn2DwAeEU7RsbGxjmYY8QDeESyx/R2xjojd/QDgu9vLD8zdjIjsDwAAzvwPAOzMzIyIAAAAAAAAAADu7QwAAAAAAAAAAAAAzAAAAAAAAAAAAAAAAAAAAAA=",
+    "image9": {
+        "data": "hwQgABgAAAAAAAAAAAAAwMzMDAAAAAAAAADArKrMzAAAAAAAAMCsqqrKzAwAAAAAAKw7s6uqzMwAAAAAwDszM7OqyswAAAAAvDMzMzOjyswAAADAOzMRMTOjqswAAAC8MxMRETMzqswAAAA8MxERETMzo8wAAMA6ExERETMzo8wAAMA7ExERMTMzo8wAAKwzExERMzMzo8wAALwzMxExMzMzo8wAALwzMzMzMzMzq8wAwDozMzMzMzMzq8wAwLozMzMzMzMzq8wAwLozMzMzMzMzq8wAwLo7MzMzMzMzq8wAwLq7uzMzMzMzq8zg7q6qu7szMzMzq8zgEe67urs7MzOzq8wAThW1q7s7MzOzq8wA7F61vbq7MzO7q8wAzB5V26y7M7u7qswAzBFV2826u7u7qswA4FFVtc2qu7uryswAHlVVtcqsu7uqyszgRERUscysqqqqzMzg7u7uscysqqqqzMwAAMDsQczMrKrKzAwAAADs5cDMzMzMzAAAAADgDgDAzMzMDAA=",
         "mimeType": "image/x-mkcd-f4",
-        "displayName": "skeleton"
+        "displayName": "slime-king"
+    },
+    "image11": {
+        "data": "hwQOABIAAAAAAAAAoPoAAAAAAAAAAAAASiQPAAAAAAAAqsr8SiQPAAAAAACgIirCSqLMrAoAAAAqJEUkqqqiKqIAAABKJEFEsr1PRKIAAABKRERFwtv7KqIAAABKRERFwtu9r8wAAABKJEFEstvd+6IAAAAqJEUkqqrd+8IAAACgIirCSqLPrAwAAAAAqsr8SiQPAAAAAAAAAAAASiQPAAAAAAAAAAAAoPoAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "lava-zombie"
+    },
+    "image26": {
+        "data": "hwQQABIAAAAAOgoAAAAAAAAAAAAAwAysygAAAAAAAAAAAAAcowwAAAAAAAAAqqrKMcrADAAAAACgMzMzHKOsygAAAAA6wxERwzE6owwAAAA6wREaMRoTMcoAAAA6EcERMRoREcMAAAA6EcERMRoREcMAAAA6wREaMTozEcMAAAA6wxERwzGqqsoAAACgMzMzHKPMAMwAAAAAqqrKMcoAAMAAAAAAAAAcowwAAAAAAAAAoAqsygAAAAAAAAAAOgwAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "mourner"
+    },
+    "image16": {
+        "data": "hwQSABYAAAAAAAAAAAAAAAAAAACgDAAAAAAAAAAAAAA6yuXu7swMAAAAAACsysTMzBzN7u4AAADADAAA4BHN/88AAAAAzvwP4N38DwAAAADgu9vLD/zRzIjoDwDe0Uyx/RwbG4wc8QAeESvRsdzb22zI/QAeERHcsb+xsZmG/AAeERHese/t7Zn2DwAeESvRsdzb22wY8QDe0Uyx/RwbG4zd/QDgu9vLD//RzIjsDwAAzvwPAOz8z4yIAAAAAAAAAADu7QwAAAAAAAAAAAAAzAAAAAAAAAAAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "skeleton-mage"
+    },
+    "image2": {
+        "data": "hwQOABIAAAAAAAAAgPgAAAAAAAAAAAAAeGcPAAAAAAAAiMj8eGcPAAAAAACAZmzGeIbMzAwAAABox2JniMi8fMcAAAB4x3R35k5LzocAAAB4d3di5kRLzoYAAAB4d3di5kTrjIgAAAB4x3R35k7rfIYAAABox2JniOi8ZsYAAACAZmzGeIbMzAwAAAAAiMj8eGcPAAAAAAAAAAAAeGcPAAAAAAAAAAAAgPgAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "zombie"
     },
     "anim1": {
         "namespace": "myAnimations",

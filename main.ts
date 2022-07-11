@@ -85,6 +85,8 @@ let spray_spawn_tick: TickTracking = start_tick_track(spawn_spray)
 let spray_damage = 0
 let spray_speed = 0
 
+let enemy_attack_cooldown_tick: TickTracking = start_tick_track(reset_enemy_attack_cooldown)
+enemy_attack_cooldown_tick.rate = 2
 let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave)
 enemy_spawn_tick.rate = 4
 let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase)
@@ -143,10 +145,10 @@ function setup_upgrade_menu() {
     spray_speed = 120
     spray_spawn_tick.rate = 8
     spray_damage = 12
-    custom.add_upgrade_to_list("Daggers 2", assets.image`icon-dagger`, "+50% damage", "Daggers")
-    custom.add_upgrade_to_list("Daggers 3", assets.image`icon-dagger`, "+1 dagger", "Daggers 2")
+    custom.add_upgrade_to_list("Daggers 2", assets.image`icon-dagger`, "+100% damage", "Daggers")
+    custom.add_upgrade_to_list("Daggers 3", assets.image`icon-dagger`, "+2 dagger", "Daggers 2")
     custom.add_upgrade_to_list("Daggers 4", assets.image`icon-dagger`, "+50% speed", "Daggers 3")
-    custom.add_upgrade_to_list("Daggers 5", assets.image`icon-dagger`, "+1 dagger", "Daggers 4")
+    custom.add_upgrade_to_list("Daggers 5", assets.image`icon-dagger`, "+2 dagger", "Daggers 4")
 
     custom.add_upgrade_to_list("Spark", assets.image`icon-spark`, "auto aim missile", "Weapon")
     tracer_spawn_count = 0
@@ -216,16 +218,16 @@ function perform_upgrade(name: string) {
             spray_spawn_count += 3
             break
         case "Daggers 2":
-            spray_damage *= 1.5
+            spray_damage *= 2
             break
         case "Daggers 3":
-            spray_spawn_count += 1
+            spray_spawn_count += 2
             break
         case "Daggers 4":
             spray_speed *= 1.5
             break
         case "Daggers 5":
-            spray_spawn_count += 1
+            spray_spawn_count += 2
             break
 
         case "Spark":
@@ -354,14 +356,72 @@ function setup_enemy_phase() {
             break
         case 1:
             custom.add_wave_data(4, 2, "zombie")
-            spawn_enemy("troll")
             break
         case 2:
-            custom.add_wave_data(3, 1, "skeleton")
+            custom.add_wave_data(3, 1, "knight")
             break
         case 3:
             custom.reset_wave_data()
             custom.add_wave_data(3, 2, "zombie")
+            spawn_enemy("troll")
+            break
+        case 4:
+            custom.reset_wave_data()
+            custom.add_wave_data(2, 1, "knight")
+            custom.add_wave_data(4, 1, "knight")
+            break
+        case 5:
+            custom.add_wave_data(3, 2, "lava-zombie")
+            break
+        case 6:
+            custom.add_wave_data(1, 2, "lava-zombie")
+            custom.add_wave_data(5, 2, "lava-zombie")
+            break
+        case 7:
+            custom.reset_wave_data()
+            custom.add_wave_data(1, 1, "slime")
+            custom.add_wave_data(2, 2, "slime")
+            custom.add_wave_data(3, 1, "slime")
+            custom.add_wave_data(4, 2, "slime")
+            custom.add_wave_data(5, 1, "slime")
+            spawn_enemy("slime-king")
+            break
+        case 8:
+            custom.reset_wave_data()
+            custom.add_wave_data(1, 1, "lava-zombie")
+            custom.add_wave_data(3, 1, "ghost")
+            custom.add_wave_data(5, 1, "lava-zombie")
+            custom.add_wave_data(2, 2, "zombie")
+            custom.add_wave_data(4, 2, "zombie")
+            break
+        case 9:
+            custom.reset_wave_data()
+            custom.add_wave_data(1, 1, "captain")
+            custom.add_wave_data(3, 1, "mourner")
+            custom.add_wave_data(5, 1, "captain")
+            custom.add_wave_data(2, 2, "knight")
+            custom.add_wave_data(4, 2, "knight")
+            break
+        case 10:
+            custom.reset_wave_data()
+            custom.add_wave_data(2, 1, "ghost")
+            custom.add_wave_data(4, 1, "ghost")
+            spawn_enemy("skeleton-mage")
+            spawn_enemy("skeleton-mage")
+            spawn_enemy("skeleton-mage")
+            break
+        case 11:
+            custom.add_wave_data(3, 1, "captain")
+            spawn_enemy("troll")
+            spawn_enemy("troll")
+            break
+        case 12:
+            custom.add_wave_data(1, 1, "slime")
+            custom.add_wave_data(2, 2, "slime")
+            custom.add_wave_data(3, 1, "slime")
+            custom.add_wave_data(4, 2, "slime")
+            custom.add_wave_data(5, 1, "slime")
+            spawn_enemy("slime-king")
             break
     }
 }
@@ -382,15 +442,41 @@ function spawn_enemy(name: string) {
     if (name == "zombie") {
         new_enemy = sprites.create(assets.image`zombie`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 10, 10, 20, 1)
-    } else if (name == "skeleton") {
-        new_enemy = sprites.create(assets.image`skeleton`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 20, 10, 30, 2)
+    } else if (name == "lava-zombie") {
+        new_enemy = sprites.create(assets.image`lava-zombie`, SpriteKind.Enemy)
+        setup_enemy(new_enemy, name, 20, 15, 50, 1)
+    } else if (name == "knight") {
+        new_enemy = sprites.create(assets.image`knight`, SpriteKind.Enemy)
+        setup_enemy(new_enemy, name, 40, 20, 30, 1)
+        sprites.setDataBoolean(new_enemy, "multi_hit", true)
+    } else if (name == "captain") {
+        new_enemy = sprites.create(assets.image`captain`, SpriteKind.Enemy)
+        setup_enemy(new_enemy, name, 80, 25, 40, 2)
+        sprites.setDataBoolean(new_enemy, "multi_hit", true)
+    } else if (name == "ghost") {
+        new_enemy = sprites.create(assets.image`ghost`, SpriteKind.Enemy)
+        setup_enemy(new_enemy, name, 15, 15, 60, 1)
+    } else if (name == "mourner") {
+        new_enemy = sprites.create(assets.image`mourner`, SpriteKind.Enemy)
+        setup_enemy(new_enemy, name, 30, 30, 80, 1)
+    } else if (name == "skeleton-mage") {
+        new_enemy = sprites.create(assets.image`skeleton-mage`, SpriteKind.Enemy)
+        setup_enemy(new_enemy, name, 450, 25, 50, 2)
+        sprites.setDataBoolean(new_enemy, "multi_hit", true)
+        sprites.setDataBoolean(new_enemy, "boss", true)
+    } else if (name == "slime") {
+        new_enemy = sprites.create(assets.image`slime`, SpriteKind.Enemy)
+        setup_enemy(new_enemy, name, 20, 20, 30, 1)
+    } else if (name == "slime-king") {
+        new_enemy = sprites.create(assets.image`slime-king`, SpriteKind.Enemy)
+        setup_enemy(new_enemy, name, 600, 20, 45, 3)
+        sprites.setDataBoolean(new_enemy, "multi_hit", true)
+        sprites.setDataBoolean(new_enemy, "boss", true)
     } else if (name == "troll") {
         new_enemy = sprites.create(assets.image`troll`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 150, 15, 25, 3)
+        setup_enemy(new_enemy, name, 300, 40, 30, 3)
+        sprites.setDataBoolean(new_enemy, "multi_hit", true)
         sprites.setDataBoolean(new_enemy, "boss", true)
-    } else {
-
     }
     custom.move_sprite_off_camera(new_enemy)
 }
@@ -403,6 +489,7 @@ function setup_enemy(enemy: Sprite, name: string, health: number, damage: number
     sprites.setDataNumber(enemy, "speed", speed)
     enemy.follow(hero, speed)
     sprites.setDataBoolean(enemy, "boss", false)
+    sprites.setDataBoolean(enemy, "multi_hit", false)
     sprites.setDataBoolean(enemy, "attack_cooldown", false)
     enemy.z = 50
 }
@@ -412,13 +499,13 @@ ENEMY EVENTS
 */
 
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
-    if (sprites.readDataBoolean(otherSprite, "boss")) {
+    if (sprites.readDataBoolean(otherSprite, "multi_hit")) {
         if (!(sprites.readDataBoolean(otherSprite, "attack_cooldown"))) {
-            hero_health.value += sprites.readDataNumber(otherSprite, "damage") * -1
+            hero_health.value -= sprites.readDataNumber(otherSprite, "damage")
             sprites.setDataBoolean(otherSprite, "attack_cooldown", true)
         }
     } else {
-        hero_health.value += sprites.readDataNumber(otherSprite, "damage") * -1
+        hero_health.value -= sprites.readDataNumber(otherSprite, "damage")
         otherSprite.destroy()
     }
 })
@@ -436,7 +523,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.PickUp, function (sprite, otherS
 })
 
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, otherSprite) {
-    get_random_upgrade("Congrats! You found a treasure!")
+    get_random_upgrade("You found an upgrade!")
     otherSprite.destroy()
 })
 scene.onHitWall(SpriteKind.Explosive, function (sprite, location) {
@@ -680,7 +767,7 @@ function spawn_spray() {
         )
         new_weapon.lifespan = DEFAULT_WEAPON_LIFESPAN
         sprites.setDataNumber(new_weapon, "damage", spray_damage)
-        spray_angle += 15
+        spray_angle += 10
     }
 }
 
@@ -747,7 +834,9 @@ function spawn_enemy_wave() {
         spawn_enemy(next_enemy)
     }
     custom.advance_wave()
+}
 
+function reset_enemy_attack_cooldown() {
     for (let enemy of sprites.allOfKind(SpriteKind.Enemy)) {
         sprites.setDataBoolean(enemy, "attack_cooldown", false)
     }
