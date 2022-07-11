@@ -457,7 +457,7 @@ function setup_game () {
     true
     )
     hero.z = 100
-    tiles.placeOnRandomTile(hero, sprites.dungeon.floorLightMoss)
+    tiles.placeOnRandomTile(hero, sprites.dungeon.floorLight5)
     scene.cameraFollowSprite(hero)
     hero_health = statusbars.create(20, 4, StatusBarKind.Health)
     hero_health.attachToSprite(hero, 4, 0)

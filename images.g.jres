@@ -9,11 +9,6 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "treasure"
     },
-    "image2": {
-        "data": "hwQQABAAAAAAAAAAAAAAAAAAcAcAAHcGAABwdwBwdwYAAHB3B3dnBgB3d3d3dwYAcCJmdnd3BgBwdyd2d3cGAHB3J3Z3dwYAcCJmdnd3ZgBwd3d2d3dnBgB3d3cHcHcGAABwdwAAcAYAAHd3AAAABwAAdwcAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "zombie"
-    },
     "image16": {
         "data": "hwQQABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQAAAA0N0NAN0AAAAd0RHbDQAA0N3dEdvdvdDQHdERu72929Ddvdvd3d3dAN27C93dDQAAsLsAvb29AAAAAADd3b27AAAABQ0A0L0RERHVXQAA0BAREdVVAAAAAAAABQAAAAAAAAAAAAAAAA==",
         "mimeType": "image/x-mkcd-f4",
@@ -94,15 +89,20 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "survivor"
     },
-    "image24": {
-        "data": "hwQHAAcAAAARAAAAGwEAALARQAAAG0EAALBMAABE7gQAAOAO",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "weapon-dagger"
-    },
     "J(iuG#_X7y0^|=U??F9D": {
         "data": "hwQJAAsAAABFiIiISAUAAISIhYiIBAAAiIiBiIgLAACIFRFVhQsAAIiIgYiICwAAiIiFiIgLAACEiIiIiAQAAEXMzMxMBQAA8P////8PAAA=",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "weapon-bible"
+    },
+    "image2": {
+        "data": "hwQQABQAAAAAAAAAAAAAAAAAAAAAAAAAAID4AAAAAAAAAAAAAHhnDwAAAAAAAIjI/HhnDwAAAAAAgGZsxniGDAAAAAAAaMdiZ4jIzMyIAAAAeMd0d+ZE5OSHAAAAeHd3Yua0vuuHAAAAeHd3Yua0vsyIAAAAeMd0d+ZE5G6GAAAAaMdiZ4jIzMyIAAAAgGZsxniGDAAAAAAAAIjI/HhnDwAAAAAAAAAAAHhnDwAAAAAAAAAAAID4AAAAAAAAAAAAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "zombie"
+    },
+    "image24": {
+        "data": "hwQGAAYAAADPAAAAHwwEAPDBBAAAHwQAQETkAAAA7gA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "weapon-dagger"
     },
     "anim1": {
         "namespace": "myAnimations",
