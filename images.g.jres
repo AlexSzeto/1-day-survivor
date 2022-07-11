@@ -74,11 +74,6 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "weapon-bible"
     },
-    "image24": {
-        "data": "hwQGAAYAAADPAAAAHwwEAPDBBAAAHwQAQETkAAAA7gA=",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "weapon-dagger"
-    },
     "image5": {
         "data": "hwQQAAoAAAAAAKrKAAAAAACgu6sMAAAAADszs8oAAACwMzMzygAAALATMTPKAAAAOxMxM8oAAAA7EzMzygAAADszMzPKAAAAOjMzM8oAAAA6MzMzygAAADozM7PKAAAAoDMzs8oAAADAOjOrzAAAAACsu6rMAAAAAMCqygwAAAAAAMzMAAAAAA==",
         "mimeType": "image/x-mkcd-f4",
@@ -93,11 +88,6 @@
         "data": "hwQYACQAAAAAAAAAAAAAAAAAzPwAAAAAAAAAAADu7s7M/P8PAMyIiA8AAAAAAAAA4O5ERETuzvz/b5lpDwAAAAAAAADuREREzOzu7u7OlmkPAAAAAAAAAOxORERERMTM7syWac+MzAAAAAAAzM7MzO7u7s7MjGiGj//ozA8AAADs7u7u7v7MjP//iPhohk+O+AAAAMDMzMz/aGZmiPz/j5ZpT46GDwAAAAAAwGiGZu5mxshomZn47pgPAAAAAACMlvZoEW6IaGmZmfjknA8AAAAAAGiZ+WjhLsmYmWmW+ORsCAAAAAAAaJnJZu4iaZiZ9mz45PwPAAAAAABomclm7iJpmJn2bPjk/A8AAAAAAGiZ+WjhLsmYmWmW+ORoCAAAAAAAiJb2aBFuiGhpmZn4zpgIAAAAAACMaIZm7mbGiGaZmfjOmA8AAAAAAMCMaGZmiPzIaJZpT26GDwAAAAAAgIiIiIj4/8yIZobviPwAAAAAAABoZsj//4/8j4yM+Mz8AAAAAAAAgJmWhmxmyA8AwPwPAAAAAAAAAACAaZZpbIb8AAAAAAAAAAAAAAAAAICZmWlm+A8AAAAAAAAAAAAAAAAAgJaZZogIAAAAAAAAAAAAAAAAAAAAiIiICAAAAAAAAAAAAAAAAAA=",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "troll"
-    },
-    "image10": {
-        "data": "hwQOABIAAAAAAADMuwAAAAAAAAAAAAAc0QwAAAAAAAAAzMy7EcvADAAAAADA3d3dvLvczQAAAADcHdwRwd0b0QwAAADcERwREdsREcsAAADcEREkEtsREc0AAADcEREkEtsREc0AAADcERwREdsR3c0AAADcHdwRwd29y80AAADA3d3dvLvMAMwAAAAAzMy7EcsAAMAAAAAAAAAc0QwAAAAAAAAAAADMuwAAAAAAAAA=",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "ghost"
     },
     "image7": {
         "data": "hwQQABQAAAAAAAAAhgAAAAAAAABARETubmgIAAAAAABUFRFRRRiJqsoPAADg7u7ubpiJKiLyAADAZsiMhv+IiIj4AABsGYEWYSzKZoaGAACcEYFsEcaiHIGBAACYERHIlsYinIGJAACYmZnIhoj4nMn/AACcmYlsaGamb4aGAABsGYHWmBGZ9miGAADAZshmmJmZ9oz4AAAAzMz/mJmZ9iL6AAAAAAAAaGamL6r6AAAAAAAAgP//yvwPAAAAAAAAAAAAAAAAAAA=",
@@ -124,20 +114,30 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "lava-zombie"
     },
-    "image26": {
-        "data": "hwQQABIAAAAAOgoAAAAAAAAAAAAAwAysygAAAAAAAAAAAAAcowwAAAAAAAAAqqrKMcrADAAAAACgMzMzHKOsygAAAAA6wxERwzE6owwAAAA6wREaMRoTMcoAAAA6EcERMRoREcMAAAA6EcERMRoREcMAAAA6wREaMTozEcMAAAA6wxERwzGqqsoAAACgMzMzHKPMAMwAAAAAqqrKMcoAAMAAAAAAAAAcowwAAAAAAAAAoAqsygAAAAAAAAAAOgwAAAAAAAAAAAA=",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "mourner"
-    },
-    "image16": {
-        "data": "hwQSABYAAAAAAAAAAAAAAAAAAACgDAAAAAAAAAAAAAA6yuXu7swMAAAAAACsysTMzBzN7u4AAADADAAA4BHN/88AAAAAzvwP4N38DwAAAADgu9vLD/zRzIjoDwDe0Uyx/RwbG4wc8QAeESvRsdzb22zI/QAeERHcsb+xsZmG/AAeERHese/t7Zn2DwAeESvRsdzb22wY8QDe0Uyx/RwbG4zd/QDgu9vLD//RzIjsDwAAzvwPAOz8z4yIAAAAAAAAAADu7QwAAAAAAAAAAAAAzAAAAAAAAAAAAAAAAAAAAAA=",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "skeleton-mage"
-    },
     "image2": {
         "data": "hwQOABIAAAAAAAAAgPgAAAAAAAAAAAAAeGcPAAAAAAAAiMj8eGcPAAAAAACAZmzGeIbMzAwAAABox2JniMi8fMcAAAB4x3R35k5LzocAAAB4d3di5kRLzoYAAAB4d3di5kTrjIgAAAB4x3R35k7rfIYAAABox2JniOi8ZsYAAACAZmzGeIbMzAwAAAAAiMj8eGcPAAAAAAAAAAAAeGcPAAAAAAAAAAAAgPgAAAAAAAA=",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "zombie"
+    },
+    "image10": {
+        "data": "hwQOABIAAAAAAADMuwAAAAAAAAAAAAAc0QwAAAAAAAAAwMy7EcvADAAAAADA3N3dvLvczQAAAAC8HdwRwd0b0QwAAADcERwREdsREcsAAADcEREkEtsREc0AAADcEREkEtsREc0AAADcERwREdsR3c0AAAC8HdwRwd29y80AAADA3N3dvLvMAMwAAAAAwMy7EcsAAMAAAAAAAAAc0QwAAAAAAAAAAADMuwAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "ghost"
+    },
+    "image26": {
+        "data": "hwQQABIAAAAAOgoAAAAAAAAAAAAAwAysygAAAAAAAAAAAAAcowwAAAAAAAAAoKrKMcrADAAAAACgOjOjHKOsygAAAAA6E8ERwzE6owwAAAA6ERyhMRETMcoAAAA6EREcMREREcMAAAA6EREcMRERMcMAAAA6ERyhMREzo8MAAAA6E8ERwzGqysoAAACgOjOjHKPMAMwAAAAAoKrKMcoAAMAAAAAAAAAcowwAAAAAAAAAoAqsygAAAAAAAAAAOgwAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "mourner"
+    },
+    "image16": {
+        "data": "hwQSABYAAAAAAAAAAAAAAAAAAABwBgAAAAAAAAAAAACXZ+Xu7swMAAAAAAB2Z8TMzBzN7u4AAABgBgAA4BHN/88AAAAAzvwP4N38DwAAAADgu9vLD/zRzGbmDwDe0Vyx/RUbG3zG+wAeEXvRsVzb25xn/AAeERHcsZ+3sZdnDwAeERHesX/n7XcW8QAeEXvRsVzb23zb/QDe0Vyx/RUbG2zsDwDgu9vLD//RzGdmAAAAzvwPAOz8zwwAAAAAAAAAAADu7QwAAAAAAAAAAAAAzAAAAAAAAAAAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "skeleton-mage"
+    },
+    "image24": {
+        "data": "hwQKAAoAAADMDAAAAAAAABzNAAAAAAAAvNEMAAAAAADAG80AAAAAAAC80VwOAAAAAMAbSwAAAAAAALzEAAAAAAAARewMAAAAAAAOwM4AAAAAAAAAzAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "weapon-dagger"
     },
     "anim1": {
         "namespace": "myAnimations",

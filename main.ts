@@ -265,19 +265,19 @@ function perform_upgrade(name: string) {
             break
 
         case "Bible":
-            orbit_spawn_count += 3
+            orbit_spawn_count += 2
             break
         case "Bible 2":
-            orbit_damage *= 1.25
+            orbit_damage *= 1.5
             break
         case "Bible 3":
-            orbit_spawn_count += 2
+            orbit_spawn_count += 1
             break
         case "Bible 4":
             orbit_angular_speed *= 1.5
             break
         case "Bible 5":
-            orbit_spawn_tick.rate *= 0.5
+            orbit_spawn_count += 2
             break
 
         case "Divine Aura":
@@ -285,17 +285,18 @@ function perform_upgrade(name: string) {
             create_new_aura()
             break
         case "Divine Aura 2":
-            aura_tick_damage *= 1.5
+            aura_tick_damage *= 2
             break
         case "Divine Aura 3":
             aura_scale += 0.25
             adjust_aura_scale()
             break
         case "Divine Aura 4":
-            aura_tick_damage *= 1.5
+            aura_tick_damage *= 2
             break
         case "Divine Aura 5":
-            aura_aoe_tick.rate *= 0.5
+            aura_scale += 0.50
+            adjust_aura_scale()
             break
 
         case "Holy Water":
