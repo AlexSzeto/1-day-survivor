@@ -354,6 +354,7 @@ function setup_enemy_phase() {
             break
         case 1:
             custom.add_wave_data(4, 2, "zombie")
+            spawn_enemy("troll")
             break
         case 2:
             custom.add_wave_data(3, 1, "skeleton")
@@ -361,7 +362,6 @@ function setup_enemy_phase() {
         case 3:
             custom.reset_wave_data()
             custom.add_wave_data(3, 2, "zombie")
-            spawn_enemy("troll")
             break
     }
 }
@@ -449,7 +449,7 @@ GAME SETUP
 
 function setup_game () {
     tiles.setCurrentTilemap(tilemap`dungeon`)
-    hero = sprites.create(assets.image`survivor`, SpriteKind.Player)
+    hero = sprites.create(assets.image`hero`, SpriteKind.Player)
     animation.runImageAnimation(
     hero,
     assets.animation`hero-anim`,

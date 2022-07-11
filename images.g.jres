@@ -14,11 +14,6 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "skeleton"
     },
-    "image17": {
-        "data": "hwQYACAAAAAAAAAAAAAAAAAAAAAAAAAA4O7u7u7uAAAAAAAAAAAAAO7u7u7ubmZmAAAAAOAOAADu7u7uAGBmZgYAAODubmZm7u4AAAAAZmZm4O7u7mZmZu4OAGYGAABm5u7u7u5mZmYAAGBmZgAAAO7u7u7uZmZmAABmZmYGAO7u7u7u7g4AAABmZmYmZu7u7u7u7u4OAAAAZiZmImbu7u7u7u7uDgAAAGYiZiJi6O7u7u7u7u4AAABmZmYiYobo7u7u7u7uBgAAZmZmImJmiOju7u7ubmZmYGZmZiJiZoaI7u7u7m5mZmBmImYiYmZmiIju7u5uZmZgJiJmJmZmZmaIiO7uZmZmYCYiZiYGZmZmhojo7u5mZmBmZmZmAGBmZoaI6O4OYAYAZmZmBgAAZmYAAAAAAAAAAGAGAAAAAGZmAAAAAAAAAAAAAAAAAGBmZgAAAAAAAAAAAAAAAABmZgYAAAAAAAAAAAAAAAAAZmYAAAAAAAAAAAAAAAAAAGYGAAAAAAAAAAA=",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "troll"
-    },
     "image18": {
         "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA2xHd3c0AAADbvNHdzQAAANvNG9TNAAAA29283s0AAADb3eTezQAAANvd3e3NAAAA293d3c0AAADLzMzMzAAAAA==",
         "mimeType": "image/x-mkcd-f4",
@@ -84,25 +79,60 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "green gem"
     },
-    "image1": {
-        "data": "hwQQABQAAAAA8P8PAAAAAAAAAAAAv6r6AIiACAAAAADwqvv/z5jYhAAAAACvqvre7pxGhAAAAACv+u8bPfj//IhOAADKur//PZ9pboZOAADKrPvd3ZSGlYnOAACqzOrd3ZSGlekEAACqyq//PZ9pbuYEAADPyu8bPfj//OgMAADPjP7e7mzWhAAAAAD/zOj+z2hIhAAAAAAv////AIiACAAAAACPoqr4DwAAAAAAAADwzMz/AAAAAAAAAAAA//8AAAAAAAAAAAA=",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "survivor"
-    },
     "J(iuG#_X7y0^|=U??F9D": {
         "data": "hwQJAAsAAABFiIiISAUAAISIhYiIBAAAiIiBiIgLAACIFRFVhQsAAIiIgYiICwAAiIiFiIgLAACEiIiIiAQAAEXMzMxMBQAA8P////8PAAA=",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "weapon-bible"
     },
-    "image2": {
-        "data": "hwQQABQAAAAAAAAAAAAAAAAAAAAAAAAAAID4AAAAAAAAAAAAAHhnDwAAAAAAAIjI/HhnDwAAAAAAgGZsxniGDAAAAAAAaMdiZ4jIzMyIAAAAeMd0d+ZE5OSHAAAAeHd3Yua0vuuHAAAAeHd3Yua0vsyIAAAAeMd0d+ZE5G6GAAAAaMdiZ4jIzMyIAAAAgGZsxniGDAAAAAAAAIjI/HhnDwAAAAAAAAAAAHhnDwAAAAAAAAAAAID4AAAAAAAAAAAAAAAAAAAAAAA=",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "zombie"
-    },
     "image24": {
         "data": "hwQGAAYAAADPAAAAHwwEAPDBBAAAHwQAQETkAAAA7gA=",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "weapon-dagger"
+    },
+    "image5": {
+        "data": "hwQQAAoAAAAAAKrKAAAAAACgu6sMAAAAADszs8oAAACwMzMzygAAALATMTPKAAAAOxMxM8oAAAA7EzMzygAAADszMzPKAAAAOjMzM8oAAAA6MzMzygAAADozM7PKAAAAoDMzs8oAAADAOjOrzAAAAACsu6rMAAAAAMCqygwAAAAAAMzMAAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "slime"
+    },
+    "image2": {
+        "data": "hwQOABIAAAAAAAAAgPgAAAAAAAAAAAAAeGcPAAAAAAAAiMj8eGcPAAAAAACAZmzGeIYMAAAAAABox2JniMjMzIgAAAB4x3R35kTk5IcAAAB4d3di5rS+64cAAAB4d3di5rS+zIgAAAB4x3R35kTkboYAAABox2JniMjMzIgAAACAZmzGeIYMAAAAAAAAiMj8eGcPAAAAAAAAAAAAeGcPAAAAAAAAAAAAgPgAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "zombie"
+    },
+    "image1": {
+        "data": "hwQQABQAAAAA8P8PAAAAAAAAAAAAv6r6AIiACAAAAADwqvv/z5jYhAAAAACvqvre7pxGhAAAAACv+u8bPfj//IhOAADKur//PZ9pboZOAADKrPvd3ZSGlYnOAACqzOrd3ZSGlekEAACqyq//PZ9pbuYEAADPyu8bPfj//OgMAADPjP7e7mzWhAAAAAD/zOj+z2hIhAAAAAAv////AIiACAAAAACPoqr4DwAAAAAAAADwzMz/AAAAAAAAAAAA//8AAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "hero"
+    },
+    "image17": {
+        "data": "hwQYACQAAAAAAAAAAAAAAAAAzPwAAAAAAAAAAADu7s7M/P8PAMyIiA8AAAAAAAAA4O5ERETuzvz/b5lpDwAAAAAAAADuREREzOzu7u7OlmkPAAAAAAAAAOxORERERMTM7syWac+MzAAAAAAAzM7MzO7u7s7MjGiGj//ozA8AAADs7u7u7v7MjP//iPhohk+O+AAAAMDMzMz/aGZmiPz/j5ZpT46GDwAAAAAAwGiGZu5mxshomZn47pgPAAAAAACMlvZoEW6IaGmZmfjknA8AAAAAAGiZ+WjhLsmYmWmW+ORsCAAAAAAAaJnJZu4iaZiZ9mz45PwPAAAAAABomclm7iJpmJn2bPjk/A8AAAAAAGiZ+WjhLsmYmWmW+ORoCAAAAAAAiJb2aBFuiGhpmZn4zpgIAAAAAACMaIZm7mbGiGaZmfjOmA8AAAAAAMCMaGZmiPzIaJZpT26GDwAAAAAAgIiIiIj4/8yIZobviPwAAAAAAABoZsj//4/8j4yM+Mz8AAAAAAAAgJmWhmxmyA8AwPwPAAAAAAAAAACAaZZpbIb8AAAAAAAAAAAAAAAAAICZmWlm+A8AAAAAAAAAAAAAAAAAgJaZZogIAAAAAAAAAAAAAAAAAAAAiIiICAAAAAAAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "troll"
+    },
+    "image9": {
+        "data": "hwQgABgAAAAAAAAAAAAAwMzMDAAAAAAAAADArKrMzAAAAAAAAMCsqqrKzAwAAAAAAKw7s6uqzMwAAAAAwDszM7OqyswAAAAAvDMzMzOjyswAAADAOzMRMTOjqswAAAC8MxMRETMzqswAAAA8MxERETMzo8wAAMA6ExERETMzo8wAAMA7ExERMTMzo8wAAKwzExERMzMzo8wAALwzMxExMzMzo8wAALwzMzMzMzMzq8wAwDozMzMzMzMzq8wAwLozMzMzMzMzq8wAwLozMzMzMzMzq8wAwLo7MzMzMzMzq8wAwLq7uzMzMzMzq8zg7q6qu7szMzMzq8zgEe67urs7MzOzq8wAThW1q7s7MzOzq8wA7F61vbq7MzO7q8wAzB5V26y7M7u7qswAzBFV2826u7u7qswA4FFVtc2qu7uryswAHlVVtcqsu7uqyszgRERUscysqqqqzMzg7u7uscysqqqqzMwAAMDsQczMrKrKzAwAAADs5cDMzMzMzAAAAADgDgDAzMzMDAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "king-slime"
+    },
+    "image10": {
+        "data": "hwQOABIAAAAAAADMuwAAAAAAAAAAAAAc0QwAAAAAAAAAzMy7EcvADAAAAADA3d3dvLvczQAAAADcHdwRwd0b0QwAAADcERwREdsREcsAAADcEREkEtsREc0AAADcEREkEtsREc0AAADcERwREdsR3c0AAADcHdwRwd29y80AAADA3d3dvLvMAMwAAAAAzMy7EcsAAMAAAAAAAAAc0QwAAAAAAAAAAADMuwAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "ghost"
+    },
+    "image11": {
+        "data": "hwQOABIAAAAAAAAAoPoAAAAAAAAAAAAASiQPAAAAAAAAqsr8SiQPAAAAAACgIirCSqLMrAoAAAAqJEUkqqqiKqIAAABKJEFEsr1PRKIAAABKRERFwtv7KqIAAABKRERFwtu9r8wAAABKJEFEstvd+6IAAAAqJEUkqqrd+8IAAACgIirCSqLPrAwAAAAAqsr8SiQPAAAAAAAAAAAASiQPAAAAAAAAAAAAoPoAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "fire-zombie"
+    },
+    "image7": {
+        "data": "hwQQABQAAAAAAAAAhgAAAAAAAABARETubmgIAAAAAABUFRFRRRiJqsoPAADg7u7ubpiJKiLyAADAZsiMhv+IiIj4AABsGYEWYSzKZoaGAACcEYFsEcaiHIGBAACYERHIlsYinIGJAACYmZnIhoj4nMn/AACcmYlsaGamb4aGAABsGYHWmBGZ9miGAADAZshmmJmZ9oz4AAAAzMz/mJmZ9iL6AAAAAAAAaGamL6r6AAAAAAAAgP//yvwPAAAAAAAAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "captain"
+    },
+    "image12": {
+        "data": "hwQQABQAAAAAAAAA5AAAAAAAAACwu7u7S04PAAAAAAAbERERsR71AAAAAADwzMz/T171AAAAAADARc7s9P//zPz/AABcVeRUQe/kRE70AABcEeFMVfRBTuHlAABeERHOVPRVXuH1AABeVVXO5P//TsX/AABcVeVMTkXkT+TkAABcVeRUHhFR9F7lAADARc5FHhFR9Mz/AAAAzMz/XlVV9AAAAAAAAAAATkXkDwAAAAAAAAAA4P//AAAAAAAAAAAAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "knight"
     },
     "anim1": {
         "namespace": "myAnimations",
