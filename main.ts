@@ -143,72 +143,72 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("Daggers", assets.image`icon-dagger`, "throw 3 daggers", "Weapon")
     spray_spawn_count = 0
     spray_speed = 120
-    spray_spawn_tick.rate = 8
-    spray_damage = 12
-    custom.add_upgrade_to_list("Daggers 2", assets.image`icon-dagger`, "+100% damage", "Daggers")
-    custom.add_upgrade_to_list("Daggers 3", assets.image`icon-dagger`, "+2 dagger", "Daggers 2")
-    custom.add_upgrade_to_list("Daggers 4", assets.image`icon-dagger`, "+50% speed", "Daggers 3")
-    custom.add_upgrade_to_list("Daggers 5", assets.image`icon-dagger`, "+2 dagger", "Daggers 4")
+    spray_spawn_tick.rate = 6
+    spray_damage = 16
+    custom.add_upgrade_to_list("Daggers 2", assets.image`icon-dagger`, "+1 dagger", "Daggers")
+    custom.add_upgrade_to_list("Daggers 3", assets.image`icon-dagger`, "x2 damage", "Daggers 2")
+    custom.add_upgrade_to_list("Daggers 4", assets.image`icon-dagger`, "+1 dagger", "Daggers 3")
+    custom.add_upgrade_to_list("Daggers 5", assets.image`icon-dagger`, "x2 pace", "Daggers 4")
 
     custom.add_upgrade_to_list("Spark", assets.image`icon-spark`, "auto aim missile", "Weapon")
     tracer_spawn_count = 0
     tracer_speed = 100
-    tracer_spawn_tick.rate = 6
-    tracer_damage = 10
-    custom.add_upgrade_to_list("Spark 2", assets.image`icon-spark`, "+50% speed", "Spark")
-    custom.add_upgrade_to_list("Spark 3", assets.image`icon-spark`, "x2 attacks", "Spark 2")
-    custom.add_upgrade_to_list("Spark 4", assets.image`icon-spark`, "+50% damage", "Spark 3")
+    tracer_spawn_tick.rate = 4
+    tracer_damage = 12
+    custom.add_upgrade_to_list("Spark 2", assets.image`icon-spark`, "x2 damage", "Spark")
+    custom.add_upgrade_to_list("Spark 3", assets.image`icon-spark`, "x2 pace", "Spark 2")
+    custom.add_upgrade_to_list("Spark 4", assets.image`icon-spark`, "x2 damage", "Spark 3")
     custom.add_upgrade_to_list("Spark 5", assets.image`icon-spark`, "+1 spark", "Spark 4")
 
     custom.add_upgrade_to_list("Fireball", assets.image`icon-fireball`, "explode on impact", "Weapon")
     exploder_spawn_count = 0
     exploder_speed = 80
-    exploder_spawn_tick.rate = 6
-    exploder_projectile_damage = 10
-    exploder_explosion_damage = 10
+    exploder_spawn_tick.rate = 8
+    exploder_projectile_damage = 0
+    exploder_explosion_damage = 30
     exploder_explosion_scale = 1.0
-    custom.add_upgrade_to_list("Fireball 2", assets.image`icon-fireball`, "+25% radius", "Fireball")
-    custom.add_upgrade_to_list("Fireball 3", assets.image`icon-fireball`, "+100% damage", "Fireball 2")
-    custom.add_upgrade_to_list("Fireball 4", assets.image`icon-fireball`, "+% radius", "Fireball 3")
-    custom.add_upgrade_to_list("Fireball 5", assets.image`icon-fireball`, "x2 attacks", "Fireball 4")
+    custom.add_upgrade_to_list("Fireball 2", assets.image`icon-fireball`, "x2 damage", "Fireball")
+    custom.add_upgrade_to_list("Fireball 3", assets.image`icon-fireball`, "+50% radius", "Fireball 2")
+    custom.add_upgrade_to_list("Fireball 4", assets.image`icon-fireball`, "x2 damage", "Fireball 3")
+    custom.add_upgrade_to_list("Fireball 5", assets.image`icon-fireball`, "x2 pace", "Fireball 4")
 
     custom.add_upgrade_to_list("Bible", assets.image`icon-bible`, "circles to protect", "Weapon")
     orbit_spawn_count = 0
-    orbit_spawn_tick.rate = 20
+    orbit_spawn_tick.rate = 18
     orbit_angular_speed = 6
     orbit_distance = 30
     orbit_duration = 3000
-    orbit_damage = 16
-    custom.add_upgrade_to_list("Bible 2", assets.image`icon-bible`, "+25% damage", "Bible")
-    custom.add_upgrade_to_list("Bible 3", assets.image`icon-bible`, "+2 book", "Bible 2")
+    orbit_damage = 12
+    custom.add_upgrade_to_list("Bible 2", assets.image`icon-bible`, "+50% damage", "Bible")
+    custom.add_upgrade_to_list("Bible 3", assets.image`icon-bible`, "+1 book", "Bible 2")
     custom.add_upgrade_to_list("Bible 4", assets.image`icon-bible`, "+50% speed", "Bible 3")
-    custom.add_upgrade_to_list("Bible 5", assets.image`icon-bible`, "x2 attacks", "Bible 4")
+    custom.add_upgrade_to_list("Bible 5", assets.image`icon-bible`, "+2 book", "Bible 4")
 
     custom.add_upgrade_to_list("Divine Aura", assets.image`icon-aura`, "damage aura", "Weapon")
     aura_spawn_count = 0
     aura_aoe_tick.rate = 2
-    aura_tick_damage = 4
+    aura_tick_damage = 8
     aura_scale = 1.0
-    custom.add_upgrade_to_list("Divine Aura 2", assets.image`icon-aura`, "+50% damage", "Divine Aura")
+    custom.add_upgrade_to_list("Divine Aura 2", assets.image`icon-aura`, "x2 damage", "Divine Aura")
     custom.add_upgrade_to_list("Divine Aura 3", assets.image`icon-aura`, "+25% radius", "Divine Aura 2")
-    custom.add_upgrade_to_list("Divine Aura 4", assets.image`icon-aura`, "+50% damage", "Divine Aura 3")
-    custom.add_upgrade_to_list("Divine Aura 5", assets.image`icon-aura`, "x2 attacks", "Divine Aura 4")
+    custom.add_upgrade_to_list("Divine Aura 4", assets.image`icon-aura`, "x2 damage", "Divine Aura 3")
+    custom.add_upgrade_to_list("Divine Aura 5", assets.image`icon-aura`, "+50% radius", "Divine Aura 4")
 
     custom.add_upgrade_to_list("Holy Water", assets.image`icon-water`, "toss and burn", "Weapon")
     molotov_spawn_count = 0
     molotov_speed = 100
-    molotov_damage = 10
+    molotov_damage = 12
     molotov_duration_min = 300
     molotov_duration_max = 700
-    molotov_flame_duration = 5000
-    molotov_spawn_tick.rate = 32
+    molotov_flame_duration = 3000
+    molotov_spawn_tick.rate = 24
     molotov_aoe_tick.rate = 2
     molotov_tick_damage = 6
     molotov_flame_scale = 1.0
-    custom.add_upgrade_to_list("Holy Water 2", assets.image`icon-water`, "+25% damage", "Holy Water")
-    custom.add_upgrade_to_list("Holy Water 3", assets.image`icon-water`, "+50% duration", "Holy Water 2")
-    custom.add_upgrade_to_list("Holy Water 4", assets.image`icon-water`, "x2 attacks", "Holy Water 3")
-    custom.add_upgrade_to_list("Holy Water 5", assets.image`icon-water`, "+1 vial", "Holy Water 4")
+    custom.add_upgrade_to_list("Holy Water 2", assets.image`icon-water`, "+50% duration", "Holy Water")
+    custom.add_upgrade_to_list("Holy Water 3", assets.image`icon-water`, "+25% radius", "Holy Water 2")
+    custom.add_upgrade_to_list("Holy Water 4", assets.image`icon-water`, "+1 vial", "Holy Water 3")
+    custom.add_upgrade_to_list("Holy Water 5", assets.image`icon-water`, "x2 damage", "Holy Water 4")
 }
 
 // CONTAINS GAME DESIGN
@@ -218,29 +218,29 @@ function perform_upgrade(name: string) {
             spray_spawn_count += 3
             break
         case "Daggers 2":
-            spray_damage *= 2
+            spray_spawn_count += 1
             break
         case "Daggers 3":
-            spray_spawn_count += 2
+            spray_damage *= 2
             break
         case "Daggers 4":
-            spray_speed *= 1.5
+            spray_spawn_count += 1
             break
         case "Daggers 5":
-            spray_spawn_count += 2
+            spray_spawn_tick.rate *= 0.5
             break
 
         case "Spark":
             tracer_spawn_count += 1
             break
         case "Spark 2":
-            tracer_speed *= 1.5
+            tracer_damage *= 2
             break
         case "Spark 3":
             tracer_spawn_tick.rate *= 0.5
             break
         case "Spark 4":
-            tracer_damage *= 1.5
+            tracer_damage *= 2
             break
         case "Spark 5":
             tracer_spawn_count += 1
@@ -250,14 +250,15 @@ function perform_upgrade(name: string) {
             exploder_spawn_count += 1
             break
         case "Fireball 2":
-            exploder_explosion_scale += 0.25
-            break
-        case "Fireball 3":
             exploder_projectile_damage *= 2
             exploder_explosion_damage *= 2
             break
+        case "Fireball 3":
+            exploder_explosion_scale += 0.50
+            break
         case "Fireball 4":
-            exploder_explosion_scale += 0.25
+            exploder_projectile_damage *= 2
+            exploder_explosion_damage *= 2
             break
         case "Fireball 5":
             exploder_spawn_tick.rate *= 0.5
@@ -301,16 +302,16 @@ function perform_upgrade(name: string) {
             molotov_spawn_count += 1
             break
         case "Holy Water 2":
-            molotov_damage *= 1.25
-            break
-        case "Holy Water 3":
             molotov_flame_duration *= 1.5
             break
+        case "Holy Water 3":
+            molotov_flame_scale += 0.25
+            break
         case "Holy Water 4":
-            molotov_aoe_tick.rate *= 0.5
+            molotov_spawn_count += 1
             break
         case "Holy Water 5":
-            molotov_spawn_count += 1
+            molotov_tick_damage *= 2
             break
     }
     redraw_upgrades()
@@ -334,7 +335,7 @@ HERO EVENTS
 
 statusbars.onStatusReached(StatusBarKind.Experience, statusbars.StatusComparison.GTE, statusbars.ComparisonType.Percentage, 100, function (status) {
     status.value = 0
-    status.max = Math.floor(status.max * 1.5)
+    status.max = Math.floor(status.max + 5)
     choose_upgrade("Pick Upgrade")
 })
 
@@ -607,14 +608,17 @@ function deal_enemy_damage(enemy: Sprite, damage: number) {
     if (sprites.readDataNumber(enemy, "health") <= 0) {
         if (sprites.readDataNumber(enemy, "drop_type") == 1) {
             new_drop = sprites.create(assets.image`blue gem`, SpriteKind.PickUp)
+            new_drop.z = 30
             sprites.setDataNumber(new_drop, "xp", 2)
             custom.move_sprite_on_top_of_another(new_drop, enemy)
         } else if (sprites.readDataNumber(enemy, "drop_type") == 2) {
             new_drop = sprites.create(assets.image`green gem`, SpriteKind.PickUp)
+            new_drop.z = 30
             sprites.setDataNumber(new_drop, "xp", 4)
             custom.move_sprite_on_top_of_another(new_drop, enemy)
         } else if (sprites.readDataNumber(enemy, "drop_type") == 3) {
             new_drop = sprites.create(assets.image`red gem`, SpriteKind.PickUp)
+            new_drop.z = 30
             sprites.setDataNumber(new_drop, "xp", 8)
             custom.aim_projectile_at_angle(
                 new_drop,
@@ -624,6 +628,7 @@ function deal_enemy_damage(enemy: Sprite, damage: number) {
                 enemy
             )
             new_drop = sprites.create(assets.image`treasure`, SpriteKind.Treasure)
+            new_drop.z = 30
             custom.move_sprite_on_top_of_another(new_drop, enemy)
         }
         enemy.destroy()
@@ -646,7 +651,7 @@ function create_new_aura() {
 
 function damage_enemies_in_aura(aura: Sprite) {
     for (let aura_target of sprites.allOfKind(SpriteKind.Enemy)) {
-        if (aura_target.overlapsWith(aura)) {
+        if ((aura_target.width + aura_target.height) / 4 + (aura.width / 2) > custom.get_distance_between(aura, aura_target)) {
             deal_enemy_damage(aura_target, sprites.readDataNumber(aura, "damage"))
         }
     }
@@ -691,18 +696,19 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, oth
 })
 
 sprites.onDestroyed(SpriteKind.Explosive, function (sprite) {
-    let flame_weapon = sprites.create(assets.image`area32x32`, SpriteKind.NonInteractive)
+    let explosion = sprites.create(assets.image`area32x32`, SpriteKind.NonInteractive)
     animation.runImageAnimation(
-        flame_weapon,
+        explosion,
         assets.animation`explosion-anim`,
         100,
         false
     )
-    flame_weapon.setPosition(sprite.x, sprite.y)
-    flame_weapon.scale = exploder_explosion_scale
-    flame_weapon.lifespan = 500
-    sprites.setDataNumber(flame_weapon, "damage", exploder_explosion_damage)
-    damage_enemies_in_aura(flame_weapon)
+    explosion.setPosition(sprite.x, sprite.y)
+    explosion.z = hero.z
+    explosion.scale = exploder_explosion_scale
+    explosion.lifespan = 500
+    sprites.setDataNumber(explosion, "damage", exploder_explosion_damage)
+    damage_enemies_in_aura(explosion)
 })
 
 sprites.onOverlap(SpriteKind.Orbital, SpriteKind.Enemy, function (sprite, otherSprite) {
