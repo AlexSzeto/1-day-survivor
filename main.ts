@@ -27,10 +27,26 @@ const DEFAULT_WEAPON_LIFESPAN = 1000
 /*
 GLOBALS
 */
+type TickTracking = {
+    rate: number,
+    count: number,
+    event: () => void
+}
+
+let tick_trackers:TickTracking[] = []
+function start_tick_track(event: () => void): TickTracking {
+    const new_tick = {
+        rate: 0,
+        count: 0,
+        event
+    }
+    tick_trackers.push(new_tick)
+    return new_tick
+}
 
 let molotov_spawn_count = 0
-let molotov_tick_rate = 0
-let molotov_firing_rate = 0
+let molotov_spawn_tick:TickTracking = start_tick_track(spawn_molotov)
+let molotov_aoe_tick: TickTracking = start_tick_track(molotov_aoe)
 let molotov_duration_max = 0
 let molotov_duration_min = 0
 let molotov_damage = 0
@@ -39,10 +55,11 @@ let molotov_tick_damage = 0
 let molotov_flame_duration = 0
 
 let aura_spawn_count = 0
-let aura_tick_rate = 0
+let aura_aoe_tick: TickTracking = start_tick_track(aura_aoe)
 let aura_tick_damage = 0
 
 let orbit_spawn_count = 0
+let orbit_spawn_tick: TickTracking = start_tick_track(spawn_orbit)
 let orbit_damage = 0
 let orbit_refresh_rate = 0
 let orbit_duration = 0
@@ -50,22 +67,26 @@ let orbit_distance = 0
 let orbit_angular_speed = 0
 
 let exploder_spawn_count = 0
+let exploder_spawn_tick: TickTracking = start_tick_track(spawn_exploder)
 let exploder_projectile_damage = 0
-let exploder_firing_rate = 0
 let exploder_speed = 0
 let exploder_explosion_damage = 0
 
 let tracer_spawn_count = 0
+let tracer_spawn_tick: TickTracking = start_tick_track(spawn_tracer)
 let tracer_damage = 0
-let tracer_firing_rate = 0
 let tracer_speed = 0
 
 let spray_spawn_count = 0
+let spray_spawn_tick: TickTracking = start_tick_track(spawn_spray)
 let spray_damage = 0
-let spray_firing_rate = 0
 let spray_speed = 0
 
-let level_enemy_phase = 0
+let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave)
+enemy_spawn_tick.rate = 2
+let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase)
+enemy_phase_tick.rate = 120
+let enemy_phase = 0
 
 let hero: Sprite = null
 let hero_health: StatusBarSprite = null
@@ -163,18 +184,18 @@ statusbars.onZero(StatusBarKind.Health, function (status) {
 /*
 ENEMY SPAWNING
 */
-function create_enemy_waves() {
-    if (level_enemy_phase == 0) {
+function setup_enemy_phase() {
+    if (enemy_phase == 0) {
         custom.reset_wave_data()
         custom.add_wave_data(4, 2, "zombie")
-    } else if (level_enemy_phase == 1) {
+    } else if (enemy_phase == 1) {
 
-    } else if (level_enemy_phase == 2) {
+    } else if (enemy_phase == 2) {
         custom.add_wave_data(2, 2, "zombie")
-    } else if (level_enemy_phase == 3) {
+    } else if (enemy_phase == 3) {
         custom.add_wave_data(1, 1, "skeleton")
         custom.add_wave_data(3, 1, "skeleton")
-    } else if (level_enemy_phase == 4) {
+    } else if (enemy_phase == 4) {
         custom.reset_wave_data()
         custom.add_wave_data(4, 2, "zombie")
         spawn_enemy("troll")
@@ -223,14 +244,6 @@ function spawn_enemy(name: string) {
     custom.move_sprite_off_camera(new_enemy)
 }
 
-function spawn_enemy_wave() {
-    let list = custom.get_wave_enemy_list()
-    for (let next_enemy of list) {
-        spawn_enemy(next_enemy)
-    }
-    custom.advance_wave()
-}
-
 /*
 ENEMY EVENTS
 */
@@ -273,41 +286,46 @@ GAME SETUP
 
 function setup_upgrade_menu () {
     custom.add_upgrade_to_list("Daggers", assets.image`icon-dagger`, "throw 3 daggers")
-spray_spawn_count = 0
+    spray_spawn_count = 0
     spray_speed = 120
-    spray_firing_rate = 2000
+    spray_spawn_tick.rate = 8
     spray_damage = 12
+
     custom.add_upgrade_to_list("Spark", assets.image`icon-spark`, "auto aim missile")
-tracer_spawn_count = 0
+    tracer_spawn_count = 0
     tracer_speed = 100
-    tracer_firing_rate = 1500
+    tracer_spawn_tick.rate = 6
     tracer_damage = 10
+
     custom.add_upgrade_to_list("Fireball", assets.image`icon-fireball`, "explode on impact")
-exploder_spawn_count = 0
+    exploder_spawn_count = 0
     exploder_speed = 80
-    exploder_firing_rate = 1500
+    exploder_spawn_tick.rate = 6
     exploder_projectile_damage = 10
     exploder_explosion_damage = 10
+
     custom.add_upgrade_to_list("Bible", assets.image`icon-bible`, "circles to protect")
-orbit_spawn_count = 0
+    orbit_spawn_count = 0
+    orbit_spawn_tick.rate = 20
     orbit_angular_speed = 6
     orbit_distance = 30
     orbit_duration = 3000
-    orbit_refresh_rate = 5000
     orbit_damage = 15
+
     custom.add_upgrade_to_list("Divine Aura", assets.image`icon-aura`, "damage aura")
-aura_spawn_count = 0
-    aura_tick_rate = 500
+    aura_spawn_count = 0
+    aura_aoe_tick.rate = 2
     aura_tick_damage = 4
+
     custom.add_upgrade_to_list("Holy Water", assets.image`icon-water`, "toss and burn")
-molotov_spawn_count = 0
+    molotov_spawn_count = 0
     molotov_speed = 100
     molotov_damage = 10
     molotov_duration_min = 300
     molotov_duration_max = 700
     molotov_flame_duration = 5000
-    molotov_firing_rate = 8000
-    molotov_tick_rate = 500
+    molotov_spawn_tick.rate = 32
+    molotov_aoe_tick.rate = 2
     molotov_tick_damage = 5
 }
 
@@ -339,8 +357,8 @@ function setup_game () {
     hero_xp.setStatusBarFlag(StatusBarFlag.SmoothTransition, false)
     controller.moveSprite(hero)
     setup_upgrade_menu()
-    level_enemy_phase = 0
-    create_enemy_waves()
+    enemy_phase = 0
+    setup_enemy_phase()
     custom.set_game_state(GameState.normal)
 }
 
@@ -384,7 +402,6 @@ function deal_enemy_damage(enemy: Sprite, damage: number) {
     if (sprites.readDataNumber(enemy, "health") <= 0) {
         if (sprites.readDataNumber(enemy, "drop_type") == 1) {
             new_drop = sprites.create(assets.image`blue gem`, SpriteKind.PickUp)
-            new_drop.lifespan = 8000
             sprites.setDataNumber(new_drop, "xp", 2)
             custom.move_sprite_on_top_of_another(new_drop, enemy)
         } else if (sprites.readDataNumber(enemy, "drop_type") == 2) {
@@ -481,12 +498,17 @@ sprites.onOverlap(SpriteKind.Orbital, SpriteKind.Enemy, function (sprite, otherS
     sprite.destroy()
 })
 
+sprites.onOverlap(SpriteKind.Explosive, SpriteKind.Enemy, function (sprite, otherSprite) {
+    deal_enemy_damage(otherSprite, sprites.readDataNumber(sprite, "damage"))
+    sprite.destroy()
+})
+
 /*
 TICK EVENTS
 */
 
-game.onUpdateInterval(exploder_firing_rate, function () {
-    if (custom.game_state_is(GameState.normal) && exploder_spawn_count > 0) {
+function spawn_exploder() {
+    if (exploder_spawn_count > 0) {
         let new_weapon = sprites.create(assets.image`fireball`, SpriteKind.Explosive)
         custom.aim_projectile_at_angle(
         new_weapon,
@@ -498,14 +520,16 @@ game.onUpdateInterval(exploder_firing_rate, function () {
         new_weapon.lifespan = DEFAULT_WEAPON_LIFESPAN
         sprites.setDataNumber(new_weapon, "damage", exploder_projectile_damage)
     }
-})
-game.onUpdateInterval(aura_tick_rate, function () {
-    if (custom.game_state_is(GameState.normal) && aura_spawn_count > 0) {
+}
+
+function aura_aoe() {
+    if (aura_spawn_count > 0) {
         damage_enemies_in_aura(aura_weapon)
     }
-})
-game.onUpdateInterval(molotov_firing_rate, function () {
-    if (custom.game_state_is(GameState.normal) && molotov_spawn_count > 0) {
+}
+
+function spawn_molotov() {
+    if (molotov_spawn_count > 0) {
         let new_weapon = sprites.create(assets.image`weapon-water`, SpriteKind.Molotov)
         new_weapon.lifespan = randint(molotov_duration_min, molotov_duration_max)
         custom.aim_projectile_at_angle(
@@ -516,9 +540,10 @@ game.onUpdateInterval(molotov_firing_rate, function () {
         hero
         )
     }
-})
-game.onUpdateInterval(spray_firing_rate, function () {
-    if (custom.game_state_is(GameState.normal) && spray_spawn_count > 0) {
+}
+
+function spawn_spray() {
+    if (spray_spawn_count > 0) {
         let spray_angle = randint(0, 360)
         for (let index = 0; index < spray_spawn_count; index++) {
             let new_weapon = sprites.create(assets.image`weapon-dagger`, SpriteKind.Projectile)
@@ -534,23 +559,11 @@ game.onUpdateInterval(spray_firing_rate, function () {
             spray_angle += 15
         }
     }
-})
-game.onUpdateInterval(30000, function () {
-    if (custom.game_state_is(GameState.normal)) {
-        level_enemy_phase += 1
-        create_enemy_waves()
-    }
-})
-game.onUpdateInterval(500, function () {
-    if (custom.game_state_is(GameState.normal)) {
-        spawn_enemy_wave()
-    }
-    for (let value5 of sprites.allOfKind(SpriteKind.Enemy)) {
-        sprites.setDataBoolean(value5, "attack_cooldown", false)
-    }
-})
-game.onUpdateInterval(orbit_refresh_rate, function () {
-    if (custom.game_state_is(GameState.normal) && orbit_spawn_count > 0) {
+}
+
+
+function spawn_orbit() {
+    if (orbit_spawn_count > 0) {
         sprites.destroyAllSpritesOfKind(SpriteKind.Orbital)
         let spawn_angle_spacing = 360 / orbit_spawn_count
         for (let orbit = 0; orbit <= orbit_spawn_count - 1; orbit++) {
@@ -567,16 +580,18 @@ game.onUpdateInterval(orbit_refresh_rate, function () {
             sprites.setDataNumber(new_weapon, "damage", orbit_damage)
         }
     }
-})
-game.onUpdateInterval(molotov_tick_rate, function () {
-    if (custom.game_state_is(GameState.normal) && molotov_spawn_count > 0) {
+}
+
+function molotov_aoe() {
+    if (molotov_spawn_count > 0) {
         for (let molotov_fire_weapon of sprites.allOfKind(SpriteKind.Flame)) {
             damage_enemies_in_aura(molotov_fire_weapon)
         }
     }
-})
-game.onUpdateInterval(tracer_firing_rate, function () {
-    if (custom.game_state_is(GameState.normal) && tracer_spawn_count > 0) {
+}
+
+function spawn_tracer() {
+    if (tracer_spawn_count > 0) {
         let new_weapon = sprites.create(assets.image`spark`, SpriteKind.Projectile)
         new_weapon.startEffect(effects.trail)
         custom.aim_projectile_at_angle(
@@ -595,24 +610,50 @@ game.onUpdateInterval(tracer_firing_rate, function () {
         new_weapon.lifespan = DEFAULT_WEAPON_LIFESPAN
         sprites.setDataNumber(new_weapon, "damage", tracer_damage)
     }
-})
-sprites.onOverlap(SpriteKind.Explosive, SpriteKind.Enemy, function (sprite, otherSprite) {
-    deal_enemy_damage(otherSprite, sprites.readDataNumber(sprite, "damage"))
-    sprite.destroy()
+}
+
+function next_enemy_phase() {
+    enemy_phase += 1
+    setup_enemy_phase()
+}
+
+function spawn_enemy_wave() {
+    let list = custom.get_wave_enemy_list()
+    for (let next_enemy of list) {
+        spawn_enemy(next_enemy)
+    }
+    custom.advance_wave()
+
+    for (let enemy of sprites.allOfKind(SpriteKind.Enemy)) {
+        sprites.setDataBoolean(enemy, "attack_cooldown", false)
+    }
+}
+
+game.onUpdateInterval(250, () => {
+    if(custom.game_state_is(GameState.normal)) {
+        for (let ticker of tick_trackers) {
+            ticker.count++
+            if(ticker.count >= ticker.rate) {
+                ticker.count = 0
+                ticker.event()
+            }
+        }
+    }
 })
 
 /*
 GLOBAL ON FRAME EVENTS
 */
 game.onUpdate(function () {
-    for (let upgrade_icon_sprite2 of sprites.allOfKind(SpriteKind.UpgradeIcons)) {
+    for (let icon of sprites.allOfKind(SpriteKind.UpgradeIcons)) {
         custom.move_sprite_relative_to_camera(
-            upgrade_icon_sprite2,
-            sprites.readDataNumber(upgrade_icon_sprite2, "sx"),
-            sprites.readDataNumber(upgrade_icon_sprite2, "sy"),
+            icon,
+            sprites.readDataNumber(icon, "sx"),
+            sprites.readDataNumber(icon, "sy"),
             hero
         )
     }
+
     for (let moving_orbital of sprites.allOfKind(SpriteKind.Orbital)) {
         sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed)
         custom.aim_projectile_at_angle(
@@ -623,6 +664,7 @@ game.onUpdate(function () {
             hero
         )
     }
+
     if (aura_spawn_count > 0) {
         aura_weapon.setPosition(hero.x, hero.y)
     }
