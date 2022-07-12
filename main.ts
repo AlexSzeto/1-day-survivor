@@ -21,7 +21,7 @@ PERFORMANCE CONSTANTS
 */
 const MAX_DROPS = 8
 const MAX_ENEMIES = 8
-const DEFAULT_WEAPON_LIFESPAN = 1000
+const DEFAULT_WEAPON_LIFESPAN = 800
 
 
 /*
@@ -468,7 +468,7 @@ function spawn_enemy(name: string) {
         sprites.setDataBoolean(new_enemy, "boss", true)
     } else if (name == "slime") {
         new_enemy = sprites.create(assets.image`slime`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 20, 20, 30, 1)
+        setup_enemy(new_enemy, name, 20, 20, 30, 0)
     } else if (name == "slime-king") {
         new_enemy = sprites.create(assets.image`slime-king`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 600, 20, 45, 3)
@@ -620,7 +620,7 @@ function deal_enemy_damage(enemy: Sprite, damage: number) {
         } else if (sprites.readDataNumber(enemy, "drop_type") == 3) {
             new_drop = sprites.create(assets.image`red gem`, SpriteKind.PickUp)
             new_drop.z = 30
-            sprites.setDataNumber(new_drop, "xp", 8)
+            sprites.setDataNumber(new_drop, "xp", 16)
             custom.aim_projectile_at_angle(
                 new_drop,
                 randint(0, 360),
@@ -763,8 +763,16 @@ function spawn_molotov() {
 
 function spawn_spray() {
     let spray_angle = randint(0, 360)
+    let weapon_image = assets.image`weapon-dagger-ne`
+    if (spray_angle < 90) {
+        weapon_image = assets.image`weapon-dagger-se`
+    } else if (spray_angle < 180) {
+        weapon_image = assets.image`weapon-dagger-sw`
+    } else if (spray_angle < 270) {
+        weapon_image = assets.image`weapon-dagger-nw`
+    }
     for (let index = 0; index < spray_spawn_count; index++) {
-        let new_weapon = sprites.create(assets.image`weapon-dagger`, SpriteKind.Projectile)
+        let new_weapon = sprites.create(weapon_image, SpriteKind.Projectile)
         custom.aim_projectile_at_angle(
         new_weapon,
         spray_angle,

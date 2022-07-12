@@ -30,25 +30,6 @@ bbdccccccccccccccccccdbb
 .bbbbbbbbbbbbbbbbbbbbbb.
 ..bbbbbbbbbbbbbbbbbbbb..
 `;
-            case "image14":
-            case "treasure":return img`
-. . b b b b b b b b b b b b . . 
-. b e 4 4 4 4 4 4 4 4 4 4 e b . 
-b e 4 4 4 4 4 4 4 4 4 4 4 4 e b 
-b e 4 4 4 4 4 4 4 4 4 4 4 4 e b 
-b e 4 4 4 4 4 4 4 4 4 4 4 4 e b 
-b e e 4 4 4 4 4 4 4 4 4 4 e e b 
-b e e e e e e e e e e e e e e b 
-b e e e e e e e e e e e e e e b 
-b b b b b b b d d b b b b b b b 
-c b b b b b b c c b b b b b b c 
-c c c c c c b c c b c c c c c c 
-b e e e e e c b b c e e e e e b 
-b e e e e e e e e e e e e e e b 
-b c e e e e e e e e e e e e c b 
-b b b b b b b b b b b b b b b b 
-. b b . . . . . . . . . . b b . 
-`;
             case "image18":
             case "icon-dagger":return img`
 b b b b b b b b b b 
@@ -98,19 +79,6 @@ b d d 9 1 9 6 d d c
 b d 9 1 9 9 9 6 d c 
 b d 9 6 8 8 6 6 d c 
 b d d 9 6 6 8 d d c 
-b d d d d d d d d c 
-b c c c c c c c c c 
-`;
-            case "image22":
-            case "icon-spark":return img`
-b b b b b b b b b b 
-b d d d d d d d d c 
-b d 3 d d d d 3 d c 
-b d d d a c d d d c 
-b d d a 3 a c d d c 
-b d d c a a c d d c 
-b d d d c c d d d c 
-b d 3 d d d d 3 d c 
 b d d d d d d d d c 
 b c c c c c c c c c 
 `;
@@ -509,17 +477,162 @@ a c . a 3 1 c 1 1 c 1 3 a . a c
 .......ff.ff......
 `;
             case "image24":
-            case "weapon-dagger":return img`
-c c c . . . . . . . 
-c 1 b c . . . . . . 
-c d 1 b c . . . . . 
-. c d 1 b c . . . . 
-. . c d 1 b c 5 e . 
-. . . c d 1 b 4 . . 
-. . . . c b 4 c . . 
-. . . . 5 4 c e c . 
-. . . . e . . c e c 
-. . . . . . . . c c 
+            case "weapon-dagger-nw":return img`
+c c c . . . . . . 
+c 1 b c . . . . . 
+c d 1 b c . . . . 
+. c d 1 b c . e . 
+. . c d 1 b 4 . . 
+. . . c b 4 c . . 
+. . . . 4 c e c . 
+. . . e . . c e c 
+. . . . . . . c c 
+`;
+            case "image27":
+            case "weapon-dagger-ne":return img`
+. . . . . . c c c 
+. . . . . c d 1 c 
+. . . . c d 1 b c 
+. e . c d 1 b c . 
+. . 4 b 1 b c . . 
+. . c 4 b c . . . 
+. c e c 4 . . . . 
+c e c . . e . . . 
+c c . . . . . . . 
+`;
+            case "image28":
+            case "weapon-dagger-se":return img`
+c c . . . . . . . 
+c e c . . e . . . 
+. c e c 4 . . . . 
+. . c 4 b c . . . 
+. . 4 b 1 b c . . 
+. e . c d 1 b c . 
+. . . . c d 1 b c 
+. . . . . c d 1 c 
+. . . . . . c c c 
+`;
+            case "image29":
+            case "weapon-dagger-sw":return img`
+. . . . . . . c c 
+. . . e . . c e c 
+. . . . 4 c e c . 
+. . . c b 4 c . . 
+. . c d 1 b 4 . . 
+. c d 1 b c . e . 
+c d 1 b c . . . . 
+c 1 b c . . . . . 
+c c c . . . . . . 
+`;
+            case "image14":
+            case "treasure":return img`
+. . c c c c c c c c c c c c . . 
+. c e 4 4 4 4 4 4 4 4 4 4 e c . 
+c e 4 4 4 4 4 4 4 4 4 4 4 4 e c 
+c e 4 4 4 4 4 4 4 4 4 4 4 4 e c 
+c e 4 4 4 4 4 4 4 4 4 4 4 4 e c 
+c e e 4 4 4 4 4 4 4 4 4 4 e e c 
+c e e e e e e e e e e e e e e c 
+c e e e e e e e e e e e e e e c 
+c 1 1 5 5 5 1 1 1 1 5 5 5 1 1 c 
+c 4 4 4 4 4 5 c c 5 4 4 4 4 4 c 
+c c c c c c 4 c c 4 c c c c c c 
+c e e e e e c 4 4 c e e e e e c 
+c e e e e e e e e e e e e e e c 
+c c e e e e e e e e e e e e c c 
+. c c c c c c c c c c c c c c . 
+. . . . . . . . . . . . . . . . 
+`;
+            case "image30":
+            case "icon-shield":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d 8 6 6 6 8 c d c 
+b d 6 9 7 7 6 8 d c 
+b d 6 9 7 7 6 8 d c 
+b d 8 9 7 7 6 8 d c 
+b d d 8 9 6 8 d d c 
+b d d d 8 8 d d d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
+`;
+            case "image32":
+            case "icon-flask":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d b a a a a b d c 
+b d d b 4 4 b d d c 
+b d d b 5 3 b d d c 
+b d b 5 1 5 3 b d c 
+b d b 5 5 3 4 a d c 
+b d d b b a a d d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
+`;
+            case "image22":
+            case "icon-spark":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d d a c d d d d c 
+b d a 3 a c d d d c 
+b d c a a c d 3 d c 
+b d d c c d d d d c 
+b d d d d d d d d c 
+b d d d c d d a d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
+`;
+            case "image33":
+            case "icon-prism":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d d d 1 7 d d d c 
+b d d 1 5 6 7 d d c 
+b d 1 5 5 6 6 7 d c 
+b d 4 2 2 a a 8 d c 
+b d d 4 2 a 8 d d c 
+b d d d 4 8 d d d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
+`;
+            case "image31":
+            case "icon-ring":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d d 5 1 1 5 d d c 
+b d 5 d d d d 5 d c 
+b d 5 d 6 6 d 5 d c 
+b d 1 6 1 9 6 1 d c 
+b d d 6 9 9 8 d d c 
+b d d d 6 8 d d d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
+`;
+            case "image35":
+            case "icon-crystal":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d d 4 d d d d d c 
+b d 4 1 2 d 4 2 d c 
+b d 4 1 2 4 1 4 d c 
+b d 4 5 a 5 4 a d c 
+b d 4 5 a 2 a d d c 
+b d d a c a d d d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
+`;
+            case "image34":
+            case "icon-wing":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d d d 3 3 b 3 d c 
+b d d 3 1 1 1 b d c 
+b d 3 1 1 d 3 b d c 
+b d 1 1 1 1 1 b d c 
+b d 3 1 d 3 b d d c 
+b d d 3 3 d d d d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
 `;
         }
         return null;

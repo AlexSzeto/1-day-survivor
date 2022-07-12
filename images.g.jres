@@ -4,11 +4,6 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "dark dialog frame"
     },
-    "image14": {
-        "data": "hwQQABAAAAAAu7u7y7y7C7Du7u677M6760Tk7rvs7rtLRETuu+zuC0tERO677O4LS0RE7rvs7gtLRETuu8vuC0tERO7NvO4LS0RE7s287gtLRETuu8vuC0tERO677O4LS0RE7rvs7gtLRETuu+zuC+tE5O677O67sO7u7rvszrsAu7u7y7y7Cw==",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "treasure"
-    },
     "image18": {
         "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA2xHd3c0AAADbvNHdzQAAANvNG9TNAAAA29283s0AAADb3eTezQAAANvd3e3NAAAA293d3c0AAADLzMzMzAAAAA==",
         "mimeType": "image/x-mkcd-f4",
@@ -28,11 +23,6 @@
         "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA292d2c0AAADb0RmWzQAAANuZkWjNAAAA22mZaM0AAADb1paGzQAAANvdbdbNAAAA293d3c0AAADLzMzMzAAAAA==",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "icon-water"
-    },
-    "image22": {
-        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA29PdPc0AAADb3crdzQAAANuto9zNAAAA282q3M0AAADb3czdzQAAANvT3T3NAAAA293d3c0AAADLzMzMzAAAAA==",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "icon-spark"
     },
     "image23": {
         "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA2x1V0c0AAADbUd0VzQAAANvV3V3NAAAA29XdXc0AAADbUd0VzQAAANsdVdHNAAAA293d3c0AAADLzMzMzAAAAA==",
@@ -135,9 +125,64 @@
         "displayName": "skeleton-mage"
     },
     "image24": {
-        "data": "hwQKAAoAAADMDAAAAAAAABzNAAAAAAAAvNEMAAAAAADAG80AAAAAAAC80VwOAAAAAMAbSwAAAAAAALzEAAAAAAAARewMAAAAAAAOwM4AAAAAAAAAzAAAAA==",
+        "data": "hwQJAAkAAADMDAAAAAAAABzNAAAAAAAAvNEMAAAAAADAG83gAAAAAAC8sQQAAAAAAMBLDAAAAAAAAMTOAAAAAADgAOwMAAAAAAAAwAwAAAA=",
         "mimeType": "image/x-mkcd-f4",
-        "displayName": "weapon-dagger"
+        "displayName": "weapon-dagger-nw"
+    },
+    "image27": {
+        "data": "hwQJAAkAAAAAAADADAAAAADgAOwMAAAAAADEzgAAAAAAwEsMAAAAAADcsQQAAAAAwB3L4AAAAADcsQwAAAAAABzLAAAAAAAAzAwAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "weapon-dagger-ne"
+    },
+    "image28": {
+        "data": "hwQJAAkAAADMAAAAAAAAAOwM4AAAAAAAwM4EAAAAAAAATMsAAAAAAAC00QwAAAAA4MAbzQAAAAAAALzRDAAAAAAAwBsMAAAAAAAAzAwAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "weapon-dagger-se"
+    },
+    "image29": {
+        "data": "hwQJAAkAAAAAAADMDAAAAAAAwB0MAAAAAADcsQwAAADgwB3LAAAAAAC0sQwAAAAAAEzLAAAAAADAzgQAAAAAAOwM4AAAAAAAzAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "weapon-dagger-sw"
+    },
+    "image14": {
+        "data": "hwQQABAAAAAAzMzMzMzMAMDu7u5B7M4M7ETk7kHs7gxMRETuRezuDExERO5F7O4MTERE7kXs7gxMRETuUcTuDExERO7BTO4MTERE7sFM7gxMRETuUcTuDExERO5F7O4MTERE7kXs7gxMRETuRezuDOxE5O5B7O4MwO7u7kHszgwAzMzMzMzMAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "treasure"
+    },
+    "image30": {
+        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA22iG3c0AAADblpnYzQAAANt2d4nNAAAA23Z3hs0AAADbaGbYzQAAANuMiN3NAAAA293d3c0AAADLzMzMzAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "icon-shield"
+    },
+    "image32": {
+        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA29u9280AAADbulu1zQAAANtKFbXNAAAA20pTo80AAADbujukzQAAANvbvdrNAAAA293d3c0AAADLzMzMzAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "icon-flask"
+    },
+    "image22": {
+        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA263c3c0AAADbOsrdzQAAANusys3NAAAA283c3c0AAADb3d3dzQAAANvd063NAAAA293d3c0AAADLzMzMzAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "icon-spark"
+    },
+    "image33": {
+        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA291B3c0AAADbHSXUzQAAANtRJULNAAAA22emis0AAADbfabYzQAAANvdh93NAAAA293d3c0AAADLzMzMzAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "icon-prism"
+    },
+    "image31": {
+        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA210V3c0AAADb1W3WzQAAANvRFmnNAAAA29GWic0AAADb1W3YzQAAANtdFd3NAAAA293d3c0AAADLzMzMzAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "icon-ring"
+    },
+    "image35": {
+        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA201E1M0AAADbFFGlzQAAANstosrNAAAA291Uos0AAADbTUHazQAAANstpN3NAAAA293d3c0AAADLzMzMzAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "icon-crystal"
+    },
+    "image34": {
+        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA290T080AAADbPRExzQAAANsTET3NAAAA2xMd080AAADbGxPbzQAAANuzu93NAAAA293d3c0AAADLzMzMzAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "icon-wing"
     },
     "anim1": {
         "namespace": "myAnimations",
