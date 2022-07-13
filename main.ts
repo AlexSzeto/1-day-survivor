@@ -21,7 +21,7 @@ PERFORMANCE CONSTANTS
 */
 const MAX_DROPS = 8
 const MAX_ENEMIES = 8
-const DEFAULT_WEAPON_LIFESPAN = 800
+const DEFAULT_WEAPON_LIFESPAN = 900
 
 
 /*
@@ -75,6 +75,7 @@ let exploder_projectile_damage = 0
 let exploder_speed = 0
 let exploder_explosion_damage = 0
 let exploder_explosion_scale = 0
+let exploder_duration = 0
 
 let tracer_spawn_count = 0
 let tracer_spawn_tick: TickTracking = start_tick_track(spawn_tracer)
@@ -91,12 +92,13 @@ let bonus_magic_spawn = 0
 let enemy_attack_cooldown_tick: TickTracking = start_tick_track(reset_enemy_attack_cooldown)
 enemy_attack_cooldown_tick.rate = 2
 let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 4)
-let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 120)
+let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100)
 let enemy_phase = 0
 
 let hero: Sprite = null
 let hero_health: StatusBarSprite = null
 let hero_xp: StatusBarSprite = null
+let hero_xp_increment: number = 0
 let hero_speed = 100
 let hero_regen = 0
 let hero_regen_tick: TickTracking = start_tick_track(regenerate_hero, 4)
@@ -110,6 +112,9 @@ let gem_bonus_xp = 0
 let weapon_pushback = 0
 let aura_weapon: Sprite = null
 let upgrade_menu: miniMenu.MenuSprite = null
+
+let cat_inside_chest = false
+let cat_out_of_chest = false
 
 controller.left.onEvent(ControllerButtonEvent.Pressed, () => { hero_angle = 180 })
 controller.right.onEvent(ControllerButtonEvent.Pressed, () => { hero_angle = 0 })
@@ -128,8 +133,12 @@ function get_random_upgrade (message: string) {
         game.showLongText(message, DialogLayout.Bottom)
         game.showLongText(next_upgrade, DialogLayout.Bottom)
         perform_upgrade(custom.get_upgrade(next_upgrade))
+    } else {
+        game.showLongText("You found 100 gold!", DialogLayout.Bottom)
+        info.changeScoreBy(100)
     }
 }
+
 function choose_upgrade(title: string) {
     let upgrade_list = custom.get_upgrade_choices(3)
     if (upgrade_list.length > 0) {
@@ -150,6 +159,10 @@ function choose_upgrade(title: string) {
             perform_upgrade(next_upgrade)
             unpause_the_game()
         })
+    } else {
+        game.showLongText("You reached level "+hero_level+"!", DialogLayout.Bottom)
+        game.showLongText("A burst of energy heals you!", DialogLayout.Bottom)
+        hero_health.value += 50
     }
 }
 
@@ -178,6 +191,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("Fireball", assets.image`icon-fireball`, "explode on impact", "Weapon")
     exploder_spawn_count = 0
     exploder_speed = 80
+    exploder_duration = 800
     exploder_spawn_tick.rate = 8
     exploder_projectile_damage = 0
     exploder_explosion_damage = 30
@@ -193,7 +207,7 @@ function setup_upgrade_menu() {
     orbit_angular_speed = 6
     orbit_distance = 30
     orbit_duration = 3000
-    orbit_damage = 12
+    orbit_damage = 16
     custom.add_upgrade_to_list("Spellbook 2", assets.image`icon-bible`, "+50% damage", "Spellbook")
     custom.add_upgrade_to_list("Spellbook 3", assets.image`icon-bible`, "+1 book", "Spellbook 2")
     custom.add_upgrade_to_list("Spellbook 4", assets.image`icon-bible`, "+50% speed", "Spellbook 3")
@@ -215,7 +229,7 @@ function setup_upgrade_menu() {
     molotov_damage = 12
     molotov_duration_min = 300
     molotov_duration_max = 700
-    molotov_flame_duration = 3000
+    molotov_flame_duration = 4000
     molotov_spawn_tick.rate = 24
     molotov_aoe_tick.rate = 2
     molotov_tick_damage = 6
@@ -225,8 +239,8 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("Holy Water 4", assets.image`icon-water`, "+1 vial", "Holy Water 3")
     custom.add_upgrade_to_list("Holy Water 5", assets.image`icon-water`, "x2 damage", "Holy Water 4")
 
-    custom.add_upgrade_to_list("Life Shield", assets.image`icon-shield`, "+2 HP per second", "Armor")
-    custom.add_upgrade_to_list("Life Shield 2", assets.image`icon-shield`, "+2 HP per second", "Life Shield")
+    custom.add_upgrade_to_list("Life Shield", assets.image`icon-shield`, "+1 HP per second", "Armor")
+    custom.add_upgrade_to_list("Life Shield 2", assets.image`icon-shield`, "+1 HP per second", "Life Shield")
     custom.add_upgrade_to_list("Life Shield 3", assets.image`icon-shield`, "+50% max HP", "Life Shield 2")
 
     custom.add_upgrade_to_list("Bottled Lightning", assets.image`icon-flask`, "+20% all pace", "Armor")
@@ -254,10 +268,10 @@ function setup_upgrade_menu() {
 function perform_upgrade(name: string) {
     switch(name) {
         case "Life Shield":
-            hero_regen += 2
+            hero_regen += 1
             break
         case "Life Shield 2":
-            hero_regen += 2
+            hero_regen += 1
             break
         case "Life Shield 3":
             hero_health.max *= 1.5
@@ -464,14 +478,14 @@ HERO EVENTS
 
 statusbars.onStatusReached(StatusBarKind.Experience, statusbars.StatusComparison.GTE, statusbars.ComparisonType.Percentage, 100, function (status) {
     status.value = 0
-    status.max = Math.floor(status.max + 5)
+    status.max = Math.floor(status.max + hero_xp_increment)
     hero_level += 1
     choose_upgrade("You Reached Lv. " + hero_level + "!")
 })
 
 statusbars.onZero(StatusBarKind.Health, function (status) {
     if (status == hero_health) {
-
+        game.over(false)
     }
 })
 
@@ -503,18 +517,20 @@ function setup_enemy_phase() {
     switch(enemy_phase) {
         case 0:
             custom.reset_wave_data()
-            custom.add_wave_data(2, 2, "zombie")
+            custom.add_wave_data(1, 2, "zombie")
             break
         case 1:
-            custom.add_wave_data(4, 2, "zombie")
+            custom.add_wave_data(2, 1, "knight")
+            custom.add_wave_data(3, 2, "zombie")
             break
         case 2:
-            custom.add_wave_data(3, 1, "knight")
+            custom.add_wave_data(4, 1, "knight")
+            custom.add_wave_data(5, 2, "zombie")
             break
         case 3:
             custom.reset_wave_data()
             custom.add_wave_data(3, 2, "zombie")
-            spawn_enemy("troll")
+            spawn_enemy("skeleton-mage")
             break
         case 4:
             custom.reset_wave_data()
@@ -542,11 +558,11 @@ function setup_enemy_phase() {
             break
         case 8:
             custom.reset_wave_data()
-            custom.add_wave_data(1, 2, "lava-zombie")
-            custom.add_wave_data(5, 2, "lava-zombie")
+            custom.add_wave_data(1, 1, "lava-zombie")
+            custom.add_wave_data(2, 3, "zombie")
             custom.add_wave_data(3, 1, "mourner")
-            custom.add_wave_data(2, 2, "zombie")
-            custom.add_wave_data(4, 2, "zombie")
+            custom.add_wave_data(4, 3, "lava-zombie")
+            custom.add_wave_data(5, 1, "zombie")
             break
         case 9:
             custom.reset_wave_data()
@@ -565,24 +581,45 @@ function setup_enemy_phase() {
             custom.add_wave_data(4, 1, "captain")
         case 11:
             custom.add_wave_data(1, 2, "knight")
-            custom.add_wave_data(3, 2, "knight")
+            custom.add_wave_data(3, 2, "captain")
             custom.add_wave_data(5, 2, "knight")
-            spawn_enemy("skeleton-mage")
+            spawn_enemy("troll")
+            cat_inside_chest = true
             break
         case 12:
             custom.add_wave_data(2, 1, "captain")
             custom.add_wave_data(3, 1, "mourner")
             custom.add_wave_data(4, 1, "captain")
-            spawn_enemy("skeleton-mage")
             break
-        case 13:
-            custom.add_wave_data(1, 2, "knight")
-            custom.add_wave_data(3, 2, "knight")
-            custom.add_wave_data(5, 2, "knight")
-            spawn_enemy("skeleton-mage")
+        case 15:
+            custom.reset_wave_data()
+            custom.add_wave_data(1, 1, "slime")
+            custom.add_wave_data(2, 1, "slime")
+            custom.add_wave_data(3, 1, "slime")
+            custom.add_wave_data(3, 1, "ghost")
+            custom.add_wave_data(4, 1, "slime")
+            custom.add_wave_data(5, 1, "slime")
             break
-        case 14:
-            spawn_enemy("black-cat")
+        default:
+            if(enemy_phase < 16) {
+                break
+            }
+            const dice_roll_enemy = Math.pickRandom([
+                "lava-zombie",
+                "captain",
+                "mourner",
+            ])
+            const dice_roll_wave = Math.randomRange(1, 5)
+            custom.add_wave_data(dice_roll_wave, 1, dice_roll_enemy)
+            if(enemy_phase % 2 == 0 && cat_out_of_chest) {
+                const dice_roll_boss = Math.pickRandom([
+                    "skeleton-mage",
+                    "slime-king",
+                    "troll"
+                ])
+                spawn_enemy(dice_roll_boss)
+            }
+            break
     }
 }
 
@@ -604,14 +641,14 @@ function spawn_enemy(name: string) {
         setup_enemy(new_enemy, name, 10, 10, 20, 1)
     } else if (name == "lava-zombie") {
         new_enemy = sprites.create(assets.image`lava-zombie`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 60, 20, 20, 1)
+        setup_enemy(new_enemy, name, 60, 20, 18, 2)
     } else if (name == "knight") {
         new_enemy = sprites.create(assets.image`knight`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 40, 15, 25, 1)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "captain") {
         new_enemy = sprites.create(assets.image`captain`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 120, 30, 30, 2)
+        setup_enemy(new_enemy, name, 120, 30, 22, 2)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "ghost") {
         new_enemy = sprites.create(assets.image`ghost`, SpriteKind.Enemy)
@@ -621,7 +658,7 @@ function spawn_enemy(name: string) {
         setup_enemy(new_enemy, name, 10, 30, 50, 2)
     } else if (name == "skeleton-mage") {
         new_enemy = sprites.create(assets.image`skeleton-mage`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 600, 30, 40, 3)
+        setup_enemy(new_enemy, name, 360, 30, 40, 3)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
         sprites.setDataBoolean(new_enemy, "boss", true)
     } else if (name == "slime") {
@@ -634,11 +671,11 @@ function spawn_enemy(name: string) {
         sprites.setDataBoolean(new_enemy, "boss", true)
     } else if (name == "troll") {
         new_enemy = sprites.create(assets.image`troll`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 400, 40, 15, 3)
+        setup_enemy(new_enemy, name, 1200, 40, 15, 3)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
         sprites.setDataBoolean(new_enemy, "boss", true)
     } else if (name == "black-cat") {
-        new_enemy = sprites.create(assets.image`black-cat`, SpriteKind.Food)
+        new_enemy = sprites.create(assets.image`black-cat`, SpriteKind.NonInteractive)
         setup_enemy(new_enemy, name, 1, 0, 30, 0)
     }
     custom.move_sprite_off_camera(new_enemy)
@@ -704,9 +741,32 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.PickUp, function (sprite, otherS
 })
 
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, otherSprite) {
-    get_random_upgrade("You found a treasure!")
+    if(cat_inside_chest && !cat_out_of_chest) {
+        cat_out_of_chest = true
+        game.showLongText("You found the naughty cat, Jiji!", DialogLayout.Bottom)
+        info.changeScoreBy(100)
+        game.showLongText("Jiji summoned all the monsters. He was stuck in the chest and very scared!", DialogLayout.Bottom)
+        game.showLongText("If you lead him out of the castle, the monsters should stop appearing.", DialogLayout.Bottom)
+        game.showLongText("The doors to the north open. Time to leave the castle... or not?", DialogLayout.Bottom)
+        tiles.setWallAt(tiles.getTilesByType(assets.tile`door-closed-left`)[0], false)
+        tiles.setTileAt(tiles.getTilesByType(assets.tile`door-closed-left`)[0], assets.tile`door-open-left`)
+        tiles.setWallAt(tiles.getTilesByType(assets.tile`door-closed-mid`)[0], false)
+        tiles.setTileAt(tiles.getTilesByType(assets.tile`door-closed-mid`)[0], assets.tile`door-open-mid`)
+        tiles.setWallAt(tiles.getTilesByType(assets.tile`door-closed-right`)[0], false)
+        tiles.setTileAt(tiles.getTilesByType(assets.tile`door-closed-right`)[0], assets.tile`door-open-right`)
+        let cat = sprites.create(assets.image`black-cat`, SpriteKind.NonInteractive)
+        cat.follow(hero, 80)
+        custom.move_sprite_on_top_of_another(cat, otherSprite)
+    } else {
+        get_random_upgrade("You found a treasure!")
+    }
     otherSprite.destroy()
 })
+
+scene.onOverlapTile(SpriteKind.Player, assets.tile`door-open-mid`, () => {
+    game.over(true)
+})
+
 scene.onHitWall(SpriteKind.Explosive, function (sprite, location) {
     sprite.destroy()
 })
@@ -716,7 +776,7 @@ GAME SETUP
 */
 
 function setup_game () {
-    tiles.setCurrentTilemap(tilemap`dungeon`)
+    tiles.setCurrentTilemap(tilemap`castle`)
     hero = sprites.create(assets.image`hero`, SpriteKind.Player)
     animation.runImageAnimation(
     hero,
@@ -738,6 +798,7 @@ function setup_game () {
     hero_xp.positionDirection(CollisionDirection.Bottom)
     hero_xp.setOffsetPadding(0, 4)
     hero_xp.max = 10
+    hero_xp_increment = 5
     hero_xp.value = 0
     hero_xp.setColor(9, 15, 15)
     hero_xp.setStatusBarFlag(StatusBarFlag.SmoothTransition, false)
@@ -924,7 +985,7 @@ function spawn_exploder() {
                 exploder_speed,
                 hero
             )
-            new_weapon.lifespan = DEFAULT_WEAPON_LIFESPAN
+            new_weapon.lifespan = exploder_duration
             sprites.setDataNumber(new_weapon, "damage", exploder_projectile_damage)
         }
     }
