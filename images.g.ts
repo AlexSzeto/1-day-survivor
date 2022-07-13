@@ -580,33 +580,6 @@ b d d d c f d d d c
 b d d d d d d d d c 
 b c c c c c c c c c 
 `;
-            case "image4":
-            case "dark dialog frame":return img`
-..33333333333333333333..
-.3d111111111111111111d3.
-3d1d3333333333333333d1d3
-31d333333333333333333d13
-313d1111111111111111d313
-313111111111111111111313
-313111111111111111111313
-313111111111111111111313
-313111111111111111111313
-313111111111111111111313
-313111111111111111111313
-313111111111111111111313
-313111111111111111111313
-313111111111111111111313
-313111111111111111111313
-313111111111111111111313
-313111111111111111111313
-313111111111111111111313
-313111111111111111111313
-313d1111111111111111d313
-3d13333333333333333331d3
-33d111111111111111111d33
-.3333333333333333333333.
-..33333333333333333333..
-`;
             case "J(iuG#_X7y0^|=U??F9D":
             case "weapon-bible":return img`
 5 4 8 8 8 8 4 5 . 
@@ -633,6 +606,50 @@ b d 8 8 8 1 8 f d c
 b d 6 8 5 8 6 f d c 
 b d d d d d d d d c 
 b c c c c c c c c c 
+`;
+            case "image4":
+            case "dark dialog frame":return img`
+..bbbbbbbbbbbbbbbbbbbb..
+.bd111111111111111111db.
+bd1dbbbbbbbbbbbbbbbbd1db
+b1dbbbbbbbbbbbbbbbbbbd1b
+b1bd1111111111111111db1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1bd1111111111111111db1b
+bd1bbbbbbbbbbbbbbbbbb1db
+bbd111111111111111111dbb
+.bbbbbbbbbbbbbbbbbbbbbb.
+..bbbbbbbbbbbbbbbbbbbb..
+`;
+            case "image36":
+            case "black-cat":return img`
+. . . f . . f . . . . . . c f f . . 
+. . f e f f e f . . . . c f f f f . 
+. f e c f f c e f . . . f . . c f . 
+. f c c c c c c f . . . . . . c f . 
+f c b 5 c c 5 b c f . . . . . c f . 
+f f c c a a c c f f e e e 8 . c f . 
+f f 8 c c c c 8 f f c c c c 8 f . . 
+. f f 8 c c 8 f f c c c c 8 f . . . 
+. . . f f f f f f 8 8 8 8 f f . . . 
+. . . c f f f 8 f f f f f c f . . . 
+. . . 8 c f 8 c f f 8 f f c f . . . 
+. . . f 8 f c f . . f 8 f c f . . . 
+. . . . f f f . . . . f f f . . . . 
+. . . . . . . . . . . . . . . . . . 
 `;
         }
         return null;
