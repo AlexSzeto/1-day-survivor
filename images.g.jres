@@ -1,9 +1,4 @@
 {
-    "image4": {
-        "data": "hwQYABgAAAAAu7u7u7u7u7u7uwCwzczMzMzMzMzMvQvb3Lu7u7u7u7u73LvLvR0RERERERHRy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLuxERERERERERy7vLvR0RERERERHRy7vb3Lu7u7u7u7u73LuwzczMzMzMzMzMvQsAu7u7u7u7u7u7uwA=",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "dark dialog frame"
-    },
     "image18": {
         "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA2xHd3c0AAADbvNHdzQAAANvNG9TNAAAA29283s0AAADb3eTezQAAANvd3e3NAAAA293d3c0AAADLzMzMzAAAAA==",
         "mimeType": "image/x-mkcd-f4",
@@ -13,11 +8,6 @@
         "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA29Ii0s0AAADbLVQlzQAAANstRSXNAAAA200kJM0AAADbQk3SzQAAANvULd3NAAAA293d3c0AAADLzMzMzAAAAA==",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "icon-fireball"
-    },
-    "image20": {
-        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA24aIaM0AAADbiIWIzQAAANtYVYXNAAAA24iFiM0AAADbhohozQAAANv8///NAAAA293d3c0AAADLzMzMzAAAAA==",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "icon-bible"
     },
     "image21": {
         "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA292d2c0AAADb0RmWzQAAANuZkWjNAAAA22mZaM0AAADb1paGzQAAANvdbdbNAAAA293d3c0AAADLzMzMzAAAAA==",
@@ -58,11 +48,6 @@
         "data": "hwQIAAgAAAAAYAYAAFZnAGBVdwZWVXdndndmZmB3ZgYAdmYAAGAGAA==",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "green gem"
-    },
-    "J(iuG#_X7y0^|=U??F9D": {
-        "data": "hwQJAAsAAABFiIiISAUAAISIhYiIBAAAiIiBiIgLAACIFRFVhQsAAIiIgYiICwAAiIiFiIgLAACEiIiIiAQAAEXMzMxMBQAA8P////8PAAA=",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "weapon-bible"
     },
     "image5": {
         "data": "hwQQAAoAAAAAAKrKAAAAAACgu6sMAAAAADszs8oAAACwMzMzygAAALATMTPKAAAAOxMxM8oAAAA7EzMzygAAADszMzPKAAAAOjMzM8oAAAA6MzMzygAAADozM7PKAAAAoDMzs8oAAADAOjOrzAAAAACsu6rMAAAAAMCqygwAAAAAAMzMAAAAAA==",
@@ -169,20 +154,35 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "icon-prism"
     },
-    "image31": {
-        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA210V3c0AAADb1W3WzQAAANvRFmnNAAAA29GWic0AAADb1W3YzQAAANtdFd3NAAAA293d3c0AAADLzMzMzAAAAA==",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "icon-ring"
-    },
     "image35": {
         "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA201E1M0AAADbFFGlzQAAANstosrNAAAA291Uos0AAADbTUHazQAAANstpN3NAAAA293d3c0AAADLzMzMzAAAAA==",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "icon-crystal"
     },
     "image34": {
-        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA290T080AAADbPRExzQAAANsTET3NAAAA2xMd080AAADbGxPbzQAAANuzu93NAAAA293d3c0AAADLzMzMzAAAAA==",
+        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA291tZs0AAADbbRaBzQAAANsWEYnNAAAA2xYZ1s0AAADbFmnYzQAAANtt2N3NAAAA293d3c0AAADLzMzMzAAAAA==",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "icon-wing"
+    },
+    "image31": {
+        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA210V3c0AAADb1b3czQAAANvRG8jNAAAA29GM+M0AAADb1c3fzQAAANtdFd3NAAAA293d3c0AAADLzMzMzAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "icon-ring"
+    },
+    "image4": {
+        "data": "hwQYABgAAAAAMzMzMzMzMzMzMwAwHRERERERERERPQPT0TMzMzMzMzMz0TMTPR0RERERERHREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTMxEREREREREREzMTPR0RERERERHREzPT0TMzMzMzMzMz0TMwHRERERERERERPQMAMzMzMzMzMzMzMwA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "dark dialog frame"
+    },
+    "J(iuG#_X7y0^|=U??F9D": {
+        "data": "hwQJAAsAAABFiIiISAUAAISIGIiIBAAAiIhRiIULAACIWFgYiAsAAIiFWIGICwAAiIgYiIgLAACEiIiIiAQAAEXMzMxMBQAA8P////8PAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "weapon-bible"
+    },
+    "image20": {
+        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA24aIaM0AAADbiFGIzQAAANtYWFjNAAAA24hYgc0AAADbhohozQAAANv8///NAAAA293d3c0AAADLzMzMzAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "icon-bible"
     },
     "anim1": {
         "namespace": "myAnimations",

@@ -79,7 +79,7 @@ namespace custom {
         const eligible_list = upgrades_available_list
            .filter(upgrade =>
                 ((upgrade.prerequisite == "Weapon") && basic_weapons_count < max_basic_weapons)
-               || ((upgrade.prerequisite == "Armor") && basic_armors_count < max_basic_armors)
+               || ((upgrade.prerequisite == "Armor") && basic_armors_count < max_basic_armors && upgrades_obtained.length > 0)
                 || upgrades_obtained.some(existing_upgrade => existing_upgrade.name == upgrade.prerequisite)
             )
         

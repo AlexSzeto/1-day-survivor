@@ -3,33 +3,6 @@ namespace myImages {
 
     helpers._registerFactory("image", function(name: string) {
         switch(helpers.stringTrim(name)) {
-            case "image4":
-            case "dark dialog frame":return img`
-..bbbbbbbbbbbbbbbbbbbb..
-.bdccccccccccccccccccdb.
-bdcdbbbbbbbbbbbbbbbbdcdb
-bcdbbbbbbbbbbbbbbbbbbdcb
-bcbd1111111111111111dbcb
-bcb111111111111111111bcb
-bcb111111111111111111bcb
-bcb111111111111111111bcb
-bcb111111111111111111bcb
-bcb111111111111111111bcb
-bcb111111111111111111bcb
-bcb111111111111111111bcb
-bcb111111111111111111bcb
-bcb111111111111111111bcb
-bcb111111111111111111bcb
-bcb111111111111111111bcb
-bcb111111111111111111bcb
-bcb111111111111111111bcb
-bcb111111111111111111bcb
-bcbd1111111111111111dbcb
-bdcbbbbbbbbbbbbbbbbbbcdb
-bbdccccccccccccccccccdbb
-.bbbbbbbbbbbbbbbbbbbbbb.
-..bbbbbbbbbbbbbbbbbbbb..
-`;
             case "image18":
             case "icon-dagger":return img`
 b b b b b b b b b b 
@@ -53,19 +26,6 @@ b d 2 4 5 4 d d d c
 b d 2 5 4 2 4 2 d c 
 b d 2 5 5 4 2 d d c 
 b d d 2 2 2 d d d c 
-b d d d d d d d d c 
-b c c c c c c c c c 
-`;
-            case "image20":
-            case "icon-bible":return img`
-b b b b b b b b b b 
-b d d d d d d d d c 
-b d 6 8 8 8 6 c d c 
-b d 8 8 5 8 8 f d c 
-b d 8 5 5 5 8 f d c 
-b d 8 8 5 8 8 f d c 
-b d 8 8 5 8 8 f d c 
-b d 6 8 8 8 6 f d c 
 b d d d d d d d d c 
 b c c c c c c c c c 
 `;
@@ -169,20 +129,6 @@ c a a 3 3 3 a a c
 . 6 7 7 6 6 6 . 
 . . 6 7 6 6 . . 
 . . . 6 6 . . . 
-`;
-            case "J(iuG#_X7y0^|=U??F9D":
-            case "weapon-bible":return img`
-5 4 8 8 8 8 4 5 . 
-4 8 8 8 8 8 8 4 f 
-8 8 8 5 8 8 8 c f 
-8 8 8 1 8 8 8 c f 
-8 5 1 1 1 5 8 c f 
-8 8 8 1 8 8 8 c f 
-8 8 8 5 8 8 8 c f 
-8 8 8 5 8 8 8 c f 
-8 8 8 5 8 8 8 c f 
-4 8 8 8 8 8 8 4 f 
-5 4 b b b b 4 5 f 
 `;
             case "image5":
             case "slime":return img`
@@ -595,19 +541,6 @@ b d d d 4 8 d d d c
 b d d d d d d d d c 
 b c c c c c c c c c 
 `;
-            case "image31":
-            case "icon-ring":return img`
-b b b b b b b b b b 
-b d d d d d d d d c 
-b d d 5 1 1 5 d d c 
-b d 5 d d d d 5 d c 
-b d 5 d 6 6 d 5 d c 
-b d 1 6 1 9 6 1 d c 
-b d d 6 9 9 8 d d c 
-b d d d 6 8 d d d c 
-b d d d d d d d d c 
-b c c c c c c c c c 
-`;
             case "image35":
             case "icon-crystal":return img`
 b b b b b b b b b b 
@@ -625,12 +558,79 @@ b c c c c c c c c c
             case "icon-wing":return img`
 b b b b b b b b b b 
 b d d d d d d d d c 
-b d d d 3 3 b 3 d c 
-b d d 3 1 1 1 b d c 
-b d 3 1 1 d 3 b d c 
-b d 1 1 1 1 1 b d c 
-b d 3 1 d 3 b d d c 
-b d d 3 3 d d d d c 
+b d d d 6 6 6 d d c 
+b d d 6 1 1 1 6 d c 
+b d d 6 1 9 9 8 d c 
+b d 6 1 1 1 6 d d c 
+b d 6 1 9 6 8 d d c 
+b d 6 8 8 d d d d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
+`;
+            case "image31":
+            case "icon-ring":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d d 5 1 1 5 d d c 
+b d 5 d d d d 5 d c 
+b d 5 d b c d 5 d c 
+b d 1 b 1 8 c 1 d c 
+b d d c 8 8 f d d c 
+b d d d c f d d d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
+`;
+            case "image4":
+            case "dark dialog frame":return img`
+..33333333333333333333..
+.3d111111111111111111d3.
+3d1d3333333333333333d1d3
+31d333333333333333333d13
+313d1111111111111111d313
+313111111111111111111313
+313111111111111111111313
+313111111111111111111313
+313111111111111111111313
+313111111111111111111313
+313111111111111111111313
+313111111111111111111313
+313111111111111111111313
+313111111111111111111313
+313111111111111111111313
+313111111111111111111313
+313111111111111111111313
+313111111111111111111313
+313111111111111111111313
+313d1111111111111111d313
+3d13333333333333333331d3
+33d111111111111111111d33
+.3333333333333333333333.
+..33333333333333333333..
+`;
+            case "J(iuG#_X7y0^|=U??F9D":
+            case "weapon-bible":return img`
+5 4 8 8 8 8 4 5 . 
+4 8 8 8 8 8 8 4 f 
+8 8 8 8 5 8 8 c f 
+8 8 8 5 8 8 8 c f 
+8 8 1 8 8 8 8 c f 
+8 1 5 5 5 1 8 c f 
+8 8 8 8 1 8 8 c f 
+8 8 8 1 8 8 8 c f 
+8 8 5 8 8 8 8 c f 
+4 8 8 8 8 8 8 4 f 
+5 4 b b b b 4 5 f 
+`;
+            case "image20":
+            case "icon-bible":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d 6 8 8 8 6 c d c 
+b d 8 8 5 8 8 f d c 
+b d 8 1 8 8 8 f d c 
+b d 8 5 5 5 8 f d c 
+b d 8 8 8 1 8 f d c 
+b d 6 8 5 8 6 f d c 
 b d d d d d d d d c 
 b c c c c c c c c c 
 `;

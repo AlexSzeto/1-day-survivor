@@ -34,9 +34,9 @@ type TickTracking = {
 }
 
 let tick_trackers:TickTracking[] = []
-function start_tick_track(event: () => void): TickTracking {
+function start_tick_track(event: () => void, rate: number = 0): TickTracking {
     const new_tick = {
-        rate: 0,
+        rate,
         count: 0,
         event
     }
@@ -87,19 +87,27 @@ let spray_speed = 0
 
 let enemy_attack_cooldown_tick: TickTracking = start_tick_track(reset_enemy_attack_cooldown)
 enemy_attack_cooldown_tick.rate = 2
-let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave)
-enemy_spawn_tick.rate = 4
-let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase)
-enemy_phase_tick.rate = 120
+let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 4)
+let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 120)
 let enemy_phase = 0
 
 let hero: Sprite = null
 let hero_health: StatusBarSprite = null
 let hero_xp: StatusBarSprite = null
+let hero_speed = 100
+let hero_regen = 0
+let hero_regen_tick: TickTracking = start_tick_track(regenerate_hero, 4)
+let hero_auto_collect_tick: TickTracking = null
+let hero_level = 1
+let hero_angle = 0
 
 let aura_weapon: Sprite = null
 let upgrade_menu: miniMenu.MenuSprite = null
 
+controller.left.onEvent(ControllerButtonEvent.Pressed, () => { hero_angle = 180 })
+controller.right.onEvent(ControllerButtonEvent.Pressed, () => { hero_angle = 0 })
+controller.up.onEvent(ControllerButtonEvent.Pressed, () => { hero_angle = 270 })
+controller.down.onEvent(ControllerButtonEvent.Pressed, () => { hero_angle = 90 })
 
 /*
 UPGRADES
@@ -111,7 +119,7 @@ function get_random_upgrade (message: string) {
         let next_upgrade = upgrade_list.pop()
         game.setDialogFrame(assets.image`dark dialog frame`)
         game.showLongText(message, DialogLayout.Bottom)
-        game.showLongText("You obtained " + next_upgrade, DialogLayout.Bottom)
+        game.showLongText(next_upgrade, DialogLayout.Bottom)
         perform_upgrade(custom.get_upgrade(next_upgrade))
     }
 }
@@ -172,17 +180,17 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("Fireball 4", assets.image`icon-fireball`, "x2 damage", "Fireball 3")
     custom.add_upgrade_to_list("Fireball 5", assets.image`icon-fireball`, "x2 pace", "Fireball 4")
 
-    custom.add_upgrade_to_list("Bible", assets.image`icon-bible`, "circles to protect", "Weapon")
+    custom.add_upgrade_to_list("Spellbook", assets.image`icon-bible`, "circles to protect", "Weapon")
     orbit_spawn_count = 0
     orbit_spawn_tick.rate = 18
     orbit_angular_speed = 6
     orbit_distance = 30
     orbit_duration = 3000
     orbit_damage = 12
-    custom.add_upgrade_to_list("Bible 2", assets.image`icon-bible`, "+50% damage", "Bible")
-    custom.add_upgrade_to_list("Bible 3", assets.image`icon-bible`, "+1 book", "Bible 2")
-    custom.add_upgrade_to_list("Bible 4", assets.image`icon-bible`, "+50% speed", "Bible 3")
-    custom.add_upgrade_to_list("Bible 5", assets.image`icon-bible`, "+2 book", "Bible 4")
+    custom.add_upgrade_to_list("Spellbook 2", assets.image`icon-bible`, "+50% damage", "Spellbook")
+    custom.add_upgrade_to_list("Spellbook 3", assets.image`icon-bible`, "+1 book", "Spellbook 2")
+    custom.add_upgrade_to_list("Spellbook 4", assets.image`icon-bible`, "+50% speed", "Spellbook 3")
+    custom.add_upgrade_to_list("Spellbook 5", assets.image`icon-bible`, "+2 book", "Spellbook 4")
 
     custom.add_upgrade_to_list("Divine Aura", assets.image`icon-aura`, "damage aura", "Weapon")
     aura_spawn_count = 0
@@ -209,11 +217,62 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("Holy Water 3", assets.image`icon-water`, "+25% radius", "Holy Water 2")
     custom.add_upgrade_to_list("Holy Water 4", assets.image`icon-water`, "+1 vial", "Holy Water 3")
     custom.add_upgrade_to_list("Holy Water 5", assets.image`icon-water`, "x2 damage", "Holy Water 4")
+
+    custom.add_upgrade_to_list("Life Shield", assets.image`icon-shield`, "+2 HP per second", "Armor")
+    custom.add_upgrade_to_list("Life Shield 2", assets.image`icon-shield`, "+50% max HP", "Life Shield")
+    custom.add_upgrade_to_list("Life Shield 3", assets.image`icon-shield`, "+2 hp per second ", "Life Shield 2")
+
+    custom.add_upgrade_to_list("Bottled Lightning", assets.image`icon-flask`, "+20% all pace", "Armor")
+    custom.add_upgrade_to_list("Bottled Lightning 2", assets.image`icon-flask`, "+20% all pace", "Bottled Lightning")
+    custom.add_upgrade_to_list("Bottled Lightning 3", assets.image`icon-flask`, "+20% all pace", "Bottled Lightning 2")
+
+    custom.add_upgrade_to_list("Force Crystal", assets.image`icon-crystal`, "+20% all damage", "Armor")
+
+    custom.add_upgrade_to_list("Aura Ring", assets.image`icon-ring`, "+25% all radius", "Armor")
+    custom.add_upgrade_to_list("Gem Prism", assets.image`icon-prism`, "auto collect gems (12s cooldown)", "Armor")
+    custom.add_upgrade_to_list("Phoenix Feather", assets.image`icon-wing`, "+20% move speed", "Armor")
 }
 
 // CONTAINS GAME DESIGN
 function perform_upgrade(name: string) {
     switch(name) {
+        case "Life Shield":
+            hero_regen += 2
+            break
+
+        case "Lightning Flask":
+            spray_spawn_tick.rate *= 0.8
+            tracer_spawn_tick.rate *= 0.8
+            exploder_spawn_tick.rate *= 0.8
+            orbit_spawn_tick.rate *= 0.8
+            molotov_spawn_tick.rate *= 0.8
+            break
+
+        case "Power Crystal":
+            spray_damage *= 1.2
+            tracer_damage *= 1.2
+            exploder_projectile_damage *= 1.2
+            exploder_explosion_damage *= 1.2
+            aura_tick_damage *= 1.2
+            orbit_damage *= 1.2
+            molotov_damage *= 1.2
+            break
+
+        case "Aura Ring":
+            exploder_explosion_scale *= 1.25
+            aura_scale *= 1.25
+            molotov_flame_scale *= 1.25
+            break
+
+        case "Gem Prism":
+            start_auto_collect()
+            break
+
+        case "Phoenix Feather":
+            hero_speed += 20
+            adjust_hero_speed()
+            break
+
         case "Daggers":
             spray_spawn_count += 3
             break
@@ -264,19 +323,19 @@ function perform_upgrade(name: string) {
             exploder_spawn_tick.rate *= 0.5
             break
 
-        case "Bible":
+        case "Spellbook":
             orbit_spawn_count += 2
             break
-        case "Bible 2":
+        case "Spellbook 2":
             orbit_damage *= 1.5
             break
-        case "Bible 3":
+        case "Spellbook 3":
             orbit_spawn_count += 1
             break
-        case "Bible 4":
+        case "Spellbook 4":
             orbit_angular_speed *= 1.5
             break
-        case "Bible 5":
+        case "Spellbook 5":
             orbit_spawn_count += 2
             break
 
@@ -337,7 +396,8 @@ HERO EVENTS
 statusbars.onStatusReached(StatusBarKind.Experience, statusbars.StatusComparison.GTE, statusbars.ComparisonType.Percentage, 100, function (status) {
     status.value = 0
     status.max = Math.floor(status.max + 5)
-    choose_upgrade("Pick Upgrade")
+    hero_level += 1
+    choose_upgrade("You Reached Lv. " + hero_level + "!")
 })
 
 statusbars.onZero(StatusBarKind.Health, function (status) {
@@ -345,6 +405,26 @@ statusbars.onZero(StatusBarKind.Health, function (status) {
 
     }
 })
+
+function start_auto_collect() {
+    hero_auto_collect_tick = start_tick_track(auto_collect_all_gems, 48)
+}
+
+function auto_collect_all_gems() {
+    for(let gem of sprites.allOfKind(SpriteKind.PickUp)) {
+        gem.follow(hero, 200)
+    }
+}
+
+function regenerate_hero() {
+    hero_health.value += hero_regen
+}
+
+function adjust_hero_speed() {
+    if(custom.game_state_is(GameState.normal)) {
+        controller.moveSprite(hero, hero_speed, hero_speed)
+    }
+}
 
 /*
 ENEMY SPAWNING
@@ -521,11 +601,12 @@ PICKUP EVENTS
 */
 sprites.onOverlap(SpriteKind.Player, SpriteKind.PickUp, function (sprite, otherSprite) {
     hero_xp.value += sprites.readDataNumber(otherSprite, "xp")
+    info.changeScoreBy(sprites.readDataNumber(otherSprite, "xp"))
     otherSprite.destroy()
 })
 
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, otherSprite) {
-    get_random_upgrade("You found an upgrade!")
+    get_random_upgrade("You found a treasure!")
     otherSprite.destroy()
 })
 scene.onHitWall(SpriteKind.Explosive, function (sprite, location) {
@@ -562,6 +643,7 @@ function setup_game () {
     hero_xp.value = 0
     hero_xp.setColor(9, 15)
     hero_xp.setStatusBarFlag(StatusBarFlag.SmoothTransition, false)
+    info.setScore(0)
     controller.moveSprite(hero)
     setup_upgrade_menu()
     enemy_phase = 0
@@ -762,14 +844,19 @@ function spawn_molotov() {
 }
 
 function spawn_spray() {
-    let spray_angle = randint(0, 360)
-    let weapon_image = assets.image`weapon-dagger-ne`
+    let spray_angle = hero_angle
+    spray_angle -= spray_spawn_count * 15 / 2
+    spray_angle += Math.randomRange(-30, 30)
+    let weapon_image:Image = null
+
     if (spray_angle < 90) {
         weapon_image = assets.image`weapon-dagger-se`
     } else if (spray_angle < 180) {
         weapon_image = assets.image`weapon-dagger-sw`
     } else if (spray_angle < 270) {
         weapon_image = assets.image`weapon-dagger-nw`
+    } else {
+        weapon_image = assets.image`weapon-dagger-ne`
     }
     for (let index = 0; index < spray_spawn_count; index++) {
         let new_weapon = sprites.create(weapon_image, SpriteKind.Projectile)
@@ -782,7 +869,7 @@ function spawn_spray() {
         )
         new_weapon.lifespan = DEFAULT_WEAPON_LIFESPAN
         sprites.setDataNumber(new_weapon, "damage", spray_damage)
-        spray_angle += 10
+        spray_angle += 15
     }
 }
 
