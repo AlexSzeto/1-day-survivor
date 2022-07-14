@@ -133,8 +133,8 @@ let main_menu: miniMenu.MenuSprite = null
 let seen_intro: boolean = false
 
 function start_main_menu() {
-    scene.setBackgroundImage(assets.image`splash-screen`)
-    let menu_hero = sprites.create(assets.image`title-foreground`, SpriteKind.NonInteractive)    
+    scene.setBackgroundImage(assets.image`title-background`)
+    let title_text = sprites.create(assets.image`title-text`, SpriteKind.NonInteractive)    
     game.setDialogFrame(assets.image`dialog frame`)
     main_menu = miniMenu.createMenu(
         miniMenu.createMenuItem("START   "),
@@ -154,7 +154,7 @@ function start_main_menu() {
 
     main_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
         main_menu.close()
-        menu_hero.destroy()
+        title_text.destroy()
         switch(selectedIndex) {
             case 0:
                 if (info.highScore() == 0 && !seen_intro) {
