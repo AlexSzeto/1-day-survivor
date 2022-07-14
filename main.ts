@@ -134,6 +134,7 @@ let seen_intro: boolean = false
 
 function start_main_menu() {
     scene.setBackgroundImage(assets.image`splash-screen`)
+    let menu_hero = sprites.create(assets.image`title-foreground`, SpriteKind.NonInteractive)    
     game.setDialogFrame(assets.image`dialog frame`)
     main_menu = miniMenu.createMenu(
         miniMenu.createMenuItem("START   "),
@@ -153,6 +154,7 @@ function start_main_menu() {
 
     main_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
         main_menu.close()
+        menu_hero.destroy()
         switch(selectedIndex) {
             case 0:
                 if (info.highScore() == 0 && !seen_intro) {
@@ -175,10 +177,9 @@ function start_main_menu() {
 }
 
 function show_intro() {
-    game.showLongText("An ancient evil haunts the castle. The king calls for help!", DialogLayout.Bottom)
-    game.showLongText("You are Sophie, the brave knight, here to answer the call!", DialogLayout.Bottom)
-    game.showLongText("As you enter the castle, the heavy doors close behind you...", DialogLayout.Bottom)
-    game.showLongText("The only way out now is to defeat the ancient evil. Good luck!", DialogLayout.Bottom)
+    game.showLongText("You are Sophie, the brave knight!", DialogLayout.Bottom)
+    game.showLongText("An ancient evil haunts the castle.", DialogLayout.Bottom)
+    game.showLongText("Defeat the final boss and escape!", DialogLayout.Bottom)
 }
 
 controller.left.onEvent(ControllerButtonEvent.Pressed, () => { hero_angle = 180 })
@@ -201,6 +202,7 @@ function get_random_upgrade (message: string) {
         game.showLongText("You found 100 gold!", DialogLayout.Bottom)
         info.changeScoreBy(100)
     }
+    effects.confetti.startScreenEffect(500)
 }
 
 function choose_upgrade(title: string) {
@@ -551,7 +553,7 @@ statusbars.onStatusReached(StatusBarKind.Experience, statusbars.StatusComparison
     status.value = 0
     status.max = Math.floor(status.max + hero_xp_increment)
     hero_level += 1
-    choose_upgrade("You Reached Lv. " + hero_level + "!")
+    choose_upgrade("YOU REACHED LV. " + hero_level + "!")
 })
 
 statusbars.onZero(StatusBarKind.Health, function (status) {
@@ -772,7 +774,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
         if (!(sprites.readDataBoolean(otherSprite, "attack_cooldown"))) {
             if(!Math.percentChance(hero_dodge)) {
                 hero_health.value -= sprites.readDataNumber(otherSprite, "damage")
-                scene.cameraShake(Math.max(4, Math.floor(sprites.readDataNumber(otherSprite, "damage") / hero_health.max * 8)), 500)
+                scene.cameraShake(Math.max(1, Math.floor(sprites.readDataNumber(otherSprite, "damage") / hero_health.max * 8)), 250)
                 sprites.setDataBoolean(otherSprite, "attack_cooldown", true)
             } else {
                 custom.aim_projectile_at_sprite(hero, otherSprite, AimType.velocity, hero_dodge_distance)
@@ -785,7 +787,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
     } else {
         if (!Math.percentChance(hero_dodge)) {
             hero_health.value -= sprites.readDataNumber(otherSprite, "damage")
-            scene.cameraShake(Math.max(4, Math.floor(sprites.readDataNumber(otherSprite, "damage") / hero_health.max * 8)), 500)
+            scene.cameraShake(Math.max(2, Math.floor(sprites.readDataNumber(otherSprite, "damage") / hero_health.max * 8)), 250)
             otherSprite.destroy()
          } else {
             custom.aim_projectile_at_sprite(hero, otherSprite, AimType.velocity, hero_dodge_distance)
