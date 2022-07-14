@@ -102,6 +102,17 @@ namespace custom {
 
 
     /**
+     * get obtained upgrade name list
+     */
+    //% group="Upgrades"
+    //% block="name list for obtained upgrades"
+    export function get_obtained_upgrade_names(): string[] {
+        return upgrades_obtained
+            .map(upgrade => upgrade.name)
+            .sort()
+    }
+
+    /**
      * get obtained upgrade icon list
      */
     //% group="Upgrades"
@@ -192,13 +203,13 @@ namespace custom {
     export function move_sprite_off_camera(target: Sprite): void {
         const spawn_pixel: number = Math.randomRange(0, scene.screenWidth() * 2 + scene.screenHeight() * 2)
         if(spawn_pixel < scene.screenWidth()) {
-            target.y = scene.cameraTop() - target.height / 2
+            target.y = scene.cameraProperty(CameraProperty.Y) - scene.screenWidth() / 2 - target.height / 2
             target.x = scene.cameraLeft() + spawn_pixel
         } else if (spawn_pixel < scene.screenWidth() + scene.screenHeight()) {
             target.x = scene.cameraLeft() + scene.screenWidth() + target.width / 2
             target.y = scene.cameraTop() + spawn_pixel - scene.screenWidth()
         } else if (spawn_pixel < scene.screenWidth() * 2 + scene.screenHeight()) {
-            target.y = scene.cameraTop() + scene.screenHeight() + target.height / 2
+            target.y = scene.cameraTop() + scene.screenHeight() / 2 + scene.screenWidth() / 2 + target.height / 2
             target.x = scene.cameraLeft() + spawn_pixel - scene.screenWidth() - scene.screenHeight()
         } else {
             target.x = scene.cameraLeft() - target.width / 2
