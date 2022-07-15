@@ -219,6 +219,13 @@ let hero_auto_collect_chance: number = 0
 let hero_gem_collect_radius: number = 24
 let hero_food_heal = 30
 
+type HeroBuild = {
+    prerequsites: string[]
+    strongest_weapon: string
+    name: string
+}
+let hero_builds:HeroBuild[] = []
+
 let gem_bonus_xp = 0
 let weapon_pushback = 0
 let aura_weapon: Sprite = null
@@ -346,6 +353,15 @@ function choose_upgrade(title: string) {
 }
 
 // CONTAINS GAME DESIGN
+
+function add_build(name: string, prerequsites: string[] = null, strongest_weapon: string = null) {
+    hero_builds.push({
+        name,
+        prerequsites,
+        strongest_weapon
+    })
+}
+
 function setup_upgrade_menu() {
     custom.add_upgrade_to_list("CROSS", assets.image`icon-cross`, "throw 3 crosses", "WEAPON")
     spray_spawn_count = 0
@@ -438,7 +454,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("POWER CRYSTAL", assets.image`icon-crystal`, "x1.1 all damage", "ACCESSORY")
     custom.add_upgrade_to_list("POWER CRYSTAL 2", assets.image`icon-crystal`, "x1.2 all damage", "POWER CRYSTAL")
     custom.add_upgrade_to_list("POWER CRYSTAL 3", assets.image`icon-crystal`, "+weapon pushback", "POWER CRYSTAL 2")
-    // cross, spark, spellbook, fireball (negative)
+    // cross, spark, spellbook
 
     custom.add_upgrade_to_list("AURA RING", assets.image`icon-ring`, "x1.2 all radius", "ACCESSORY")
     custom.add_upgrade_to_list("AURA RING 2", assets.image`icon-ring`, "x1.2 all radius", "AURA RING")
@@ -449,6 +465,21 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("BLESSED CUP 2", assets.image`icon-cup`, "x1.1 holy damage", "BLESSED CUP")
     custom.add_upgrade_to_list("BLESSED CUP 3", assets.image`icon-cup`, "x1.5 holy intensity", "BLESSED CUP 2")
     // holy water, cross, divine aura
+
+    add_build("SORCERESS", ["SPELLBOOK", "SPARK", "FIREBALL"])
+    add_build("FLASH SORCERESS", ["SPELLBOOK", "SPARK", "FIREBALL", "FLASH FLASK 3"])
+    add_build("TRICKSTER", ["CROSS", "SPARK", "SPELLBOOK"])
+    add_build("CRYSTAL TRICKSTER", ["CROSS", "SPARK", "SPELLBOOK", "POWER CRYSTAL 3"])
+    add_build("ALCHEMIST", ["HOLY WATER", "FIREBALL", "DIVINE AURA"])
+    add_build("AWAKENED ALCHEMIST", ["HOLY WATER", "FIREBALL", "DIVINE AURA", "AURA RING 3"])
+    add_build("PALADIN", ["HOLY WATER", "CROSS", "DIVINE AURA"])
+    add_build("BLESSED PALADIN", ["HOLY WATER", "CROSS", "DIVINE AURA", "BLESSED CUP 3"])
+    add_build("APPRENTICE", [], "SPARK")
+    add_build("FIGHTER", [], "CROSS")
+    add_build("PYROMANCER", [], "FIREBALL")
+    add_build("GUARDIAN", [], "DIVINE AURA")
+    add_build("PRIESTESS", [], "HOLY WATER")
+    add_build("SCHOLAR", [], "SPELLBOOK")
 }
 
 // CONTAINS GAME DESIGN
@@ -886,8 +917,13 @@ function despawn_enemy(destroy_candidate: Sprite) {
 function spawn_enemy(name: string) {
     const enemies: Sprite[] = sprites.allOfKind(SpriteKind.Enemy)
     if (enemies.length >= MAX_ENEMIES) {
-        const destroy_candidate = enemies.reduce((farthest, target) => custom.get_distance_between(target, hero) > custom.get_distance_between(farthest, hero) ? target : farthest, enemies[0])
-        despawn_enemy(destroy_candidate)
+
+        if(!(["SKELETON MAGE", "SLIME KING", "TROLL"].indexOf(name) >= 0)) {
+            return
+        }
+        // const destroy_candidate = enemies.reduce((farthest, target) => custom.get_distance_between(target, hero) > custom.get_distance_between(farthest, hero) ? target : farthest, enemies[0])
+        // despawn_enemy(destroy_candidate)
+        // spawn_over_enemy_tracker++
     }
 
     // CONTAINS GAME DESIGN
@@ -895,12 +931,15 @@ function spawn_enemy(name: string) {
     if (name == "ZOMBIE") {
         new_enemy = sprites.create(assets.image`zombie`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 12, 10, 25, 1)
+        sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "LAVA ZOMBIE") {
         new_enemy = sprites.create(assets.image`lava-zombie`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 90, 20, 30, 2)
+        sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "MUMMY") {
         new_enemy = sprites.create(assets.image`mummy`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 30, 10, 20, 1)
+        sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "KNIGHT") {
         new_enemy = sprites.create(assets.image`knight`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 40, 15, 30, 1)
@@ -1442,7 +1481,7 @@ game.onUpdate(function () {
                 hero_health.value += hero_food_heal
                 pickup.destroy()
             } else if (distance > scene.screenWidth()) {
-                pickup.destroy()
+                custom.move_sprite_off_camera(pickup)
             }
         }
 
@@ -1463,13 +1502,9 @@ game.onUpdate(function () {
 })
 
 function show_stats() {
-    if(debug_mode) {
-        game.showLongText(`LV ${hero_level}` + "\n \n" + damage_tracker.filter(value => value.total > 0).map(value => `${value.name}: ${Math.floor(value.total)}`).join("\n"), DialogLayout.Full)
-        game.showLongText(`UPGRADES` + "\n \n" + custom.get_obtained_highest_upgrade_names().join("\n"), DialogLayout.Full)
-        game.showLongText(`ENEMY PHASE ${enemy_phase} LV+ ${enemy_extra_difficulty}` + "\n \n" + kill_tracker.filter(value => value.total > 0).map(value => `${value.name}: ${Math.floor(value.total)}`).join("\n"), DialogLayout.Full)
-        game.showLongText(`DAMAGE TAKEN\n \n` + wound_tracker.filter(value => value.total > 0).map(value => `${value.name}: ${Math.floor(value.total)}`).join("\n"), DialogLayout.Full)
-
-    }
+    game.pushScene()
+    scene.setBackgroundImage(assets.image`title-background`)
+    game.popScene()
 }
 
 let press_b = 0
