@@ -41,7 +41,7 @@ namespace custom {
     const upgrades_obtained: UpgradeData[] = []
 
     let max_basic_weapons: number = 3
-    let max_basic_armors: number = 3
+    let max_basic_accessories: number = 3
     let current_game_state: GameState = GameState.setup
 
     let spawn_waves: WaveData[] = [[],[],[],[],[]]
@@ -74,12 +74,12 @@ namespace custom {
     //% blockId="get_upgrade_choices"
     //% block="list of eligible upgrades up to $max"
     export function get_upgrade_choices(max: number): string[] {
-        const basic_weapons_count = upgrades_obtained.reduce((count, upgrade) => (upgrade.prerequisite == "Weapon") ? count + 1 : count, 0)
-        const basic_armors_count = upgrades_obtained.reduce((count, upgrade) => (upgrade.prerequisite == "Armor") ? count + 1 : count, 0)
+        const basic_weapons_count = upgrades_obtained.reduce((count, upgrade) => (upgrade.prerequisite == "WEAPON") ? count + 1 : count, 0)
+        const basic_armors_count = upgrades_obtained.reduce((count, upgrade) => (upgrade.prerequisite == "ACCESSORY") ? count + 1 : count, 0)
         const eligible_list = upgrades_available_list
            .filter(upgrade =>
-                ((upgrade.prerequisite == "Weapon") && basic_weapons_count < max_basic_weapons)
-               || ((upgrade.prerequisite == "Armor") && basic_armors_count < max_basic_armors && upgrades_obtained.length > 0)
+                ((upgrade.prerequisite == "WEAPON") && basic_weapons_count < max_basic_weapons)
+               || ((upgrade.prerequisite == "ACCESSORY") && basic_armors_count < max_basic_accessories && upgrades_obtained.length > 0)
                 || upgrades_obtained.some(existing_upgrade => existing_upgrade.name == upgrade.prerequisite)
             )
         
@@ -106,8 +106,9 @@ namespace custom {
      */
     //% group="Upgrades"
     //% block="name list for obtained upgrades"
-    export function get_obtained_upgrade_names(): string[] {
+    export function get_obtained_highest_upgrade_names(): string[] {
         return upgrades_obtained
+            .filter(past_upgrade => !upgrades_obtained.some(newer_upgrade => newer_upgrade.prerequisite == past_upgrade.name))
             .map(upgrade => upgrade.name)
             .sort()
     }
@@ -119,7 +120,7 @@ namespace custom {
     //% block="icon list for obtained upgrades"
     export function get_obtained_upgrade_icons(): Image[] {
         return upgrades_obtained
-            .filter(upgrade => upgrade.prerequisite == "Weapon" || upgrade.prerequisite == "Armor")
+            .filter(upgrade => upgrade.prerequisite == "WEAPON" || upgrade.prerequisite == "ACCESSORY")
             .map(upgrade => get_upgrade_icon(upgrade.name))
     }
     
@@ -141,8 +142,10 @@ namespace custom {
     export function get_upgrade(menu_description: string): string {
         const next_upgrade_name = menu_description.indexOf(':') >= 0 ? menu_description.split(':')[0] : menu_description
         const upgrade_item = upgrades_available_list.find(upgrade => upgrade.name == next_upgrade_name)
-        upgrades_obtained.push(upgrade_item)
-        upgrades_available_list.removeElement(upgrade_item)
+        if(upgrade_item.prerequisite != "CONSUMABLE") {
+            upgrades_obtained.push(upgrade_item)
+            upgrades_available_list.removeElement(upgrade_item)
+        }
         return next_upgrade_name
     }
 
@@ -360,5 +363,15 @@ namespace custom {
             }
         })
         return list
+    }
+
+
+    /**
+     * get a count of spawns from a spawn wave
+     */
+    //% group="Spawn Waves"
+    //% block="list of spawn wave enemies from $wave"
+    export function get_wave_enemy_count(wave: number): number {
+        return spawn_waves[wave].reduce((count, spawn) => count += spawn.count, 0)
     }
 }

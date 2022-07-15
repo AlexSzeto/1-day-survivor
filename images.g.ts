@@ -3,19 +3,6 @@ namespace myImages {
 
     helpers._registerFactory("image", function(name: string) {
         switch(helpers.stringTrim(name)) {
-            case "image18":
-            case "icon-dagger":return img`
-b b b b b b b b b b 
-b d d d d d d d d c 
-b d 1 c d d d d d c 
-b d 1 b c d d d d c 
-b d d 1 b c 4 d d c 
-b d d d 1 b e d d c 
-b d d d 4 e e d d c 
-b d d d d d d e d c 
-b d d d d d d d d c 
-b c c c c c c c c c 
-`;
             case "image19":
             case "icon-fireball":return img`
 b b b b b b b b b b 
@@ -397,79 +384,6 @@ a c . a 3 1 c 1 1 c 1 3 a . a c
 . . . . . c a 3 3 3 a c . . . . 
 . . . . . . c c c c c c c . . . 
 `;
-            case "image16":
-            case "skeleton-mage":return img`
-..76...eeeeee.....
-.7976.ed1111de....
-.6776eb111111be...
-..66.cbd1111dbc...
-..54.cbcb11bcbc...
-..ec.fd571175df...
-..ec.fb11ce11bf...
-..ec..cbddddbc....
-..ec..fd1111df....
-..ecee.fbbbbf.....
-..cc1dc5cffc5fc...
-..c11df159751fe...
-..cddc1bb77bb1ce..
-...ccfd1dbed1dfe..
-...effcbb1dbbcfdc.
-...ef.c1dbed1ccec.
-...ef.6cc77cc7cc..
-...ec.67997766....
-......66776bc6....
-......ec661de6....
-......fbcf1df.....
-.......ff.ff......
-`;
-            case "image24":
-            case "weapon-dagger-nw":return img`
-c c c . . . . . . 
-c 1 b c . . . . . 
-c d 1 b c . . . . 
-. c d 1 b c . e . 
-. . c d 1 b 4 . . 
-. . . c b 4 c . . 
-. . . . 4 c e c . 
-. . . e . . c e c 
-. . . . . . . c c 
-`;
-            case "image27":
-            case "weapon-dagger-ne":return img`
-. . . . . . c c c 
-. . . . . c d 1 c 
-. . . . c d 1 b c 
-. e . c d 1 b c . 
-. . 4 b 1 b c . . 
-. . c 4 b c . . . 
-. c e c 4 . . . . 
-c e c . . e . . . 
-c c . . . . . . . 
-`;
-            case "image28":
-            case "weapon-dagger-se":return img`
-c c . . . . . . . 
-c e c . . e . . . 
-. c e c 4 . . . . 
-. . c 4 b c . . . 
-. . 4 b 1 b c . . 
-. e . c d 1 b c . 
-. . . . c d 1 b c 
-. . . . . c d 1 c 
-. . . . . . c c c 
-`;
-            case "image29":
-            case "weapon-dagger-sw":return img`
-. . . . . . . c c 
-. . . e . . c e c 
-. . . . 4 c e c . 
-. . . c b 4 c . . 
-. . c d 1 b 4 . . 
-. c d 1 b c . e . 
-c d 1 b c . . . . 
-c 1 b c . . . . . 
-c c c . . . . . . 
-`;
             case "image14":
             case "treasure":return img`
 . . c c c c c c c c c c c c . . 
@@ -567,32 +481,6 @@ b d 6 8 8 d d d d c
 b d d d d d d d d c 
 b c c c c c c c c c 
 `;
-            case "image31":
-            case "icon-ring":return img`
-b b b b b b b b b b 
-b d d d d d d d d c 
-b d d 5 1 1 5 d d c 
-b d 5 d d d d 5 d c 
-b d 5 d b c d 5 d c 
-b d 1 b 1 8 c 1 d c 
-b d d c 8 8 f d d c 
-b d d d c f d d d c 
-b d d d d d d d d c 
-b c c c c c c c c c 
-`;
-            case "image20":
-            case "icon-bible":return img`
-b b b b b b b b b b 
-b d d d d d d d d c 
-b d 6 8 8 8 6 c d c 
-b d 8 8 5 8 8 f d c 
-b d 8 1 8 8 8 f d c 
-b d 8 5 5 5 8 f d c 
-b d 8 8 8 1 8 f d c 
-b d 6 8 5 8 6 f d c 
-b d d d d d d d d c 
-b c c c c c c c c c 
-`;
             case "image36":
             case "black-cat":return img`
 . . . f . . f . . . . . . e f f . . 
@@ -636,20 +524,6 @@ bd1bbbbbbbbbbbbbbbbbb1db
 bbd111111111111111111dbb
 .bbbbbbbbbbbbbbbbbbbbbb.
 ..bbbbbbbbbbbbbbbbbbbb..
-`;
-            case "J(iuG#_X7y0^|=U??F9D":
-            case "weapon-bible":return img`
-9 6 8 8 8 8 6 9 . 
-6 8 8 8 8 8 8 6 f 
-8 8 8 8 5 8 8 c f 
-8 8 8 5 8 8 8 c f 
-8 8 1 8 8 8 8 c f 
-8 1 5 5 5 1 8 c f 
-8 8 8 8 1 8 8 c f 
-8 8 8 1 8 8 8 c f 
-8 8 5 8 8 8 8 c f 
-6 8 8 8 8 8 8 6 f 
-9 6 b b b b 6 9 f 
 `;
             case "image39":
             case "title-background":return img`
@@ -774,6 +648,120 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8899999966fc888669999999999668888f88666666688cccffffffffffffffffffff
 ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff889999996ffc888669999999999668888f88666666688cccffffffffffffffffffff
 `;
+            case "image37":
+            case "hero-shadow":return img`
+...11111111111..
+..1111111111111.
+.111111111111111
+1111111111111111
+1111111111111111
+1111111111111111
+111111111111111.
+.11111111111111.
+..1111111111.1..
+..1111111111....
+.111111111111...
+.111111111111...
+..1111111111....
+.111111111111...
+.111111111111...
+..1111111111....
+....111111......
+....111111......
+....111111......
+....111.........
+`;
+            case "image41":
+            case "weapon-cross":return img`
+a c c . . . a a 
+a 8 5 c . a 8 c 
+. a 1 4 c 1 5 c 
+. . c 1 4 5 c . 
+. c 1 4 5 c . . 
+c 5 4 c 1 4 a . 
+c 8 a . c 5 8 a 
+a a . . . c c a 
+`;
+            case "image20":
+            case "icon-book":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d a 8 8 8 a c d c 
+b d 8 8 5 8 8 f d c 
+b d 8 1 8 8 8 f d c 
+b d 8 5 5 5 8 f d c 
+b d 8 8 8 1 8 f d c 
+b d a 8 5 8 a f d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
+`;
+            case "J(iuG#_X7y0^|=U??F9D":
+            case "weapon-book":return img`
+d a 8 8 8 8 a d . 
+a 8 8 8 8 8 8 a f 
+8 8 8 6 1 8 8 e f 
+8 8 6 1 8 8 8 c f 
+8 6 1 8 8 8 8 c f 
+8 1 5 5 5 5 8 c f 
+8 8 8 8 5 6 8 c f 
+8 8 8 1 6 8 8 c f 
+8 8 1 6 8 8 8 e f 
+a 8 8 8 8 8 8 a f 
+d a b b b b a d f 
+`;
+            case "image40":
+            case "icon-cup":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d 5 1 1 5 4 b d c 
+b d 5 1 5 5 5 e d c 
+b d d 5 1 5 e d d c 
+b d d d 5 4 d d d c 
+b d d d 5 4 d d d c 
+b d d 1 1 5 4 d d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
+`;
+            case "image31":
+            case "icon-ring":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d d 5 1 1 5 d d c 
+b d 5 d d d d 5 d c 
+b d 5 d 7 6 d 5 d c 
+b d 1 6 9 8 c 1 d c 
+b d d 6 8 8 f d d c 
+b d d d c f d d d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
+`;
+            case "image44":
+            case "health-potion":return img`
+. . . . 4 4 4 . . . . 
+. . . . e e e . . . . 
+. . . c c c c c . . . 
+. . . . 8 2 a . . . . 
+. . . c 8 2 a c . . . 
+. . c 2 3 2 2 a c . . 
+. c 2 3 2 2 2 2 a c . 
+. f a 3 2 2 2 2 a f . 
+. f a a 2 2 2 a a f . 
+. . f a a a a a f . . 
+. . . f f f f f . . . 
+`;
+            case "image42":
+            case "icon-cross":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d a 4 d d e a d c 
+b d e 1 4 e 1 4 d c 
+b d d e 1 5 4 d d c 
+b d d 4 5 5 e d d c 
+b d 4 1 e 4 1 e d c 
+b d a e d d 4 a d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
+`;
             case "image38":
             case "title-text":return img`
 ................................................................................................................................................................
@@ -804,8 +792,8 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 ................................................................................................................................................................
 ................................................................................................................................................................
 .......11111...........1111111.............1111111111...............1111........................................................................................
-......11aa111.........11aa11a11...........11aaa1111a11.............11aa11.......................................................................................
-......1aaaa11.........11aa11a11...........11aaa1111a11.............11aa11.......................................................................................
+......11aa111.........11a111a11...........11aa11111a11.............11a111.......................................................................................
+......1aaaa11.........11a111a11...........11aa11111a11.............11a111.......................................................................................
 .....11aa11a1.........11aa11aa1...........11aaa1111a11.............11aa11.......................................................................................
 .....1aa111a1.........1aaaa1aa1..........111aaa1111a11.............1aaaa1.......................................................................................
 .....1aa111a1.........11aa11aa1..........11aaaa1111a11.............11aa11.......................................................................................
@@ -897,28 +885,73 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 ................................................................................................................................................................
 ................................................................................................................................................................
 `;
-            case "image37":
-            case "hero-shadow":return img`
-...11111111111..
-..1111111111111.
-.111111111111111
-1111111111111111
-1111111111111111
-1111111111111111
-111111111111111.
-.11111111111111.
-..1111111111.1..
-..1111111111....
-.111111111111...
-.111111111111...
-..1111111111....
-.111111111111...
-.111111111111...
-..1111111111....
-....111111......
-....111111......
-....111111......
-....111.........
+            case "image18":
+            case "tough-slime":return img`
+. . . 7 . . . 7 . . . . . . . . 
+. . . . 7 7 7 7 6 8 6 . . 8 . . 
+. 7 7 7 7 9 9 9 7 9 9 6 8 8 . . 
+. . 7 9 9 9 9 9 9 9 7 7 6 8 . . 
+. 6 9 9 1 1 1 9 9 9 9 7 7 6 8 . 
+6 7 9 9 1 1 9 9 9 7 9 7 7 7 6 8 
+6 7 9 9 9 9 9 9 9 9 7 7 7 7 6 8 
+6 7 9 9 7 9 9 9 9 7 7 6 7 6 6 8 
+8 6 7 9 9 9 7 9 7 7 7 7 6 6 8 8 
+. 8 6 8 6 6 6 6 6 8 6 6 8 8 8 . 
+. . 8 8 8 8 8 8 8 8 8 8 8 8 . . 
+`;
+            case "image24":
+            case "skeleton-mage":return img`
+..88................
+.8668...eeeeeee.....
+869768.eed111dee....
+867768ebd11111dbe...
+.8668.cbd11111dbc...
+..88..cbdd111ddbc...
+.e54e.cbcb111bcbc...
+..ec..fd5711175df...
+..ec..fb11cce11bf...
+..ec...cbd111dbc....
+...e...cbbdddbbc....
+...ecf.fdd111ddf....
+..cecccffbbbbbf.....
+..cdddcfacfffcaf....
+..c111dcda968a1fe...
+..c11dcfbd7761bfe...
+...ccccbdb868bdbce..
+....effcbddbdd1bce..
+....effcd1ece1bcfdc.
+....ef.cbbdbdbbcfdc.
+....ef.c1deced1ccec.
+.....ef6ccc7ccc7cc..
+.....ef679996c67....
+.....ef667766bc6....
+.....ef667666bc6....
+.......c6666dbc6....
+.......bc6661dc6....
+.......fbcff1df.....
+........ff..ff......
+....................
+`;
+            case "image16":
+            case "mummy":return img`
+. . . . b b b b b b . . . . 
+. . . b d 1 1 1 1 d b . . . 
+. . b b b d d d d b b b . . 
+. . b d c c 1 1 c c d b . . 
+. . b c 5 7 d d 7 5 c b . . 
+. . c d d 1 1 1 1 d d c . . 
+. . c b b d d d d b b c . . 
+. . f c d 1 1 1 1 d c f . . 
+. b b b b d d d d b b b b . 
+b 1 b 1 b 6 6 6 6 b 1 b 1 b 
+b 1 1 d b 6 7 7 6 b d 1 1 b 
+f d d b c 7 7 7 7 6 b d d f 
+. f f c c b b b b c c f f . 
+. . . c b 7 7 6 6 b c . . . 
+. . . c c 6 6 c c b c . . . 
+. . . c d c c c d b c . . . 
+. . . c d d b c b b c . . . 
+. . . . c c c f c c . . . . 
 `;
         }
         return null;
