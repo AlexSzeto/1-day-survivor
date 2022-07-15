@@ -35,6 +35,8 @@ const ENEMY_TURN_RATE = 100
 
 const HEAL_DROP_CHANCE = 4
 
+const CHEAT_MODE = false
+
 /*
 GLOBALS
 */
@@ -224,6 +226,11 @@ let upgrade_menu: miniMenu.MenuSprite = null
 let cat_inside_chest = false
 let cat_out_of_chest = false
 
+if(CHEAT_MODE) {
+    hero_dodge = 100
+    hero_auto_collect_chance = 100
+}
+
 /*
 MAIN MENU
 */
@@ -341,7 +348,7 @@ function choose_upgrade(title: string) {
 function setup_upgrade_menu() {
     custom.add_upgrade_to_list("CROSS", assets.image`icon-cross`, "throw 3 crosses", "WEAPON")
     spray_spawn_count = 0
-    spray_speed = 120
+    spray_speed = 100
     spray_spawn_tick.rate = 6
     spray_damage = 10
     custom.add_upgrade_to_list("CROSS 2", assets.image`icon-cross`, "+1 cross", "CROSS") // 10-40
@@ -353,11 +360,11 @@ function setup_upgrade_menu() {
     tracer_spawn_count = 0
     tracer_speed = 90
     tracer_spawn_tick.rate = 8
-    tracer_damage = 10
-    custom.add_upgrade_to_list("SPARK 2", assets.image`icon-spark`, "x1.5 damage", "SPARK") // 15 * .75
-    custom.add_upgrade_to_list("SPARK 3", assets.image`icon-spark`, "x1.25 attack speed", "SPARK 2") // 15
-    custom.add_upgrade_to_list("SPARK 4", assets.image`icon-spark`, "x2 damage", "SPARK 3") // 30
-    custom.add_upgrade_to_list("SPARK 5", assets.image`icon-spark`, "+1 spark", "SPARK 4") // 30-60
+    tracer_damage = 12
+    custom.add_upgrade_to_list("SPARK 2", assets.image`icon-spark`, "x1.5 damage", "SPARK") // 18 * .75
+    custom.add_upgrade_to_list("SPARK 3", assets.image`icon-spark`, "x1.25 attack speed", "SPARK 2") // 18
+    custom.add_upgrade_to_list("SPARK 4", assets.image`icon-spark`, "x2 damage", "SPARK 3") // 36
+    custom.add_upgrade_to_list("SPARK 5", assets.image`icon-spark`, "+1 spark", "SPARK 4") // 36-72
 
     custom.add_upgrade_to_list("FIREBALL", assets.image`icon-fireball`, "explode on impact", "WEAPON")
     exploder_spawn_count = 0
@@ -408,7 +415,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("HOLY WATER 2", assets.image`icon-water`, "x1.5 duration", "HOLY WATER") // 
     custom.add_upgrade_to_list("HOLY WATER 3", assets.image`icon-water`, "x1.5 radius", "HOLY WATER 2") //
     custom.add_upgrade_to_list("HOLY WATER 4", assets.image`icon-water`, "x2 damage", "HOLY WATER 3") // 
-    custom.add_upgrade_to_list("HOLY WATER 5", assets.image`icon-water`, "+1 vial", "HOLY WATER 4") // 
+    custom.add_upgrade_to_list("HOLY WATER 5", assets.image`icon-water`, "x2 intensity", "HOLY WATER 4") // 
 
     custom.add_upgrade_to_list("LIFE SHIELD", assets.image`icon-shield`, "x3 item healing", "ACCESSORY")
     custom.add_upgrade_to_list("LIFE SHIELD 2", assets.image`icon-shield`, "x1.5 max HP", "LIFE SHIELD")
@@ -655,7 +662,7 @@ function perform_upgrade(name: string) {
             molotov_tick_damage *= 2
             break
         case "HOLY WATER 5":
-            molotov_spawn_count += 1
+            molotov_aoe_tick.rate *= 0.5
             break
     }
     redraw_upgrades()
@@ -867,15 +874,19 @@ function setup_enemy_phase() {
     }
 }
 
+function despawn_enemy(destroy_candidate: Sprite) {
+    if (sprites.readDataBoolean(destroy_candidate, "boss")) {
+        custom.move_sprite_off_camera(destroy_candidate)
+    } else {
+        destroy_candidate.destroy()
+    }
+}
+
 function spawn_enemy(name: string) {
     const enemies: Sprite[] = sprites.allOfKind(SpriteKind.Enemy)
     if (enemies.length >= MAX_ENEMIES) {
         const destroy_candidate = enemies.reduce((farthest, target) => custom.get_distance_between(target, hero) > custom.get_distance_between(farthest, hero) ? target : farthest, enemies[0])
-        if (sprites.readDataBoolean(destroy_candidate, "boss")) {
-            custom.move_sprite_off_camera(destroy_candidate)
-        } else {
-            destroy_candidate.destroy()
-        }
+        despawn_enemy(destroy_candidate)
     }
 
     // CONTAINS GAME DESIGN
@@ -1298,6 +1309,7 @@ function spawn_spray() {
         hero
         )
         new_weapon.setFlag(SpriteFlag.AutoDestroy, true)
+        new_weapon.setFlag(SpriteFlag.DestroyOnWall, true)
         new_weapon.lifespan = DEFAULT_WEAPON_LIFESPAN
         sprites.setDataString(new_weapon, "name", "CROSS")
         sprites.setDataNumber(new_weapon, "damage", spray_damage)
@@ -1355,6 +1367,7 @@ function spawn_tracer() {
                 tracer_speed
             )
             new_weapon.lifespan = DEFAULT_WEAPON_LIFESPAN
+            new_weapon.setFlag(SpriteFlag.DestroyOnWall, true)
             sprites.setDataString(new_weapon, "name", "SPARK")
             sprites.setDataNumber(new_weapon, "damage", tracer_damage)
         }
@@ -1408,20 +1421,37 @@ game.onUpdate(function () {
     }
 
     if( custom.game_state_is(GameState.normal) ) {
+        let distance = 0
         for (let pickup of sprites.allOfKind(SpriteKind.PickUp)) {
-            if (custom.get_distance_between(pickup, hero) < hero.width / 2) {
+            distance = custom.get_distance_between(pickup, hero)
+            if (distance < hero.width * 0.75) {
                 hero_xp.value += sprites.readDataNumber(pickup, "xp") + gem_bonus_xp
                 info.changeScoreBy(sprites.readDataNumber(pickup, "xp") + gem_bonus_xp)
                 pickup.destroy()
-            } else if (custom.get_distance_between(pickup, hero) < hero_gem_collect_radius) {
+            } else if (distance < hero_gem_collect_radius) {
                 pickup.follow(hero, GEM_FLY_SPEED)
+            } else if (distance > scene.screenWidth()) {
+                pickup.destroy()
             }
         }
 
         for (let pickup of sprites.allOfKind(SpriteKind.Food)) {
-            if (custom.get_distance_between(pickup, hero) < hero.width / 2 + pickup.width / 2) {
+            distance = custom.get_distance_between(pickup, hero)
+            if (distance < hero.width / 2 + pickup.width / 2) {
                 hero_health.value += hero_food_heal
                 pickup.destroy()
+            } else if (distance > scene.screenWidth()) {
+                pickup.destroy()
+            }
+        }
+
+        const enemies = sprites.allOfKind(SpriteKind.Enemy)
+        if(enemies.length > MAX_ENEMIES / 2) {
+            for (let enemy of enemies) {
+                distance = custom.get_distance_between(enemy, hero)
+                if (distance > scene.screenWidth()) {
+                    despawn_enemy(enemy)
+                }
             }
         }
     }
