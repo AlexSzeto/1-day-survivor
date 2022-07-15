@@ -934,17 +934,17 @@ b c c c c c c c c c
 `;
             case "image16":
             case "mummy":return img`
-. . . . b b b b b b . . . . 
-. . . b d 1 1 1 1 d b . . . 
-. . b b b d d d d b b b . . 
-. . b d c c 1 1 c c d b . . 
-. . b c 5 7 d d 7 5 c b . . 
+. . . . c c c c c c . . . . 
+. . . c d 1 1 1 1 d c . . . 
+. . c b d d d d d d b c . . 
+. . c d b b 1 1 b b d c . . 
+. . c 8 7 7 d d 7 7 8 c . . 
 . . c d d 1 1 1 1 d d c . . 
 . . c b b d d d d b b c . . 
 . . f c d 1 1 1 1 d c f . . 
-. b b b b d d d d b b b b . 
-b 1 b 1 b 6 6 6 6 b 1 b 1 b 
-b 1 1 d b 6 7 7 6 b d 1 1 b 
+. c b b b d d d d b b b c . 
+c 1 b 1 b 6 6 6 6 b 1 b 1 c 
+c 1 1 d b 6 7 7 6 b d 1 1 c 
 f d d b c 7 7 7 7 6 b d d f 
 . f f c c b b b b c c f f . 
 . . . c b 7 7 6 6 b c . . . 

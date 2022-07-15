@@ -783,9 +783,7 @@ function setup_enemy_phase() {
         case 3:
             custom.reset_wave_data()
             custom.add_wave_data(1, 1, "MUMMY")
-            custom.add_wave_data(2, 2, "MUMMY")
             custom.add_wave_data(3, 1, "MUMMY")
-            custom.add_wave_data(4, 2, "MUMMY")
             custom.add_wave_data(5, 1, "MUMMY")
             spawn_enemy("SKELETON MAGE")
             break
@@ -810,9 +808,9 @@ function setup_enemy_phase() {
             break
         case 8:
             custom.add_wave_data(1, 2, "SLIME")
-            custom.add_wave_data(2, 2, "TOUGH SLIME")
+            custom.add_wave_data(2, 1, "TOUGH SLIME")
             custom.add_wave_data(3, 2, "SLIME")
-            custom.add_wave_data(4, 2, "TOUGH SLIME")
+            custom.add_wave_data(4, 1, "TOUGH SLIME")
             custom.add_wave_data(5, 2, "SLIME")
             break
 
@@ -847,27 +845,30 @@ function setup_enemy_phase() {
             custom.add_wave_data(3, 3, "MEAN SPIRIT")
             custom.add_wave_data(4, 1, "CAPTAIN")
             custom.add_wave_data(5, 2, "LAVA ZOMBIE")
-        case 13:
+            break
+        case 15:
             custom.add_wave_data(1, 1, "LAVA ZOMBIE")
             custom.add_wave_data(2, 2, "KNIGHT")
             custom.add_wave_data(3, 2, "GHOST")
             custom.add_wave_data(4, 2, "KNIGHT")
             custom.add_wave_data(5, 1, "LAVA ZOMBIE")
+            break
 
 
-        case 14:
+        case 16:
             custom.reset_wave_data()
-            custom.add_wave_data(1, 3, "TOUGH SLIME")
-            custom.add_wave_data(2, 3, "TOUGH SLIME")
-            custom.add_wave_data(3, 3, "TOUGH SLIME")
-            custom.add_wave_data(4, 3, "TOUGH SLIME")
-            custom.add_wave_data(5, 3, "TOUGH SLIME")
-        case 15:
+            custom.add_wave_data(1, 2, "TOUGH SLIME")
+            custom.add_wave_data(2, 2, "TOUGH SLIME")
+            custom.add_wave_data(3, 2, "TOUGH SLIME")
+            custom.add_wave_data(4, 2, "TOUGH SLIME")
+            custom.add_wave_data(5, 2, "TOUGH SLIME")
+            break
+        case 17:
             spawn_enemy("TROLL")
             cat_inside_chest = true
             break
-        case 16:
-        case 17:
+        case 18:
+        case 19:
             custom.add_wave_data(1, 1, "TOUGH SLIME")
             custom.add_wave_data(2, 1, "TOUGH SLIME")
             custom.add_wave_data(3, 1, "TOUGH SLIME")
@@ -876,15 +877,18 @@ function setup_enemy_phase() {
             break
 
 
-        case 18:
+        case 20:
             custom.reset_wave_data()
             custom.add_wave_data(1, 2, "ZOMBIE")
             custom.add_wave_data(2, 2, "SLIME")
             custom.add_wave_data(3, 2, "GHOST")
             custom.add_wave_data(4, 2, "KNIGHT")
             custom.add_wave_data(5, 2, "TOUGH SLIME")
+            break
+
+            
         default:
-            if(enemy_phase >= 18) {
+            if(enemy_phase >= 20) {
                 enemy_extra_difficulty += 1
 
                 const dice_roll_enemy = Math.pickRandom([
@@ -928,7 +932,7 @@ function spawn_enemy(name: string) {
         setup_enemy(new_enemy, name, 12, 10, 25, 1)
     } else if (name == "LAVA ZOMBIE") {
         new_enemy = sprites.create(assets.image`lava-zombie`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 75, 20, 20, 2)
+        setup_enemy(new_enemy, name, 90, 20, 30, 2)
     } else if (name == "MUMMY") {
         new_enemy = sprites.create(assets.image`mummy`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 30, 10, 20, 2)
