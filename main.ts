@@ -136,107 +136,61 @@ let damage_tracker:StatTracking[] = [
     },
 ]
 
-let kill_tracker:StatTracking[] = [
-    {
-        name: "ZOMBIE",
-        total: 0
-    },
-    {
-        name: "KNIGHT",
-        total: 0
-    },
-    {
-        name: "CAPTAIN",
-        total: 0
-    },
-    {
-        name: "GHOST",
-        total: 0
-    },
-    {
-        name: "MEAN SPIRIT",
-        total: 0
-    },
-    {
-        name: "LAVA ZOMBIE",
-        total: 0
-    },
-    {
-        name: "SKELETON MAGE",
-        total: 0
-    },
-    {
-        name: "MUMMY",
-        total: 0
-    },
-    {
-        name: "SLIME",
-        total: 0
-    },
-    {
-        name: "TOUGH SLIME",
-        total: 0
-    },
-    {
-        name: "SLIME KING",
-        total: 0
-    },
-    {
-        name: "TROLL",
-        total: 0
-    }
-]
+function make_enemy_stat(): StatTracking[] {
+    return [
+        {
+            name: "ZOMBIE",
+            total: 0
+        },
+        {
+            name: "KNIGHT",
+            total: 0
+        },
+        {
+            name: "MUMMY",
+            total: 0
+        },
+        {
+            name: "SLIME",
+            total: 0
+        },
+        {
+            name: "TOUGH SLIME",
+            total: 0
+        },
+        {
+            name: "GHOST",
+            total: 0
+        },
+        {
+            name: "LAVA ZOMBIE",
+            total: 0
+        },
+        {
+            name: "MEAN SPIRIT",
+            total: 0
+        },
+        {
+            name: "CAPTAIN",
+            total: 0
+        },
+        {
+            name: "SKELETON MAGE",
+            total: 0
+        },
+        {
+            name: "SLIME KING",
+            total: 0
+        },
+        {
+            name: "TROLL",
+            total: 0
+        }
+    ]
+}
 
-let wound_tracker: StatTracking[] = [
-    {
-        name: "ZOMBIE",
-        total: 0
-    },
-    {
-        name: "KNIGHT",
-        total: 0
-    },
-    {
-        name: "CAPTAIN",
-        total: 0
-    },
-    {
-        name: "GHOST",
-        total: 0
-    },
-    {
-        name: "MEAN SPIRIT",
-        total: 0
-    },
-    {
-        name: "LAVA ZOMBIE",
-        total: 0
-    },
-    {
-        name: "SKELETON MAGE",
-        total: 0
-    },
-    {
-        name: "MUMMY",
-        total: 0
-    },
-    {
-        name: "SLIME",
-        total: 0
-    },
-    {
-        name: "TOUGH SLIME",
-        total: 0
-    },
-    {
-        name: "SLIME KING",
-        total: 0
-    },
-    {
-        name: "TROLL",
-        total: 0
-    }
-]
+let kill_tracker:StatTracking[] = make_enemy_stat()
+let wound_tracker: StatTracking[] = make_enemy_stat()
 
 let enemy_attack_cooldown_tick: TickTracking = start_tick_track(reset_enemy_attack_cooldown)
 enemy_attack_cooldown_tick.rate = 2
@@ -347,10 +301,9 @@ function get_random_upgrade (message: string) {
         game.showLongText(next_upgrade, DialogLayout.Bottom)
         perform_upgrade(custom.get_upgrade(next_upgrade))
     } else {
-        game.showLongText("You found 100 gold!", DialogLayout.Bottom)
+        game.showLongText("You found gold coins!", DialogLayout.Bottom)
         info.changeScoreBy(100)
     }
-    effects.confetti.startScreenEffect(500)
 }
 
 function choose_upgrade(title: string) {
@@ -935,7 +888,7 @@ function spawn_enemy(name: string) {
         setup_enemy(new_enemy, name, 90, 20, 30, 2)
     } else if (name == "MUMMY") {
         new_enemy = sprites.create(assets.image`mummy`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 30, 10, 20, 2)
+        setup_enemy(new_enemy, name, 30, 10, 20, 1)
     } else if (name == "KNIGHT") {
         new_enemy = sprites.create(assets.image`knight`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 40, 15, 30, 1)
