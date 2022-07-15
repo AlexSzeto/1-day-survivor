@@ -149,11 +149,6 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "title-background"
     },
-    "image37": {
-        "data": "hwQQABQAAAAAEBEBAAAAAAAAAAAAERERABEQAQAAAAAQEREREREREQAAAAAREREREREREQAAAAARERERERERERERAAARERERERERERERAAARERERERERERERAAAREREREREREREBAAAREREREREREREBAAAREREREREREREBAAAREREREREREQAAAAAREREREREREQAAAAARERERABEQAQAAAAARERERAQAAAAAAAAAQERERAAAAAAAAAAAAEREAAAAAAAAAAAA=",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "hero-shadow"
-    },
     "image41": {
         "data": "hwQIAAgAAACqAMCsjApcqFzBQQrAFMQAAEwVDKBRTMWKxaDIygwAqg==",
         "mimeType": "image/x-mkcd-f4",
@@ -168,11 +163,6 @@
         "data": "hwQJAAsAAACtiIiIqA0AAIqIFoiICgAAiGhRiIELAACIFlgYhgsAAIiBWGWICwAAiIhYhogLAACKiIiIiAoAAK3OzMyuDQAA8P////8PAAA=",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "weapon-book"
-    },
-    "image40": {
-        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA21Xd3c0AAADbEdUdzQAAANtRURXNAAAA21VFVM0AAADbVN5NzQAAANvr3d3NAAAA293d3c0AAADLzMzMzAAAAA==",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "icon-cup"
     },
     "image31": {
         "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA210V3c0AAADb1W3WzQAAANvRl8jNAAAA29GG+M0AAADb1c3fzQAAANtdFd3NAAAA293d3c0AAADLzMzMzAAAAA==",
@@ -208,6 +198,16 @@
         "data": "hwQOABIAAAAAAAAAwPwAAAAAAAAAAAAAHNEPAAAAAAAAzMz8u9EPAAAAAADA29jLG73MzAwAAADcvdfbu8u83M0AAAAcvRcdbXZ7xs0AAAAcHR0dbXd7xssAAAAcHR0dbXdrzPwAAAAcvRcdbXZr3MsAAADcvdfbu2u8u8sAAADA29jLG73MzAwAAAAAzMz8u9EPAAAAAAAAAAAAHNEPAAAAAAAAAAAAwPwAAAAAAAA=",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "mummy"
+    },
+    "image27": {
+        "data": "hwQQABQAAAAAsLsLAAAAAAAAAAAAOzOzALuwCwAAAACwMzO7u5vbvQAAAAA7M7Pbu5vZvQAAAAA7s7vd3bu7u7u7AAAzM9vd3ZuZm7m9AAAzM7Pd3Z2Zm7m9AAAzM7Pd3Z2Zm7kLAAAzMzvd3ZuZm7kLAAA7Mzvd3bu7u7sLAAA7M7PTu5vZvQAAAAC7MzOzu5vbvQAAAAA7u7u7ALuwCwAAAAA7MzOzCwAAAAAAAACwMzO7AAAAAAAAAAAAu7sAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "hero-shadow"
+    },
+    "image40": {
+        "data": "hwQKAAoAAAC7u7u7uwAAANvd3d3NAAAA21Xd3c0AAADbEdUdzQAAANtRURXNAAAA21VFVM0AAADbVN5NzQAAANvr3d3NAAAA293d3c0AAADLzMzMzAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "icon-cup"
     },
     "anim1": {
         "namespace": "myAnimations",

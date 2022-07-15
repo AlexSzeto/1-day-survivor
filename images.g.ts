@@ -648,29 +648,6 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8899999966fc888669999999999668888f88666666688cccffffffffffffffffffff
 ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff889999996ffc888669999999999668888f88666666688cccffffffffffffffffffff
 `;
-            case "image37":
-            case "hero-shadow":return img`
-...11111111111..
-..1111111111111.
-.111111111111111
-1111111111111111
-1111111111111111
-1111111111111111
-111111111111111.
-.11111111111111.
-..1111111111.1..
-..1111111111....
-.111111111111...
-.111111111111...
-..1111111111....
-.111111111111...
-.111111111111...
-..1111111111....
-....111111......
-....111111......
-....111111......
-....111.........
-`;
             case "image41":
             case "weapon-cross":return img`
 a c c . . . a a 
@@ -708,19 +685,6 @@ a 8 8 8 8 8 8 a f
 8 8 1 6 8 8 8 e f 
 a 8 8 8 8 8 8 a f 
 d a b b b b a d f 
-`;
-            case "image40":
-            case "icon-cup":return img`
-b b b b b b b b b b 
-b d d d d d d d d c 
-b d 5 1 1 5 4 b d c 
-b d 5 1 5 5 5 e d c 
-b d d 5 1 5 e d d c 
-b d d d 5 4 d d d c 
-b d d d 5 4 d d d c 
-b d d 1 1 5 4 d d c 
-b d d d d d d d d c 
-b c c c c c c c c c 
 `;
             case "image31":
             case "icon-ring":return img`
@@ -952,6 +916,42 @@ f d d b c 7 7 7 7 6 b d d f
 . . . c d c c c d b c . . . 
 . . . c d d b c b b c . . . 
 . . . . c c c f c c . . . . 
+`;
+            case "image27":
+            case "hero-shadow":return img`
+...bb3333bbbbb..
+..b33333333b33b.
+.b3333333333b33b
+b333b3333333b33b
+b333bb33bb33b33b
+b33bbdbb33b3b33b
+b3bbdddddd33b3b.
+.bbddddddddbbbb.
+..bbddddddbb.b..
+..bbddddddbb....
+.bbbbbddbbbbb...
+.b99b9999b99b...
+..b9b9999b9b....
+.bddb9999bddb...
+.bddbbbbbbddb...
+..bbb9999bbb....
+....b9999b......
+....bbbbbb......
+....bddbbb......
+....bbb.........
+`;
+            case "image40":
+            case "icon-cup":return img`
+b b b b b b b b b b 
+b d d d d d d d d c 
+b d 5 1 1 5 4 b d c 
+b d 5 1 5 5 5 e d c 
+b d d 5 1 5 e d d c 
+b d d d 5 4 d d d c 
+b d d d 5 4 d d d c 
+b d d 1 1 5 4 d d c 
+b d d d d d d d d c 
+b c c c c c c c c c 
 `;
         }
         return null;
