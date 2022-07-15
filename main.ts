@@ -33,7 +33,7 @@ const ENEMY_HEALTH_SCALE = 0.25
 const ENEMY_SPEED_SCALE = 0.05
 const ENEMY_TURN_RATE = 100
 
-const HEAL_DROP_CHANCE = 4
+const HEAL_DROP_CHANCE = 5
 
 const CHEAT_MODE = false
 let debug_mode = false
@@ -217,7 +217,7 @@ let hero_dodge_distance = 12
 let hero_dodge_heal = 0
 let hero_auto_collect_chance: number = 0
 let hero_gem_collect_radius: number = 24
-let hero_food_heal = 20
+let hero_food_heal = 30
 
 let gem_bonus_xp = 0
 let weapon_pushback = 0
@@ -418,7 +418,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("HOLY WATER 4", assets.image`icon-water`, "x2 damage", "HOLY WATER 3") // 
     custom.add_upgrade_to_list("HOLY WATER 5", assets.image`icon-water`, "x2 intensity", "HOLY WATER 4") // 
 
-    custom.add_upgrade_to_list("LIFE SHIELD", assets.image`icon-shield`, "x3 item healing", "ACCESSORY")
+    custom.add_upgrade_to_list("LIFE SHIELD", assets.image`icon-shield`, "x2 item healing", "ACCESSORY")
     custom.add_upgrade_to_list("LIFE SHIELD 2", assets.image`icon-shield`, "x1.5 max HP", "LIFE SHIELD")
     custom.add_upgrade_to_list("LIFE SHIELD 3", assets.image`icon-shield`, "+4 HP per second", "LIFE SHIELD 2")
 
@@ -455,7 +455,7 @@ function setup_upgrade_menu() {
 function perform_upgrade(name: string) {
     switch(name) {
         case "LIFE SHIELD":
-            hero_food_heal *= 3
+            hero_food_heal *= 2
             break
         case "LIFE SHIELD 2":
             hero_health.max *= 1.5
