@@ -36,6 +36,7 @@ const ENEMY_TURN_RATE = 100
 const HEAL_DROP_CHANCE = 4
 
 const CHEAT_MODE = false
+let debug_mode = false
 
 /*
 GLOBALS
@@ -910,10 +911,10 @@ function spawn_enemy(name: string) {
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "GHOST") {
         new_enemy = sprites.create(assets.image`ghost`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 30, 15, 40, 1)
+        setup_enemy(new_enemy, name, 30, 20, 40, 1)
     } else if (name == "MEAN SPIRIT") {
         new_enemy = sprites.create(assets.image`mourner`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 60, 15, 40, 2)
+        setup_enemy(new_enemy, name, 60, 25, 40, 2)
     } else if (name == "SKELETON MAGE") {
         new_enemy = sprites.create(assets.image`skeleton-mage`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 350, 30, 25, 3)
@@ -924,7 +925,7 @@ function spawn_enemy(name: string) {
         setup_enemy(new_enemy, name, 24, 15, 20, 1)
     } else if (name == "TOUGH SLIME") {
         new_enemy = sprites.create(assets.image`tough-slime`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 48, 20, 30, 1)
+        setup_enemy(new_enemy, name, 48, 25, 30, 1)
     } else if (name == "SLIME KING") {
         new_enemy = sprites.create(assets.image`slime-king`, SpriteKind.Enemy)
         setup_enemy(new_enemy, name, 800, 30, 35, 3)
@@ -1462,14 +1463,23 @@ game.onUpdate(function () {
 })
 
 function show_stats() {
-    game.showLongText(`LV ${hero_level}` + "\n \n" + damage_tracker.filter(value => value.total > 0).map(value => `${value.name}: ${Math.floor(value.total)}`).join("\n"), DialogLayout.Full)
-    game.showLongText(`UPGRADES` + "\n \n" + custom.get_obtained_highest_upgrade_names().join("\n"), DialogLayout.Full)
-    game.showLongText(`ENEMY PHASE ${enemy_phase} LV+ ${enemy_extra_difficulty}` + "\n \n" + kill_tracker.filter(value => value.total > 0).map(value => `${value.name}: ${Math.floor(value.total)}`).join("\n"), DialogLayout.Full)
-    game.showLongText(`DAMAGE TAKEN\n \n` + wound_tracker.filter(value => value.total > 0).map(value => `${value.name}: ${Math.floor(value.total)}`).join("\n"), DialogLayout.Full)
-    pause(100)
+    if(debug_mode) {
+        game.showLongText(`LV ${hero_level}` + "\n \n" + damage_tracker.filter(value => value.total > 0).map(value => `${value.name}: ${Math.floor(value.total)}`).join("\n"), DialogLayout.Full)
+        game.showLongText(`UPGRADES` + "\n \n" + custom.get_obtained_highest_upgrade_names().join("\n"), DialogLayout.Full)
+        game.showLongText(`ENEMY PHASE ${enemy_phase} LV+ ${enemy_extra_difficulty}` + "\n \n" + kill_tracker.filter(value => value.total > 0).map(value => `${value.name}: ${Math.floor(value.total)}`).join("\n"), DialogLayout.Full)
+        game.showLongText(`DAMAGE TAKEN\n \n` + wound_tracker.filter(value => value.total > 0).map(value => `${value.name}: ${Math.floor(value.total)}`).join("\n"), DialogLayout.Full)
+
+    }
 }
 
+let press_b = 0
 controller.B.onEvent(ControllerButtonEvent.Pressed, () => {
+    if (custom.game_state_is(GameState.setup)) {
+        press_b++
+        if(press_b >= 5) {
+            debug_mode = true
+        }
+    }
     if(custom.game_state_is(GameState.normal)) {
         show_stats()
     }
