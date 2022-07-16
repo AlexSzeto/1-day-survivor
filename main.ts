@@ -18,6 +18,11 @@ namespace StatusBarKind {
 }
 
 /*
+TESTING
+*/
+const CHEAT_MODE = false
+
+/*
 PERFORMANCE CONSTANTS
 */
 const MAX_DROPS = 8
@@ -33,8 +38,8 @@ const Z_FLAME = 10
 const Z_PICKUP = 11
 const Z_TREASURE_FOOD = 12
 const Z_NPC = 13
-const Z_HERO = 14
-const Z_ENEMY = 15
+const Z_ENEMY = 14
+const Z_HERO = 15
 const Z_AURA = 16
 const Z_PROJECTILE = 17
 const Z_EXPLOSION = 18
@@ -48,8 +53,6 @@ const ENEMY_HEALTH_SCALE = 0.25
 const ENEMY_SPEED_SCALE = 0.05
 const ENEMY_TURN_RATE = 100
 const HEAL_DROP_CHANCE = 5
-
-const CHEAT_MODE = true
 
 /*
 GLOBALS
@@ -1119,6 +1122,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (hero_sprite, en
             move_hero_to_dodge(enemy)
             sprites.setDataBoolean(enemy, "attack_cooldown", true)
         } else {
+            wound_hero(enemy)
             if (sprites.readDataBoolean(enemy, "multi_hit")) {
                 sprites.setDataBoolean(enemy, "attack_cooldown", true)
             } else {
