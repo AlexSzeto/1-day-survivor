@@ -300,7 +300,7 @@ MAIN MENU
 */
 
 let main_menu: miniMenu.MenuSprite = null
-let seen_intro: boolean = false
+let seen_intro: boolean = settings.readNumber("seen_intro") == 1
 
 const menu_image = assets.image`castle-background`.clone()
 
@@ -340,13 +340,12 @@ function start_main_menu() {
         hero_foreground.destroy()
         switch(selectedIndex) {
             case 0:
-                if (info.highScore() == 0 && !seen_intro) {
+                if (!seen_intro) {
+                    menu_image.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
                     show_intro()
                 }
                 scene.setBackgroundColor(12)
                 setup_game()
-                get_random_upgrade(true, "YEP")
-                get_random_upgrade(true, "YEP")
                 choose_upgrade("STARTING WEAPON")
                 break
             case 1:
@@ -369,6 +368,7 @@ function show_intro() {
         "Save the kingdom from the mosters.\n" +
         "Enter the castle and lift its curse!", DialogLayout.Bottom)
     seen_intro = true
+    settings.writeNumber("seen_intro", 1)
 }
 
 controller.left.onEvent(ControllerButtonEvent.Pressed, () => { hero_angle = 180 })
@@ -1753,8 +1753,9 @@ let press_b = 0
 controller.B.onEvent(ControllerButtonEvent.Pressed, () => {
     if (custom.game_state_is(GameState.setup)) {
         press_b++
-        if(press_b >= 5) {
-            debug_mode = true
+        if(press_b >= 10) {
+            settings.remove("high-score")
+            settings.writeNumber("seen_intro", 0)
         }
     }
     if(custom.game_state_is(GameState.normal)) {
