@@ -39,11 +39,13 @@ const Z_PICKUP = 11
 const Z_TREASURE_FOOD = 12
 const Z_NPC = 13
 const Z_ENEMY = 14
-const Z_HERO = 15
-const Z_AURA = 16
-const Z_PROJECTILE = 17
+const Z_PROJECTILE = 15
+const Z_HERO = 16
+const Z_AURA = 17
 const Z_EXPLOSION = 18
 const Z_UI = 19
+
+const MAX_UPGRADES = 6
 
 /*
 BALANCE CONSTANTS
@@ -53,6 +55,7 @@ const ENEMY_HEALTH_SCALE = 0.25
 const ENEMY_SPEED_SCALE = 0.05
 const ENEMY_TURN_RATE = 100
 const HEAL_DROP_CHANCE = 5
+const SPRAY_ANGLE_DELTA = 120 / 5
 
 /*
 GLOBALS
@@ -303,6 +306,8 @@ let gem_bonus_xp = 0
 let weapon_pushback = 0
 let aura_weapon: Sprite = null
 let upgrade_menu: miniMenu.MenuSprite = null
+let upgrade_ui: Image = image.create((assets.image`icon-spark`.width + 2) * MAX_UPGRADES, assets.image`icon-spark`.height)
+let upgrade_ui_sprite: Sprite = null
 
 let cat_inside_chest = false
 let cat_out_of_chest = false
@@ -800,15 +805,19 @@ function perform_upgrade(name: string) {
 }
 
 function redraw_upgrades() {
-    sprites.destroyAllSpritesOfKind(SpriteKind.UI)
-    let icon_position = 7
+    if(!upgrade_ui_sprite) {
+        upgrade_ui.fill(0)
+        upgrade_ui_sprite = sprites.create(upgrade_ui, SpriteKind.UI)
+        upgrade_ui_sprite.setFlag(SpriteFlag.RelativeToCamera, true)
+        upgrade_ui_sprite.z = Z_UI
+        upgrade_ui_sprite.top = 2
+        upgrade_ui_sprite.left = 2        
+    }
+
+    let icon_position = 0
     for (let icon of custom.get_obtained_upgrade_icons()) {
-        let upgrade_icon_sprite = sprites.create(icon, SpriteKind.UI)
-        upgrade_icon_sprite.x = icon_position
-        upgrade_icon_sprite.y = 7
-        upgrade_icon_sprite.setFlag(SpriteFlag.RelativeToCamera, true)
-        upgrade_icon_sprite.z = Z_UI
-        icon_position += 12
+        upgrade_ui.drawImage(icon, icon_position, 0)
+        icon_position += icon.width + 2
     }
 }
 
@@ -1455,7 +1464,7 @@ function spawn_molotov() {
 
 function spawn_spray() {
     let spray_angle = hero_angle
-    spray_angle -= spray_spawn_count * 15 / 2
+    spray_angle -= spray_spawn_count * SPRAY_ANGLE_DELTA / 2
     spray_angle += Math.randomRange(-15, 15)
     let weapon_image:Image = null
 
@@ -1474,7 +1483,7 @@ function spawn_spray() {
         new_weapon.lifespan = DEFAULT_WEAPON_LIFESPAN
         sprites.setDataString(new_weapon, "name", "CROSS")
         sprites.setDataNumber(new_weapon, "damage", spray_damage)
-        spray_angle += 15
+        spray_angle += SPRAY_ANGLE_DELTA
     }
 }
 
