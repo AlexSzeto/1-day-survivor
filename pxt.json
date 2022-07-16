@@ -5,8 +5,7 @@
         "device": "*",
         "arcade-sprite-data": "github:microsoft/arcade-sprite-data#v0.1.0",
         "pxt-status-bar": "github:jwunderl/pxt-status-bar#v0.4.1",
-        "arcade-mini-menu": "github:riknoll/arcade-mini-menu#10013ca1dcba54156faf7f4fefff9bc8db24ff26",
-        "arcade-text": "github:microsoft/arcade-text#v1.3.0"
+        "arcade-mini-menu": "github:riknoll/arcade-mini-menu#10013ca1dcba54156faf7f4fefff9bc8db24ff26"
     },
     "files": [
         "main.ts",

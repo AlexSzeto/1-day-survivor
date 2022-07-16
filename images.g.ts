@@ -498,33 +498,6 @@ f f 8 c c c c 8 f f c e e c 8 f . .
 . . . . f f f . . . . f f f . . . . 
 . . . . . . . . . . . . . . . . . . 
 `;
-            case "image4":
-            case "dialog frame":return img`
-..bbbbbbbbbbbbbbbbbbbb..
-.bd111111111111111111db.
-bd1dbbbbbbbbbbbbbbbbd1db
-b1dbbbbbbbbbbbbbbbbbbd1b
-b1bd1111111111111111db1b
-b1b111111111111111111b1b
-b1b111111111111111111b1b
-b1b111111111111111111b1b
-b1b111111111111111111b1b
-b1b111111111111111111b1b
-b1b111111111111111111b1b
-b1b111111111111111111b1b
-b1b111111111111111111b1b
-b1b111111111111111111b1b
-b1b111111111111111111b1b
-b1b111111111111111111b1b
-b1b111111111111111111b1b
-b1b111111111111111111b1b
-b1b111111111111111111b1b
-b1bd1111111111111111db1b
-bd1bbbbbbbbbbbbbbbbbb1db
-bbd111111111111111111dbb
-.bbbbbbbbbbbbbbbbbbbbbb.
-..bbbbbbbbbbbbbbbbbbbb..
-`;
             case "image39":
             case "title-background":return img`
 cccccccbbbbbbbbbbbbbbbbbbbbb111111111111111111111111111111111111ddddddbbbbbbbbbbbbbbbbbbbdddddddddddddddbbbbbbbbbddddddddddddddddddccccddddddcccccffffffffffffff
@@ -951,6 +924,189 @@ b d d d 5 4 d d d c
 b d d d 5 4 d d d c 
 b d d 1 1 5 4 d d c 
 b d d d d d d d d c 
+b c c c c c c c c c 
+`;
+            case "image4":
+            case "dialog-frame":return img`
+..bbbbbbbbbbbbbbbbbbbb..
+.bd111111111111111111db.
+bd1dbbbbbbbbbbbbbbbbd1db
+b1dbbbbbbbbbbbbbbbbbbd1b
+b1bd1111111111111111db1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1b111111111111111111b1b
+b1bd1111111111111111db1b
+bd1bbbbbbbbbbbbbbbbbb1db
+bbd111111111111111111dbb
+.bbbbbbbbbbbbbbbbbbbbbb.
+..bbbbbbbbbbbbbbbbbbbb..
+`;
+            case "image29":
+            case "icon-lava-zombie":return img`
+b b b b b b b b b b 
+b a 2 4 4 4 4 2 a c 
+b 2 4 4 4 4 4 4 2 c 
+b 2 2 2 4 4 2 2 2 c 
+b a 5 1 4 4 1 5 a c 
+b 2 4 4 4 4 4 4 2 c 
+b 2 4 4 5 5 4 4 2 c 
+b c 2 4 4 4 4 2 c c 
+b a a 2 2 2 2 a a c 
+b c c c c c c c c c 
+`;
+            case "image37":
+            case "icon-captain":return img`
+b b b b b b b b b b 
+b c 6 9 9 9 9 6 c c 
+b 6 9 1 1 9 9 9 6 c 
+b 6 1 1 1 9 9 1 6 c 
+b 8 1 1 1 9 9 1 8 c 
+b c 8 8 1 9 8 8 c c 
+b c 6 c 8 8 c 6 6 c 
+b 8 1 6 c c 6 d 8 c 
+b 6 1 1 6 6 d d 6 c 
+b c c c c c c c c c 
+`;
+            case "image28":
+            case "icon-zombie":return img`
+b b b b b b b b b b 
+b 8 6 7 7 7 7 6 8 c 
+b 6 7 7 7 7 7 7 6 c 
+b 6 c c 7 7 c c 6 c 
+b c 2 4 7 7 4 2 c c 
+b 6 6 7 7 7 7 6 6 c 
+b 6 7 7 2 2 7 7 6 c 
+b c 6 7 6 6 7 6 c c 
+b 8 8 6 6 6 6 8 8 c 
+b c c c c c c c c c 
+`;
+            case "image43":
+            case "icon-knight":return img`
+b b b b b b b b b b 
+b c 5 5 5 5 5 5 c c 
+b 5 5 1 1 5 5 5 5 c 
+b 4 5 1 1 5 5 5 4 c 
+b e 4 1 1 5 5 4 e c 
+b c e e 1 5 e e c c 
+b c 4 c e e c 4 5 c 
+b e 5 4 c c 4 5 4 c 
+b 4 1 5 4 4 e e e c 
+b c c c c c c c c c 
+`;
+            case "image46":
+            case "icon-tough-slime":return img`
+b b b b b b b b b b 
+b 9 7 6 6 6 8 8 8 c 
+b 9 9 9 7 7 6 8 8 c 
+b 9 9 9 9 7 7 6 8 c 
+b 9 9 7 9 7 7 7 6 c 
+b 9 9 9 7 7 7 7 6 c 
+b 9 9 7 7 6 7 6 6 c 
+b 9 7 7 7 7 6 6 8 c 
+b 6 6 8 6 6 8 8 8 c 
+b c c c c c c c c c 
+`;
+            case "image45":
+            case "icon-slime":return img`
+b b b b b b b b b b 
+b 3 3 3 b b a a a c 
+b 3 3 3 3 3 3 a a c 
+b 1 1 3 3 3 3 3 a c 
+b 1 3 3 3 3 3 3 b c 
+b 3 3 3 3 3 3 3 b c 
+b 3 3 3 3 3 3 b a c 
+b 3 3 3 3 b b a a c 
+b a a a a a a a a c 
+b c c c c c c c c c 
+`;
+            case "image48":
+            case "icon-mummy":return img`
+b b b b b b b b b b 
+b c d 1 1 1 1 d c c 
+b b d d d d d d b c 
+b d b b 1 1 b b d c 
+b 8 7 7 d d 7 7 8 c 
+b d d 1 1 1 1 d d c 
+b b b d d d d b b c 
+b c d 1 1 1 1 d c c 
+b b b d d d d b b c 
+b c c c c c c c c c 
+`;
+            case "image49":
+            case "icon-troll":return img`
+b b b b b b b b b b 
+b 6 6 9 9 9 9 6 6 c 
+b 8 f f c c f f 8 c 
+b 6 8 8 6 6 8 8 6 c 
+b 6 6 6 6 6 6 6 6 c 
+b e 1 1 e e 1 1 e c 
+b e 1 e e e e 1 e c 
+b 6 e e 2 2 e e 6 c 
+b 6 6 2 2 2 2 6 6 c 
+b c c c c c c c c c 
+`;
+            case "image50":
+            case "icon-ghost":return img`
+b b b b b b b b b b 
+b c d 1 1 1 1 d c c 
+b d 1 1 1 1 1 1 d c 
+b d c c 1 1 c c d c 
+b d d 1 1 1 1 d d c 
+b d 1 1 4 4 1 1 d c 
+b d 1 1 2 2 1 1 d c 
+b c 1 1 2 2 1 1 c c 
+b b c 1 1 1 1 c b c 
+b c c c c c c c c c 
+`;
+            case "image51":
+            case "icon-mourner":return img`
+b b b b b b b b b b 
+b a 3 3 3 3 3 3 a c 
+b a 3 1 1 1 1 3 a c 
+b 3 1 1 1 1 1 1 3 c 
+b 3 1 c 1 1 c 1 3 c 
+b 3 c 1 1 1 1 c 3 c 
+b 3 1 1 c c 1 1 3 c 
+b a 1 a 1 1 a 1 a c 
+b c 3 1 1 1 1 3 c c 
+b c c c c c c c c c 
+`;
+            case "image52":
+            case "icon-skeleton-mage":return img`
+b b b b b b b b b b 
+b e e d 1 1 d e e c 
+b c d 1 1 1 1 d c c 
+b c d d 1 1 d d c c 
+b c c b 1 1 b c c c 
+b d 5 7 1 1 7 5 d c 
+b b 1 1 c c 1 1 b c 
+b c b d 1 1 d b c c 
+b f b d 1 1 d b f c 
+b c c c c c c c c c 
+`;
+            case "image47":
+            case "icon-slime-king":return img`
+b b b b b b b b b c 
+b 1 e c c c e e e c 
+b 1 4 e c c 1 4 e c 
+b e 5 e e 1 1 4 e c 
+b e 1 5 1 1 5 4 e c 
+b b 5 5 5 5 5 4 4 c 
+b 3 b b 5 5 5 5 5 c 
+b 3 3 3 b b 5 5 1 c 
+b 3 3 3 3 3 b b b c 
 b c c c c c c c c c 
 `;
         }

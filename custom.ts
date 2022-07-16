@@ -113,6 +113,29 @@ namespace custom {
             .sort()
     }
 
+    //% group="Upgrades"
+    //% block="upgrade level of $name"
+    export function get_upgrade_level_of(name: string): number {
+        let level = 1
+        let prereq = null
+        do {
+            prereq = upgrades_obtained.find(upgrade => upgrade.prerequisite == name)
+            if(prereq != null) {
+                level++
+                name = prereq.name
+            }
+        } while(prereq != null)
+        return level
+    }
+
+    //% group="Upgrades"
+    //% block="name of strongest upgrade"
+    export function get_strongest_upgrade(): string {
+        return upgrades_obtained.length == 0 ? "" :
+        upgrades_obtained
+            .reduce((strongest, upgrade) => get_upgrade_level_of(upgrade.name) > get_upgrade_level_of(strongest.name) ? upgrade : strongest, upgrades_obtained[0]).name
+    }
+
     /**
      * get obtained upgrade icon list
      */
@@ -123,7 +146,18 @@ namespace custom {
             .filter(upgrade => upgrade.prerequisite == "WEAPON" || upgrade.prerequisite == "ACCESSORY")
             .map(upgrade => get_upgrade_icon(upgrade.name))
     }
-    
+
+    /**
+     * get obtained upgrade name list
+     */
+    //% group="Upgrades"
+    //% block="name list for obtained upgrades"
+    export function get_obtained_upgrade_names(): string[] {
+        return upgrades_obtained
+            .filter(upgrade => upgrade.prerequisite == "WEAPON" || upgrade.prerequisite == "ACCESSORY")
+            .map(upgrade => upgrade.name)
+    }
+
     /**
      * get icon of an upgrade
      */
@@ -147,6 +181,15 @@ namespace custom {
             upgrades_available_list.removeElement(upgrade_item)
         }
         return next_upgrade_name
+    }
+
+    /**
+     * check if upgrade is in the obtained list
+     */
+    //% group="Upgrades"
+    //% block="has upgrade $name"
+    export function has_upgrade(name: string): boolean {
+        return upgrades_obtained.some(upgrade => upgrade.name == name)
     }
 
     /**
@@ -374,4 +417,5 @@ namespace custom {
     export function get_wave_enemy_count(wave: number): number {
         return spawn_waves[wave].reduce((count, spawn) => count += spawn.count, 0)
     }
+
 }

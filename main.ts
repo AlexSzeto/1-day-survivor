@@ -110,84 +110,139 @@ let bonus_magic_spawn = 0
 type StatTracking = {
     name: string
     total: number
+    icon: Image
+    label?: string
 }
 
 let damage_tracker:StatTracking[] = [
     {
         name: "CROSS",
-        total: 0
+        total: 0,
+        icon: assets.image`icon-cross`
     },
     {
         name: "SPARK",
-        total: 0
+        total: 0,
+        icon: assets.image`icon-spark`
     },
     {
         name: "FIREBALL",
-        total: 0
+        total: 0,
+        icon: assets.image`icon-fireball`
     },
     {
         name: "DIVINE AURA",
-        total: 0
+        total: 0,
+        icon: assets.image`icon-aura`
     },
     {
         name: "SPELLBOOK",
-        total: 0
+        total: 0,
+        icon: assets.image`icon-book`
     },
     {
         name: "HOLY WATER",
-        total: 0
+        total: 0,
+        icon: assets.image`icon-water`
     },
+    {
+        name: "BLESSED CUP",
+        total: 0,
+        icon: assets.image`icon-cup`
+    },
+    {
+        name: "GEM PRISM",
+        total: 0,
+        icon: assets.image`icon-prism`
+    },
+    {
+        name: "LIFE SHIELD",
+        total: 0,
+        icon: assets.image`icon-shield`
+    },
+    {
+        name: "AURA RING",
+        total: 0,
+        icon: assets.image`icon-ring`
+    },
+    {
+        name: "POWER CRYSTAL",
+        total: 0,
+        icon: assets.image`icon-crystal`
+    },
+    {
+        name: "FLASH FLASK",
+        total: 0,
+        icon: assets.image`icon-flask`
+    },
+    {
+        name: "PHOENIX FEATHER",
+        total: 0,
+        icon: assets.image`icon-wing`
+    }
 ]
 
 function make_enemy_stat(): StatTracking[] {
     return [
         {
             name: "ZOMBIE",
-            total: 0
+            total: 0,
+            icon: assets.image`icon-zombie`
         },
         {
             name: "KNIGHT",
-            total: 0
+            total: 0,
+            icon: assets.image`icon-knight`
         },
         {
             name: "MUMMY",
-            total: 0
+            total: 0,
+            icon: assets.image`icon-mummy`
         },
         {
             name: "SLIME",
-            total: 0
+            total: 0,
+            icon: assets.image`icon-slime`
         },
         {
             name: "TOUGH SLIME",
-            total: 0
+            total: 0,
+            icon: assets.image`icon-tough-slime`
         },
         {
             name: "GHOST",
-            total: 0
+            total: 0,
+            icon: assets.image`icon-ghost`
         },
         {
             name: "LAVA ZOMBIE",
-            total: 0
+            total: 0,
+            icon: assets.image`icon-lava-zombie`
         },
         {
             name: "MEAN SPIRIT",
-            total: 0
+            total: 0,
+            icon: assets.image`icon-mourner`
         },
         {
             name: "CAPTAIN",
-            total: 0
+            total: 0,
+            icon: assets.image`icon-captain`
         },
         {
             name: "SKELETON MAGE",
-            total: 0
+            total: 0,
+            icon: assets.image`icon-skeleton-mage`
         },
         {
             name: "SLIME KING",
-            total: 0
+            total: 0,
+            icon: assets.image`icon-slime-king`
         },
         {
             name: "TROLL",
-            total: 0
+            total: 0,
+            icon: assets.image`icon-troll`
         }
     ]
 }
@@ -223,6 +278,7 @@ type HeroBuild = {
     prerequsites: string[]
     strongest_weapon: string
     name: string
+    color: number
 }
 let hero_builds:HeroBuild[] = []
 
@@ -249,14 +305,14 @@ let seen_intro: boolean = false
 function start_main_menu() {
     scene.setBackgroundImage(assets.image`title-background`)
     let title_text = sprites.create(assets.image`title-text`, SpriteKind.NonInteractive)    
-    game.setDialogFrame(assets.image`dialog frame`)
+    game.setDialogFrame(assets.image`dialog-frame`)
     main_menu = miniMenu.createMenu(
         miniMenu.createMenuItem("START   "),
         miniMenu.createMenuItem("THE STORY   "),
         miniMenu.createMenuItem("HOW TO PLAY   ")
     )
     main_menu.z = 1000
-    main_menu.setFrame(assets.image`dialog frame`)
+    main_menu.setFrame(assets.image`dialog-frame`)
     const menu_height = 16 + 12 * 3
     main_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, menu_height)
     main_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, main_menu.width + 12)
@@ -314,7 +370,11 @@ function get_random_upgrade (message: string) {
         let next_upgrade = upgrade_list.pop()
         game.showLongText(message, DialogLayout.Bottom)
         game.showLongText(next_upgrade, DialogLayout.Bottom)
-        perform_upgrade(custom.get_upgrade(next_upgrade))
+        if(hero) {
+            perform_upgrade(custom.get_upgrade(next_upgrade))
+        } else {
+            custom.get_upgrade(next_upgrade)
+        }
     } else {
         game.showLongText("You found gold coins!", DialogLayout.Bottom)
         info.changeScoreBy(100)
@@ -330,7 +390,7 @@ function choose_upgrade(title: string) {
         upgrade_menu.z = 1000
         upgrade_menu.setTitle(title)
         upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, scene.screenWidth() - 20)
-        upgrade_menu.setFrame(assets.image`dialog frame`)
+        upgrade_menu.setFrame(assets.image`dialog-frame`)
         upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, 32 + 14 * upgrade_list.length)
         upgrade_menu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
         upgrade_menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
@@ -354,9 +414,10 @@ function choose_upgrade(title: string) {
 
 // CONTAINS GAME DESIGN
 
-function add_build(name: string, prerequsites: string[] = null, strongest_weapon: string = null) {
+function add_build(name: string, color: number, prerequsites: string[] = null, strongest_weapon: string = null) {
     hero_builds.push({
         name,
+        color,
         prerequsites,
         strongest_weapon
     })
@@ -466,20 +527,20 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("BLESSED CUP 3", assets.image`icon-cup`, "x1.5 holy intensity", "BLESSED CUP 2")
     // holy water, cross, divine aura
 
-    add_build("SORCERESS", ["SPELLBOOK", "SPARK", "FIREBALL"])
-    add_build("FLASH SORCERESS", ["SPELLBOOK", "SPARK", "FIREBALL", "FLASH FLASK 3"])
-    add_build("TRICKSTER", ["CROSS", "SPARK", "SPELLBOOK"])
-    add_build("CRYSTAL TRICKSTER", ["CROSS", "SPARK", "SPELLBOOK", "POWER CRYSTAL 3"])
-    add_build("ALCHEMIST", ["HOLY WATER", "FIREBALL", "DIVINE AURA"])
-    add_build("AWAKENED ALCHEMIST", ["HOLY WATER", "FIREBALL", "DIVINE AURA", "AURA RING 3"])
-    add_build("PALADIN", ["HOLY WATER", "CROSS", "DIVINE AURA"])
-    add_build("BLESSED PALADIN", ["HOLY WATER", "CROSS", "DIVINE AURA", "BLESSED CUP 3"])
-    add_build("APPRENTICE", [], "SPARK")
-    add_build("FIGHTER", [], "CROSS")
-    add_build("PYROMANCER", [], "FIREBALL")
-    add_build("GUARDIAN", [], "DIVINE AURA")
-    add_build("PRIESTESS", [], "HOLY WATER")
-    add_build("SCHOLAR", [], "SPELLBOOK")
+    add_build("SORCERESS", 8, ["SPELLBOOK", "SPARK", "FIREBALL"])
+    add_build("FLASH SORCERESS", 10, ["SPELLBOOK", "SPARK", "FIREBALL", "FLASH FLASK 3"])
+    add_build("TRICKSTER", 8, ["CROSS", "SPARK", "SPELLBOOK"])
+    add_build("CRYSTAL TRICKSTER", 10, ["CROSS", "SPARK", "SPELLBOOK", "POWER CRYSTAL 3"])
+    add_build("ALCHEMIST", 8, ["HOLY WATER", "FIREBALL", "DIVINE AURA"])
+    add_build("AWAKENED ALCHEMIST", 10, ["HOLY WATER", "FIREBALL", "DIVINE AURA", "AURA RING 3"])
+    add_build("PALADIN", 8, ["HOLY WATER", "CROSS", "DIVINE AURA"])
+    add_build("BLESSED PALADIN", 10, ["HOLY WATER", "CROSS", "DIVINE AURA", "BLESSED CUP 3"])
+    add_build("APPRENTICE", 15, [], "SPARK")
+    add_build("FIGHTER", 15, [], "CROSS")
+    add_build("PYROMANCER", 15, [], "FIREBALL")
+    add_build("GUARDIAN", 15, [], "DIVINE AURA")
+    add_build("PRIESTESS", 15, [], "HOLY WATER")
+    add_build("SCHOLAR", 15, [], "SPELLBOOK")
 }
 
 // CONTAINS GAME DESIGN
@@ -726,8 +787,9 @@ statusbars.onStatusReached(StatusBarKind.Experience, statusbars.StatusComparison
 
 statusbars.onZero(StatusBarKind.Health, function (status) {
     if (status == hero_health) {
-        show_stats()
-        game.over(false, effects.splatter)
+        game.splash("DEFEAT", "Better luck next time...")
+        show_stats(false, true)
+        game.over(false)
     }
 })
 
@@ -1071,8 +1133,8 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, othe
 })
 
 scene.onOverlapTile(SpriteKind.Player, assets.tile`door-open-mid`, () => {
-    game.splash("YOU HAVE LIFTED THE CURSE!")
-    show_stats()
+    game.splash("VICTORY", "You have lifted the curse!")
+    show_stats(true, false)
     game.over(true, effects.blizzard)
 })
 
@@ -1211,18 +1273,21 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
 }
 
 function create_new_aura() {
-    aura_weapon = sprites.create(assets.image`area32x32`, SpriteKind.NonInteractive)
-    aura_weapon.z = hero.z
-    aura_weapon.scale = aura_scale
-    animation.runImageAnimation(
-        aura_weapon,
-        assets.animation`divine-aura`,
-        500,
-        true
-    )
-    custom.move_sprite_on_top_of_another(aura_weapon, hero)
-    sprites.setDataString(aura_weapon, "name", "DIVINE AURA")
-    sprites.setDataNumber(aura_weapon, "damage", aura_tick_damage)
+    if(hero) {
+        aura_weapon = sprites.create(assets.image`area32x32`, SpriteKind.NonInteractive)
+        aura_weapon.z = hero.z
+        aura_weapon.scale = aura_scale
+        animation.runImageAnimation(
+            aura_weapon,
+            assets.animation`divine-aura`,
+            500,
+            true
+        )
+        custom.move_sprite_on_top_of_another(aura_weapon, hero)
+        sprites.setDataString(aura_weapon, "name", "DIVINE AURA")
+        sprites.setDataNumber(aura_weapon, "damage", aura_tick_damage)
+
+    }
 }
 
 function damage_enemies_in_aura(aura: Sprite, pushback: number) {
@@ -1234,7 +1299,9 @@ function damage_enemies_in_aura(aura: Sprite, pushback: number) {
 }
 
 function adjust_aura_scale() {
-    aura_weapon.scale = aura_scale
+    if(aura_weapon) {
+        aura_weapon.scale = aura_scale
+    }
 }
 
 /*
@@ -1494,16 +1561,160 @@ game.onUpdate(function () {
                 }
             }
         }
-    }
 
-    if (aura_spawn_count > 0) {
-        aura_weapon.setPosition(hero.x, hero.y)
+        if (aura_spawn_count > 0) {
+            aura_weapon.setPosition(hero.x, hero.y)
+        }
     }
 })
 
-function show_stats() {
+class SummaryDialog extends game.BaseDialog {
+    line1:string
+    line2: string
+    line_color: number
+    stat_title: string
+    rows_per_column: number
+    tracked_stats: StatTracking[]
+    
+    constructor(line1: string, line2: string, line_color: number, stat_title: string, rows_per_column: number, tracked_stats: StatTracking[]) {
+        super(scene.screenWidth() - 20, scene.screenHeight() - 20, assets.image`dialog-frame`)
+        this.line1 = line1
+        this.line2 = line2
+        this.line_color = line_color
+        this.stat_title = stat_title
+        this.rows_per_column = rows_per_column
+        this.tracked_stats = tracked_stats
+        this.update()
+    }
+
+    update() {
+        this.drawBorder()
+
+        let y = 10
+        this.image.print(this.line1, 10, y, this.line_color)
+        y += 8
+
+        if(this.line2) {
+            this.image.print(this.line2, 10, y, this.line_color)
+            y += 8
+        }
+
+        y += 8
+        this.image.print(this.stat_title, 10, y, 15)
+        y += 8 + 4
+
+        const total_max = this.tracked_stats.reduce((best, next) => next.total > best ? next.total : best, 1)
+        const column_width = (scene.screenWidth() - 40 - 20) / 2
+        
+        let draw_stat = (icon: Image, level: string, value: number, max: number, col:number, row:number) => {
+            let dx = 10 + col * column_width
+            let bar_left = 12 + 2
+            const dy = y + 12 * row
+
+            this.image.drawImage(icon, dx, dy)
+            dx += 12
+
+            if(level) {
+                this.image.print(level, dx, dy + 1, 15)
+                dx += 6
+                bar_left += 6
+            }
+
+            dx += 2
+            const bar_max = column_width - bar_left - 4
+
+            if(value > 0) {
+                this.image.fillRect(dx, dy, bar_max * 1.0 * value / max, 10, 7)
+            }
+        }
+
+        this.tracked_stats.sort((a, b) => a.total - b.total)
+        for(let i=0; i<this.tracked_stats.length; i++) {
+            const stat = this.tracked_stats[i]
+            draw_stat(
+                stat.icon,
+                stat.label,
+                stat.total,
+                total_max,
+                i < this.rows_per_column ? 0 : 1,
+                i % this.rows_per_column
+            )
+        }
+    }
+}
+
+function show_stats(winning: boolean, losing: boolean) {
     game.pushScene()
-    scene.setBackgroundImage(assets.image`title-background`)
+
+    const strongest_weapon_name = custom.get_strongest_upgrade()
+    const hero_class = hero_builds.find(build => build.strongest_weapon
+        ? build.strongest_weapon == strongest_weapon_name
+        : build.prerequsites.every(prereq => custom.has_upgrade(prereq))
+    )
+    const class_name = hero_class ? hero_class.name : "COLLECTOR"
+    const class_color = hero_class ? hero_class.color : 15
+    const upgrades = custom.get_obtained_upgrade_names()
+
+    const hero_summary = new SummaryDialog(`LV ${hero_level}`, class_name, class_color, "ITEM EFFECTIVENESS:", 3,
+        damage_tracker
+            .filter(tracked => upgrades.indexOf(tracked.name) >= 0)
+            .map(tracker => ({
+                name: tracker.name,
+                icon: tracker.icon,
+                total: tracker.total,
+                label: custom.get_upgrade_level_of(tracker.name).toString()
+            }))
+    )
+
+    const panel = assets.image`title-background`.clone()
+
+    panel.drawTransparentImage(hero_summary.image, 10, 10)
+    scene.setBackgroundImage(panel)
+    const press_button = sprites.create(assets.image`hero`, SpriteKind.NonInteractive)
+
+    pause(500)
+    game.waitAnyButton()
+
+    if(winning) {
+        const winning_summary = new SummaryDialog(
+            "HERO STATS",
+            "",
+            15,
+            `MONSTERS DEFEATED:`,
+            4,
+            kill_tracker
+                .filter(stat => stat.total > 0)
+                .sort((a, b) => a.total - b.total)
+                .slice(0, 8)
+        )
+
+        panel.drawTransparentImage(winning_summary.image, 10, 10)
+        // scene.setBackgroundImage(panel)
+        pause(500)
+        game.waitAnyButton()
+
+    }
+
+    if(losing) {
+        const losing_summary = new SummaryDialog(
+            "MONSTER STATS",
+            `LV ${(enemy_phase+1).toString()}` + (enemy_extra_difficulty > 0 ? `(+${enemy_extra_difficulty})` : ""),
+            15,
+            `DAMAGE DEALT:`,
+            3,
+            wound_tracker
+                .filter(stat => stat.total > 0)
+                .sort((a, b) => a.total-b.total)
+                .slice(0, 6)
+            )
+
+        panel.drawTransparentImage(losing_summary.image, 10, 10)
+        // scene.setBackgroundImage(panel)
+        pause(500)
+        game.waitAnyButton()
+
+    }
+
     game.popScene()
 }
 
@@ -1516,7 +1727,7 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, () => {
         }
     }
     if(custom.game_state_is(GameState.normal)) {
-        show_stats()
+        show_stats(true, true)
     }
 })
 
@@ -1524,3 +1735,4 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, () => {
 MAIN
 */
 start_main_menu()
+// show_stats()
