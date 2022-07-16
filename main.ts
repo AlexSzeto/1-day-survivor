@@ -1038,7 +1038,7 @@ function spawn_enemy(name: string) {
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "MUMMY") {
         new_enemy = sprites.create(assets.image`mummy`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 30, 10, 20, 1)
+        setup_enemy(new_enemy, name, 30, 10, 25, 1)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "KNIGHT") {
         new_enemy = sprites.create(assets.image`knight`, SpriteKind.Enemy)
@@ -1056,18 +1056,18 @@ function spawn_enemy(name: string) {
         setup_enemy(new_enemy, name, 60, 25, 40, 2)
     } else if (name == "SKELETON MAGE") {
         new_enemy = sprites.create(assets.image`skeleton-mage`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 350, 30, 25, 3)
+        setup_enemy(new_enemy, name, 350, 30, 20, 3)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
         sprites.setDataBoolean(new_enemy, "boss", true)
     } else if (name == "SLIME") {
         new_enemy = sprites.create(assets.image`slime`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 24, 15, 20, 1)
+        setup_enemy(new_enemy, name, 24, 15, 35, 1)
     } else if (name == "TOUGH SLIME") {
         new_enemy = sprites.create(assets.image`tough-slime`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 48, 25, 30, 1)
+        setup_enemy(new_enemy, name, 48, 25, 35, 1)
     } else if (name == "SLIME KING") {
         new_enemy = sprites.create(assets.image`slime-king`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 800, 30, 35, 3)
+        setup_enemy(new_enemy, name, 800, 30, 30, 3)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
         sprites.setDataBoolean(new_enemy, "boss", true)
     } else if (name == "TROLL") {
