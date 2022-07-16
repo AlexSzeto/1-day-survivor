@@ -1,5 +1,6 @@
 namespace SpriteKind {
     export const NonInteractive = SpriteKind.create()
+    export const VisualEffects = SpriteKind.create()
 
     export const Orbital = SpriteKind.create()
     export const Molotov = SpriteKind.create()
@@ -9,7 +10,7 @@ namespace SpriteKind {
     export const PickUp = SpriteKind.create()
     export const Treasure = SpriteKind.create()
 
-    export const UpgradeIcons = SpriteKind.create()
+    export const UI = SpriteKind.create()
 }
 
 namespace StatusBarKind {
@@ -26,17 +27,29 @@ const DEFAULT_WEAPON_LIFESPAN = 800
 const GEM_FLY_SPEED = 100
 
 /*
+GFX CONSTANTS
+*/
+const Z_FLAME = 10
+const Z_PICKUP = 11
+const Z_TREASURE_FOOD = 12
+const Z_NPC = 13
+const Z_HERO = 14
+const Z_ENEMY = 15
+const Z_AURA = 16
+const Z_PROJECTILE = 17
+const Z_EXPLOSION = 18
+const Z_UI = 19
+
+/*
 BALANCE CONSTANTS
 */
 const ENEMY_DAMAGE_SCALE = 0.1
 const ENEMY_HEALTH_SCALE = 0.25
 const ENEMY_SPEED_SCALE = 0.05
 const ENEMY_TURN_RATE = 100
-
 const HEAL_DROP_CHANCE = 5
 
-const CHEAT_MODE = false
-let debug_mode = false
+const CHEAT_MODE = true
 
 /*
 GLOBALS
@@ -87,8 +100,8 @@ let orbit_duration = 0
 let orbit_distance = 0
 let orbit_angular_speed = 0
 
-let exploder_spawn_count = 0
-let exploder_spawn_tick: TickTracking = start_tick_track(spawn_exploder)
+let explosive_spawn_count = 0
+let exploder_spawn_tick: TickTracking = start_tick_track(spawn_explosive)
 let exploder_projectile_damage = 0
 let exploder_speed = 0
 let exploder_explosion_damage = 0
@@ -251,7 +264,7 @@ let kill_tracker:StatTracking[] = make_enemy_stat()
 let wound_tracker: StatTracking[] = make_enemy_stat()
 
 let enemy_attack_cooldown_tick: TickTracking = start_tick_track(reset_enemy_attack_cooldown)
-enemy_attack_cooldown_tick.rate = 2
+enemy_attack_cooldown_tick.rate = 3
 let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 4)
 let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100)
 let enemy_phase = 0
@@ -268,7 +281,8 @@ let hero_auto_collect_tick: TickTracking = null
 let hero_level = 1
 let hero_angle = 0
 let hero_dodge = 0
-let hero_dodge_distance = 12
+let hero_dodge_distance = 8
+let hero_dodge_speed = 150
 let hero_dodge_heal = 0
 let hero_auto_collect_chance: number = 0
 let hero_gem_collect_radius: number = 24
@@ -323,7 +337,7 @@ function start_main_menu() {
         miniMenu.createMenuItem("THE STORY   "),
         miniMenu.createMenuItem("HOW TO PLAY   ")
     )
-    main_menu.z = 1000
+    main_menu.z = Z_UI
     main_menu.setFrame(assets.image`dialog-frame`)
     const menu_height = 16 + 12 * 3
     main_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, menu_height)
@@ -384,8 +398,10 @@ function get_random_upgrade (include_basic_items:boolean, message: string) {
     let upgrade_list = custom.get_upgrade_choices(1, include_basic_items)
     if (upgrade_list.length > 0) {
         let next_upgrade = upgrade_list.pop()
-        game.showLongText(message, DialogLayout.Bottom)
-        game.showLongText(next_upgrade, DialogLayout.Bottom)
+        if(message.length > 0) {
+            game.showLongText(message, DialogLayout.Bottom)
+            game.showLongText(next_upgrade, DialogLayout.Bottom)
+        }
         if(hero) {
             perform_upgrade(custom.get_upgrade(next_upgrade))
         } else {
@@ -403,7 +419,7 @@ function choose_upgrade(title: string) {
         pause_the_game()
         effects.confetti.startScreenEffect()
         upgrade_menu = miniMenu.createMenuFromArray(custom.convert_string_array_to_mini_menu_items(upgrade_list))
-        upgrade_menu.z = 1000
+        upgrade_menu.z = Z_UI
         upgrade_menu.setTitle(title)
         upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, scene.screenWidth() - 20)
         upgrade_menu.setFrame(assets.image`dialog-frame`)
@@ -420,11 +436,14 @@ function choose_upgrade(title: string) {
             unpause_the_game()
         })
     } else {
-        game.showLongText(
-            "You reached level " + hero_level + "!\n" +
-            "You are now slightly tougher.", DialogLayout.Bottom)
-        hero_health.max += 10
-        hero_health.value += 10
+        if(!CHEAT_MODE) {
+            game.showLongText(
+                "You reached\n" +
+                "level " + hero_level + "!\n" +
+                "You feel slightly tougher.", DialogLayout.Bottom)
+            hero_health.max += 10
+            hero_health.value += 10
+        }
     }
 }
 
@@ -461,7 +480,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("SPARK 5", assets.image`icon-spark`, "+1 spark", "SPARK 4") // 36-72
 
     custom.add_upgrade_to_list("FIREBALL", assets.image`icon-fireball`, "explode on impact", "WEAPON")
-    exploder_spawn_count = 0
+    explosive_spawn_count = 0
     exploder_speed = 80
     exploder_duration = 750
     exploder_spawn_tick.rate = 10
@@ -609,7 +628,7 @@ function perform_upgrade(name: string) {
             molotov_damage *= 1.2
             break
         case "POWER CRYSTAL 3":
-            weapon_pushback = 40
+            weapon_pushback = 30
             break
 
         case "AURA RING":
@@ -702,7 +721,7 @@ function perform_upgrade(name: string) {
             break
 
         case "FIREBALL":
-            exploder_spawn_count += 1
+            explosive_spawn_count += 1
             fire_on_next_tick(exploder_spawn_tick)
             break
         case "FIREBALL 2":
@@ -778,14 +797,14 @@ function perform_upgrade(name: string) {
 }
 
 function redraw_upgrades() {
-    sprites.destroyAllSpritesOfKind(SpriteKind.UpgradeIcons)
+    sprites.destroyAllSpritesOfKind(SpriteKind.UI)
     let icon_position = 7
     for (let icon of custom.get_obtained_upgrade_icons()) {
-        let upgrade_icon_sprite = sprites.create(icon, SpriteKind.UpgradeIcons)
+        let upgrade_icon_sprite = sprites.create(icon, SpriteKind.UI)
         upgrade_icon_sprite.x = icon_position
         upgrade_icon_sprite.y = 7
         upgrade_icon_sprite.setFlag(SpriteFlag.RelativeToCamera, true)
-        upgrade_icon_sprite.z = 1000
+        upgrade_icon_sprite.z = Z_UI
         icon_position += 12
     }
 }
@@ -949,7 +968,7 @@ function setup_enemy_phase() {
 
         case 20:
             custom.reset_wave_data()
-            custom.add_wave_data(1, 2, "ZOMBIE")
+            custom.add_wave_data(1, 2, "MUMMY")
             custom.add_wave_data(2, 2, "SLIME")
             custom.add_wave_data(3, 2, "GHOST")
             custom.add_wave_data(4, 2, "KNIGHT")
@@ -1067,7 +1086,7 @@ function setup_enemy(enemy: Sprite, name: string, health: number, damage: number
     sprites.setDataBoolean(enemy, "boss", false)
     sprites.setDataBoolean(enemy, "multi_hit", false)
     sprites.setDataBoolean(enemy, "attack_cooldown", false)
-    enemy.z = 50
+    enemy.z = Z_ENEMY
     enemy.setFlag(SpriteFlag.GhostThroughWalls, true)
 }
 
@@ -1076,14 +1095,15 @@ ENEMY EVENTS
 */
 
 function move_hero_to_dodge(target:Sprite) {
-    let shadow = sprites.create(assets.image`hero-shadow`, SpriteKind.NonInteractive)
+    let shadow = sprites.create(assets.image`hero-shadow`, SpriteKind.VisualEffects)
     custom.move_sprite_on_top_of_another(shadow, hero)
-    shadow.destroy(effects.disintegrate, 500)
-    custom.aim_projectile_at_sprite(hero, target, AimType.velocity, hero_dodge_distance)
-    hero.x += -hero.vx
-    hero.y += -hero.vy
-    hero.vx = 0
-    hero.vy = 0
+    shadow.setFlag(SpriteFlag.Ghost, true)
+    shadow.destroy(effects.disintegrate, 600)
+    custom.aim_projectile_at_sprite(hero, target, AimType.velocity, hero_dodge_speed)
+    hero.vx *= -1
+    hero.vy *= -1
+    hero.fx = Math.abs(hero.vx) * 4
+    hero.fy = Math.abs(hero.vy) * 4
     hero_health.value += hero_dodge_heal
 }
 
@@ -1093,22 +1113,17 @@ function wound_hero(target:Sprite) {
     scene.cameraShake(Math.constrain(Math.floor(sprites.readDataNumber(target, "damage") / hero_health.max * 16), 2, 8), 250)
 }
 
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
-    if (sprites.readDataBoolean(otherSprite, "multi_hit")) {
-        if (!(sprites.readDataBoolean(otherSprite, "attack_cooldown"))) {
-            if(!Math.percentChance(hero_dodge)) {
-                wound_hero(otherSprite)
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (hero_sprite, enemy) {
+    if (!(sprites.readDataBoolean(enemy, "attack_cooldown"))) {
+        if (Math.percentChance(hero_dodge)) {
+            move_hero_to_dodge(enemy)
+            sprites.setDataBoolean(enemy, "attack_cooldown", true)
+        } else {
+            if (sprites.readDataBoolean(enemy, "multi_hit")) {
+                sprites.setDataBoolean(enemy, "attack_cooldown", true)
             } else {
-                move_hero_to_dodge(otherSprite)
+                enemy.destroy()
             }
-            sprites.setDataBoolean(otherSprite, "attack_cooldown", true)
-        }
-    } else {
-        if (!Math.percentChance(hero_dodge)) {
-            wound_hero(otherSprite)
-            otherSprite.destroy()
-         } else {
-            move_hero_to_dodge(otherSprite)
         }
     }
 })
@@ -1139,6 +1154,8 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, othe
             tiles.setWallAt(tiles.getTilesByType(assets.tile`door-closed-right`)[0], false)
             tiles.setTileAt(tiles.getTilesByType(assets.tile`door-closed-right`)[0], assets.tile`door-open-right`)
             let cat = sprites.create(assets.image`black-cat`, SpriteKind.NonInteractive)
+            cat.z = Z_NPC
+            cat.setFlag(SpriteFlag.Ghost, true)
             cat.follow(hero, 80)
             custom.move_sprite_on_top_of_another(cat, otherSprite)
         } else {
@@ -1154,10 +1171,6 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`door-open-mid`, () => {
     game.over(true, effects.blizzard)
 })
 
-scene.onHitWall(SpriteKind.Explosive, function (sprite, location) {
-    sprite.destroy()
-})
-
 /*
 GAME SETUP
 */
@@ -1171,7 +1184,7 @@ function setup_game () {
     400,
     true
     )
-    hero.z = 100
+    hero.z = Z_HERO
     tiles.placeOnRandomTile(hero, sprites.dungeon.floorLight5)
     scene.cameraFollowSprite(hero)
     hero_health = statusbars.create(20, 4, StatusBarKind.Health)
@@ -1179,7 +1192,7 @@ function setup_game () {
     hero_health.max = 200
     hero_health.value = 200
     hero_health.setColor(7, 2)
-    hero_health.z = hero.z + 1
+    hero_health.z = Z_UI
     hero_xp = statusbars.create(scene.screenWidth() - 40, 5, StatusBarKind.Experience)
     hero_xp.setLabel("EXP", 12)
     hero_xp.positionDirection(CollisionDirection.Bottom)
@@ -1189,11 +1202,18 @@ function setup_game () {
     hero_xp.value = 0
     hero_xp.setColor(9, 15, 15)
     hero_xp.setStatusBarFlag(StatusBarFlag.SmoothTransition, false)
-    hero_xp.z = 1000
+    hero_xp.z = Z_UI
     info.setScore(0)
-    controller.moveSprite(hero)
+    controller.moveSprite(hero, hero_speed, hero_speed)
     setup_upgrade_menu()
     enemy_phase = 0
+
+    if(CHEAT_MODE) {
+        enemy_phase = 20
+        for(let i=0; i<24; i++) {
+            get_random_upgrade(true, "")
+        }
+    }
     setup_enemy_phase()
     custom.set_game_state(GameState.normal)
 }
@@ -1206,7 +1226,10 @@ function unpause_the_game() {
     for (let upgrade_icon of sprites.allOfKind(SpriteKind.Enemy)) {
         upgrade_icon.follow(hero, sprites.readDataNumber(upgrade_icon, "speed"), ENEMY_TURN_RATE)
     }
-    controller.moveSprite(hero)
+    controller.moveSprite(hero, hero_speed, hero_speed)
+    if (aura_spawn_count > 0) {
+        aura_weapon.setFlag(SpriteFlag.Invisible, false)
+    }
     custom.set_game_state(GameState.normal)
 }
 
@@ -1220,6 +1243,10 @@ function pause_the_game() {
     sprites.destroyAllSpritesOfKind(SpriteKind.Molotov)
     sprites.destroyAllSpritesOfKind(SpriteKind.Explosive)
     sprites.destroyAllSpritesOfKind(SpriteKind.Projectile)
+    sprites.destroyAllSpritesOfKind(SpriteKind.VisualEffects)
+    if (aura_spawn_count > 0) {
+        aura_weapon.setFlag(SpriteFlag.Invisible, true)
+    }
     controller.moveSprite(hero, 0, 0)
 }
 
@@ -1228,7 +1255,8 @@ WEAPONS
 */
 function drop_gem(enemy:Sprite, image:Image, xp:number): Sprite {
     let new_drop = sprites.create(image, SpriteKind.PickUp)
-    new_drop.z = 30
+    new_drop.z = Z_PICKUP
+    new_drop.setFlag(SpriteFlag.Ghost, true)
     sprites.setDataNumber(new_drop, "xp", xp)
     custom.move_sprite_on_top_of_another(new_drop, enemy)
     if(Math.percentChance(hero_auto_collect_chance)) {
@@ -1258,7 +1286,7 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
             && Math.percentChance(HEAL_DROP_CHANCE)
             && sprites.allOfKind(SpriteKind.Food).length < MAX_FOOD) {
             let new_food = sprites.create(assets.image`health-potion`, SpriteKind.Food)
-            new_food.z = 30
+            new_food.z = Z_TREASURE_FOOD
             custom.aim_projectile_at_angle(
                 new_food,
                 randint(0, 360),
@@ -1281,7 +1309,7 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
                 enemy
             )
             let new_treasure = sprites.create(assets.image`treasure`, SpriteKind.Treasure)
-            new_treasure.z = 30
+            new_treasure.z = Z_TREASURE_FOOD
             custom.move_sprite_on_top_of_another(new_treasure, enemy)
         }
         enemy.destroy(effects.disintegrate)
@@ -1291,7 +1319,7 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
 function create_new_aura() {
     if(hero) {
         aura_weapon = sprites.create(assets.image`area32x32`, SpriteKind.NonInteractive)
-        aura_weapon.z = hero.z
+        aura_weapon.z = Z_AURA
         aura_weapon.scale = aura_scale
         animation.runImageAnimation(
             aura_weapon,
@@ -1332,7 +1360,8 @@ sprites.onDestroyed(SpriteKind.Molotov, function (sprite) {
         150,
         true
     )
-    flame_weapon.z = 25
+    flame_weapon.z = Z_FLAME
+    flame_weapon.setFlag(SpriteFlag.Ghost, true)
     flame_weapon.setPosition(sprite.x, sprite.y)
     flame_weapon.scale = molotov_flame_scale
     flame_weapon.lifespan = molotov_flame_duration
@@ -1346,7 +1375,7 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, oth
 })
 
 sprites.onDestroyed(SpriteKind.Explosive, function (sprite) {
-    let explosion = sprites.create(assets.image`area32x32`, SpriteKind.NonInteractive)
+    let explosion = sprites.create(assets.image`area32x32`, SpriteKind.VisualEffects)
     animation.runImageAnimation(
         explosion,
         assets.animation`explosion-anim`,
@@ -1354,7 +1383,8 @@ sprites.onDestroyed(SpriteKind.Explosive, function (sprite) {
         false
     )
     explosion.setPosition(sprite.x, sprite.y)
-    explosion.z = hero.z
+    explosion.setFlag(SpriteFlag.Ghost, true)
+    explosion.z = Z_EXPLOSION
     explosion.scale = exploder_explosion_scale
     explosion.lifespan = 500
     sprites.setDataNumber(explosion, "damage", exploder_explosion_damage)
@@ -1363,7 +1393,7 @@ sprites.onDestroyed(SpriteKind.Explosive, function (sprite) {
 })
 
 sprites.onOverlap(SpriteKind.Orbital, SpriteKind.Enemy, function (sprite, otherSprite) {
-    deal_enemy_damage(hero.x, hero.y, otherSprite, sprites.readDataString(sprite, "name"), sprites.readDataNumber(sprite, "damage"), weapon_pushback)
+    deal_enemy_damage(hero.x, hero.y, otherSprite, sprites.readDataString(sprite, "name"), sprites.readDataNumber(sprite, "damage"), weapon_pushback / 2)
     sprite.destroy()
 })
 
@@ -1376,10 +1406,11 @@ sprites.onOverlap(SpriteKind.Explosive, SpriteKind.Enemy, function (sprite, othe
 TICK EVENTS
 */
 
-function spawn_exploder() {
-    if(exploder_spawn_count > 0) {
-        for (let index = 0; index < exploder_spawn_count + bonus_magic_spawn; index++) {
+function spawn_explosive() {
+    if(explosive_spawn_count > 0) {
+        for (let index = 0; index < explosive_spawn_count + bonus_magic_spawn; index++) {
             let new_weapon = sprites.create(assets.image`fireball`, SpriteKind.Explosive)
+            new_weapon.z = Z_PROJECTILE
             custom.aim_projectile_at_angle(
                 new_weapon,
                 randint(0, 360),
@@ -1404,6 +1435,7 @@ function aura_aoe() {
 function spawn_molotov() {
     for (let index = 0; index < molotov_spawn_count; index++) {
         let new_weapon = sprites.create(assets.image`weapon-water`, SpriteKind.Molotov)
+        new_weapon.z = Z_PROJECTILE
         new_weapon.lifespan = randint(molotov_duration_min, molotov_duration_max)
         custom.aim_projectile_at_angle(
         new_weapon,
@@ -1413,6 +1445,7 @@ function spawn_molotov() {
         hero
         )
         new_weapon.setFlag(SpriteFlag.DestroyOnWall, true)
+        new_weapon.setFlag(SpriteFlag.Ghost, true)
     }
 }
 
@@ -1424,6 +1457,7 @@ function spawn_spray() {
 
     for (let index = 0; index < spray_spawn_count; index++) {
         let new_weapon = sprites.create(assets.image`weapon-cross`, SpriteKind.Projectile)
+        new_weapon.z = Z_PROJECTILE
         custom.aim_projectile_at_angle(
         new_weapon,
         spray_angle,
@@ -1448,6 +1482,7 @@ function spawn_orbit() {
         let spawn_angle_spacing = 360 / (orbit_spawn_count + bonus_magic_spawn)
         for (let orbit = 0; orbit < orbit_spawn_count + bonus_magic_spawn; orbit++) {
             let new_weapon = sprites.create(assets.image`weapon-book`, SpriteKind.Orbital)
+            new_weapon.z = Z_PROJECTILE
             new_weapon.lifespan = orbit_duration
             sprites.setDataNumber(new_weapon, "angle", spawn_angle_spacing * orbit)
             custom.aim_projectile_at_angle(
@@ -1475,6 +1510,7 @@ function spawn_tracer() {
     if(tracer_spawn_count > 0) {
         for (let index = 0; index < tracer_spawn_count + bonus_magic_spawn; index++) {
             let new_weapon = sprites.create(assets.image`spark`, SpriteKind.Projectile)
+            new_weapon.z = Z_PROJECTILE
             new_weapon.startEffect(effects.trail)
             custom.aim_projectile_at_angle(
                 new_weapon,
@@ -1759,7 +1795,7 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, () => {
         }
     }
     if(custom.game_state_is(GameState.normal)) {
-        show_stats(false, false, false)
+        show_stats(CHEAT_MODE, CHEAT_MODE, false)
     }
 })
 

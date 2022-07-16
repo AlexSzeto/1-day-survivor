@@ -379,8 +379,7 @@ namespace custom {
     //% group="Spawn Waves"
     //% block="insert $count of $name into wave $wave"
     export function add_wave_data(wave: number = 1, count: number = 1, name:string, ): void {
-        wave-= 1
-        spawn_waves[wave].push({
+        spawn_waves[wave - 1].unshift({
             name,
             count
         })
@@ -419,7 +418,7 @@ namespace custom {
     //% group="Spawn Waves"
     //% block="list of spawn wave enemies from $wave"
     export function get_wave_enemy_count(wave: number): number {
-        return spawn_waves[wave].reduce((count, spawn) => count += spawn.count, 0)
+        return spawn_waves[wave - 1].reduce((count, spawn) => count += spawn.count, 0)
     }
 
 }
