@@ -543,14 +543,14 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("BLESSED CUP 3", assets.image`icon-cup`, "x1.5 holy intensity", "BLESSED CUP 2")
     // holy water, cross, divine aura
 
-    add_build("SORCERESS", 8, ["SPELLBOOK", "SPARK", "FIREBALL"])
     add_build("FLASH SORCERESS", 10, ["SPELLBOOK", "SPARK", "FIREBALL", "FLASH FLASK 3"])
-    add_build("TRICKSTER", 8, ["CROSS", "SPARK", "SPELLBOOK"])
+    add_build("SORCERESS", 8, ["SPELLBOOK", "SPARK", "FIREBALL"])
     add_build("CRYSTAL TRICKSTER", 10, ["CROSS", "SPARK", "SPELLBOOK", "POWER CRYSTAL 3"])
-    add_build("ALCHEMIST", 8, ["HOLY WATER", "FIREBALL", "DIVINE AURA"])
+    add_build("TRICKSTER", 8, ["CROSS", "SPARK", "SPELLBOOK"])
     add_build("AWAKENED ALCHEMIST", 10, ["HOLY WATER", "FIREBALL", "DIVINE AURA", "AURA RING 3"])
-    add_build("PALADIN", 8, ["HOLY WATER", "CROSS", "DIVINE AURA"])
+    add_build("ALCHEMIST", 8, ["HOLY WATER", "FIREBALL", "DIVINE AURA"])
     add_build("BLESSED PALADIN", 10, ["HOLY WATER", "CROSS", "DIVINE AURA", "BLESSED CUP 3"])
+    add_build("PALADIN", 8, ["HOLY WATER", "CROSS", "DIVINE AURA"])
     add_build("APPRENTICE", 15, [], "SPARK")
     add_build("FIGHTER", 15, [], "CROSS")
     add_build("PYROMANCER", 15, [], "FIREBALL")
