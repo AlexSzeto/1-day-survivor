@@ -302,9 +302,21 @@ MAIN MENU
 let main_menu: miniMenu.MenuSprite = null
 let seen_intro: boolean = false
 
+const menu_image = assets.image`castle-background`.clone()
+
 function start_main_menu() {
-    scene.setBackgroundImage(assets.image`title-background`)
-    let title_text = sprites.create(assets.image`title-text`, SpriteKind.NonInteractive)    
+    scene.setBackgroundImage(menu_image)
+    menu_image.drawImage(assets.image`castle-background`.clone(), 0, 0)
+    let title_text = sprites.create(assets.image`title-text`, SpriteKind.NonInteractive)
+    title_text.left = 0
+    title_text.top = 12
+    title_text.vy = -24
+    title_text.fy = 24
+    let hero_foreground = sprites.create(assets.image`hero-foreground`, SpriteKind.NonInteractive)
+    hero_foreground.right = scene.screenWidth()
+    hero_foreground.top = 8
+    hero_foreground.vy = -16
+    hero_foreground.fy = 16
     game.setDialogFrame(assets.image`dialog-frame`)
     main_menu = miniMenu.createMenu(
         miniMenu.createMenuItem("START   "),
@@ -325,6 +337,7 @@ function start_main_menu() {
     main_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
         main_menu.close()
         title_text.destroy()
+        hero_foreground.destroy()
         switch(selectedIndex) {
             case 0:
                 if (info.highScore() == 0 && !seen_intro) {
@@ -332,9 +345,12 @@ function start_main_menu() {
                 }
                 scene.setBackgroundColor(12)
                 setup_game()
+                get_random_upgrade(true, "YEP")
+                get_random_upgrade(true, "YEP")
                 choose_upgrade("STARTING WEAPON")
                 break
             case 1:
+                menu_image.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
                 show_intro()
                 start_main_menu()
                 break
@@ -364,8 +380,8 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, () => { hero_angle = 90 }
 UPGRADES
 */
 
-function get_random_upgrade (message: string) {
-    let upgrade_list = custom.get_upgrade_choices(1)
+function get_random_upgrade (include_basic_items:boolean, message: string) {
+    let upgrade_list = custom.get_upgrade_choices(1, include_basic_items)
     if (upgrade_list.length > 0) {
         let next_upgrade = upgrade_list.pop()
         game.showLongText(message, DialogLayout.Bottom)
@@ -382,7 +398,7 @@ function get_random_upgrade (message: string) {
 }
 
 function choose_upgrade(title: string) {
-    let upgrade_list = custom.get_upgrade_choices(3)
+    let upgrade_list = custom.get_upgrade_choices(3, true)
     if (upgrade_list.length > 0) {
         pause_the_game()
         effects.confetti.startScreenEffect()
@@ -788,7 +804,7 @@ statusbars.onStatusReached(StatusBarKind.Experience, statusbars.StatusComparison
 statusbars.onZero(StatusBarKind.Health, function (status) {
     if (status == hero_health) {
         game.splash("DEFEAT", "Better luck next time...")
-        show_stats(false, true)
+        show_stats(false, true, true)
         game.over(false)
     }
 })
@@ -1074,7 +1090,7 @@ function move_hero_to_dodge(target:Sprite) {
 function wound_hero(target:Sprite) {
     hero_health.value -= sprites.readDataNumber(target, "damage")
     wound_tracker.find(value => value.name == sprites.readDataString(target, "name")).total += sprites.readDataNumber(target, "damage")
-    scene.cameraShake(Math.constrain(Math.floor(sprites.readDataNumber(target, "damage") / hero_health.max * 16), 1, 8), 250)
+    scene.cameraShake(Math.constrain(Math.floor(sprites.readDataNumber(target, "damage") / hero_health.max * 16), 2, 8), 250)
 }
 
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
@@ -1126,7 +1142,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, othe
             cat.follow(hero, 80)
             custom.move_sprite_on_top_of_another(cat, otherSprite)
         } else {
-            get_random_upgrade("You found treasure!")
+            get_random_upgrade(false, "You found treasure!")
         }
     }
     otherSprite.destroy()
@@ -1134,7 +1150,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, othe
 
 scene.onOverlapTile(SpriteKind.Player, assets.tile`door-open-mid`, () => {
     game.splash("VICTORY", "You have lifted the curse!")
-    show_stats(true, false)
+    show_stats(true, false, true)
     game.over(true, effects.blizzard)
 })
 
@@ -1624,11 +1640,11 @@ class SummaryDialog extends game.BaseDialog {
             const bar_max = column_width - bar_left - 4
 
             if(value > 0) {
-                this.image.fillRect(dx, dy, bar_max * 1.0 * value / max, 10, 7)
+                this.image.fillRect(dx, dy, Math.max(1, bar_max * 1.0 * value / max), 10, 7)
             }
         }
 
-        this.tracked_stats.sort((a, b) => a.total - b.total)
+        this.tracked_stats.sort((a, b) => b.total - a.total)
         for(let i=0; i<this.tracked_stats.length; i++) {
             const stat = this.tracked_stats[i]
             draw_stat(
@@ -1643,7 +1659,8 @@ class SummaryDialog extends game.BaseDialog {
     }
 }
 
-function show_stats(winning: boolean, losing: boolean) {
+function show_stats(winning: boolean, losing: boolean, end_game: boolean) {
+    pause_the_game()
     game.pushScene()
 
     const strongest_weapon_name = custom.get_strongest_upgrade()
@@ -1655,7 +1672,7 @@ function show_stats(winning: boolean, losing: boolean) {
     const class_color = hero_class ? hero_class.color : 15
     const upgrades = custom.get_obtained_upgrade_names()
 
-    const hero_summary = new SummaryDialog(`LV ${hero_level}`, class_name, class_color, "ITEM EFFECTIVENESS:", 3,
+    const hero_summary = new SummaryDialog(class_name, `LV ${hero_level}`, class_color, "ITEM EFFECTIVENESS:", 3,
         damage_tracker
             .filter(tracked => upgrades.indexOf(tracked.name) >= 0)
             .map(tracker => ({
@@ -1666,14 +1683,26 @@ function show_stats(winning: boolean, losing: boolean) {
             }))
     )
 
-    const panel = assets.image`title-background`.clone()
+    const panel = assets.image`castle-background`.clone()
+    if(winning) {
+        panel.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
+    }
+    const button_prompt = sprites.create(assets.image`hero`, SpriteKind.NonInteractive)    
+    animation.runImageAnimation(button_prompt, assets.animation`a-prompt`, 500, true)
+    button_prompt.x = scene.screenWidth() - 20
+    button_prompt.y = scene.screenHeight() - 18
+    button_prompt.setFlag(SpriteFlag.Invisible, true)
+
+    const pause_stats = () => {
+        pause(500)
+        button_prompt.setFlag(SpriteFlag.Invisible, false)
+        game.waitAnyButton()
+        button_prompt.setFlag(SpriteFlag.Invisible, true)
+    }
 
     panel.drawTransparentImage(hero_summary.image, 10, 10)
     scene.setBackgroundImage(panel)
-    const press_button = sprites.create(assets.image`hero`, SpriteKind.NonInteractive)
-
-    pause(500)
-    game.waitAnyButton()
+    pause_stats()    
 
     if(winning) {
         const winning_summary = new SummaryDialog(
@@ -1684,14 +1713,11 @@ function show_stats(winning: boolean, losing: boolean) {
             4,
             kill_tracker
                 .filter(stat => stat.total > 0)
-                .sort((a, b) => a.total - b.total)
                 .slice(0, 8)
         )
 
         panel.drawTransparentImage(winning_summary.image, 10, 10)
-        // scene.setBackgroundImage(panel)
-        pause(500)
-        game.waitAnyButton()
+        pause_stats()
 
     }
 
@@ -1700,22 +1726,27 @@ function show_stats(winning: boolean, losing: boolean) {
             "MONSTER STATS",
             `LV ${(enemy_phase+1).toString()}` + (enemy_extra_difficulty > 0 ? `(+${enemy_extra_difficulty})` : ""),
             15,
-            `DAMAGE DEALT:`,
+            `DAMAGE TAKEN:`,
             3,
             wound_tracker
                 .filter(stat => stat.total > 0)
-                .sort((a, b) => a.total-b.total)
                 .slice(0, 6)
             )
 
-        panel.drawTransparentImage(losing_summary.image, 10, 10)
-        // scene.setBackgroundImage(panel)
-        pause(500)
-        game.waitAnyButton()
-
+        panel.drawTransparentImage(losing_summary.image, 10, 10)        
+        pause_stats()
     }
 
+    panel.drawImage(assets.image`castle-background`, 0, 0)
+    if (winning) {
+        panel.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
+    }
+
+    if(end_game) {
+        pause(1000)
+    }
     game.popScene()
+    unpause_the_game()
 }
 
 let press_b = 0
@@ -1727,7 +1758,7 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, () => {
         }
     }
     if(custom.game_state_is(GameState.normal)) {
-        show_stats(true, true)
+        show_stats(false, false, false)
     }
 })
 
@@ -1735,4 +1766,3 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, () => {
 MAIN
 */
 start_main_menu()
-// show_stats()

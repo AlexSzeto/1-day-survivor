@@ -72,15 +72,19 @@ namespace custom {
      */
     //% group="Upgrades"
     //% blockId="get_upgrade_choices"
-    //% block="list of eligible upgrades up to $max"
-    export function get_upgrade_choices(max: number): string[] {
+    //% block="list of eligible upgrades up to $max" and include basic items $include_basic_items
+    export function get_upgrade_choices(max: number, include_basic_items: boolean): string[] {
         const basic_weapons_count = upgrades_obtained.reduce((count, upgrade) => (upgrade.prerequisite == "WEAPON") ? count + 1 : count, 0)
         const basic_armors_count = upgrades_obtained.reduce((count, upgrade) => (upgrade.prerequisite == "ACCESSORY") ? count + 1 : count, 0)
         const eligible_list = upgrades_available_list
-           .filter(upgrade =>
-                ((upgrade.prerequisite == "WEAPON") && basic_weapons_count < max_basic_weapons)
-               || ((upgrade.prerequisite == "ACCESSORY") && basic_armors_count < max_basic_accessories && upgrades_obtained.length > 0)
-                || upgrades_obtained.some(existing_upgrade => existing_upgrade.name == upgrade.prerequisite)
+           .filter(upgrade => 
+               (
+                   include_basic_items && (
+                       ((upgrade.prerequisite == "WEAPON") && basic_weapons_count < max_basic_weapons)
+                       || ((upgrade.prerequisite == "ACCESSORY") && basic_armors_count < max_basic_accessories && upgrades_obtained.length > 0)
+                   )
+               )
+               || upgrades_obtained.some(existing_upgrade => existing_upgrade.name == upgrade.prerequisite)
             )
         
         let choices: UpgradeData[] = []
