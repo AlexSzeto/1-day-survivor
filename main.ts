@@ -365,6 +365,7 @@ function start_main_menu() {
                 if (!seen_intro) {
                     menu_image.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
                     show_intro()
+                    show_instructions()
                 }
                 scene.setBackgroundColor(12)
                 setup_game()
@@ -376,11 +377,15 @@ function start_main_menu() {
                 start_main_menu()
                 break
             case 2:
-                game.showLongText("Move to avoid monsters.\n \nLet your weapons auto attack.\n \nCollect gems and treasures to level up your weapons. \n \nDefeat all monsters to win!", DialogLayout.Full)
+                show_instructions()
                 start_main_menu()
                 break
         }
     })
+}
+
+function show_instructions() {
+    game.showLongText("INSTRUCTIONS\n \nMove to avoid monsters.\n \nLet your weapons auto attack.\n \nCollect gems from monsters to level up and survive!", DialogLayout.Full)        
 }
 
 function show_intro() {
@@ -1621,8 +1626,8 @@ game.onUpdate(function () {
         if(enemies.length > MAX_ENEMIES / 2) {
             for (let enemy of enemies) {
                 distance = custom.get_distance_between(enemy, hero)
-                if (distance > scene.screenWidth()) {
-                    despawn_enemy(enemy)
+                if (distance > scene.screenWidth() * 3 / 4) {
+                    custom.move_sprite_off_camera(enemy)
                 }
             }
         }
