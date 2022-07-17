@@ -21,6 +21,7 @@ namespace StatusBarKind {
 TESTING
 */
 const CHEAT_MODE = false
+const GAME_PACE = 2.0
 
 /*
 PERFORMANCE CONSTANTS
@@ -51,11 +52,12 @@ const MAX_UPGRADES = 6
 BALANCE CONSTANTS
 */
 const ENEMY_DAMAGE_SCALE = 0.1
-const ENEMY_HEALTH_SCALE = 0.25
-const ENEMY_SPEED_SCALE = 0.05
+const ENEMY_HEALTH_SCALE = 0.05
+const ENEMY_SPEED_SCALE = 0.1
 const ENEMY_TURN_RATE = 100
 const HEAL_DROP_CHANCE = 5
 const SPRAY_ANGLE_DELTA = 120 / 5
+const HERO_UPGRADE_CHOICES = 5
 
 /*
 GLOBALS
@@ -123,6 +125,7 @@ let spray_spawn_count = 0
 let spray_spawn_tick: TickTracking = start_tick_track(spawn_spray)
 let spray_damage = 0
 let spray_speed = 0
+let spray_inaccuracy = 30
 
 let bonus_magic_spawn = 0
 
@@ -190,12 +193,12 @@ let damage_tracker:StatTracking[] = [
         icon: assets.image`icon-crystal`
     },
     {
-        name: "FLASH FLASK",
+        name: "MAGIC FLASK",
         total: 0,
         icon: assets.image`icon-flask`
     },
     {
-        name: "PHOENIX FEATHER",
+        name: "FAIRY FEATHER",
         total: 0,
         icon: assets.image`icon-wing`
     }
@@ -272,7 +275,7 @@ let wound_tracker: StatTracking[] = make_enemy_stat()
 let enemy_attack_cooldown_tick: TickTracking = start_tick_track(reset_enemy_attack_cooldown)
 enemy_attack_cooldown_tick.rate = 3
 let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 4)
-let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100)
+let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100 / GAME_PACE)
 let enemy_phase = 0
 let enemy_extra_difficulty = 0
 
@@ -427,7 +430,7 @@ function get_random_upgrade (include_basic_items:boolean, message: string) {
 }
 
 function choose_upgrade(title: string) {
-    let upgrade_list = custom.get_upgrade_choices(3, true)
+    let upgrade_list = custom.get_upgrade_choices(HERO_UPGRADE_CHOICES, true)
     if (upgrade_list.length > 0) {
         pause_the_game()
         effects.confetti.startScreenEffect()
@@ -476,11 +479,11 @@ function setup_upgrade_menu() {
     spray_spawn_count = 0
     spray_speed = 100
     spray_spawn_tick.rate = 6
-    spray_damage = 10
-    custom.add_upgrade_to_list("CROSS 2", assets.image`icon-cross`, "+1 cross", "CROSS") // 10-40
-    custom.add_upgrade_to_list("CROSS 3", assets.image`icon-cross`, "x1.5 damage", "CROSS 2") // 15-60
-    custom.add_upgrade_to_list("CROSS 4", assets.image`icon-cross`, "+1 cross", "CROSS 3") // 15-75
-    custom.add_upgrade_to_list("CROSS 5", assets.image`icon-cross`, "x2 damage", "CROSS 4") // 30-150
+    spray_damage = 12 // 12-24
+    custom.add_upgrade_to_list("CROSS 2", assets.image`icon-cross`, "+1 cross", "CROSS") // 12-36
+    custom.add_upgrade_to_list("CROSS 3", assets.image`icon-cross`, "x1.5 damage", "CROSS 2") // 18-54
+    custom.add_upgrade_to_list("CROSS 4", assets.image`icon-cross`, "+1 cross", "CROSS 3") // 18-72
+    custom.add_upgrade_to_list("CROSS 5", assets.image`icon-cross`, "x2 damage", "CROSS 4") // 36-144
 
     custom.add_upgrade_to_list("SPARK", assets.image`icon-spark`, "auto aim missile", "WEAPON")
     tracer_spawn_count = 0
@@ -503,19 +506,19 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("FIREBALL 2", assets.image`icon-fireball`, "x2 damage", "FIREBALL") // 60 *.6
     custom.add_upgrade_to_list("FIREBALL 3", assets.image`icon-fireball`, "x1.5 radius", "FIREBALL 2") // 60 *.6
     custom.add_upgrade_to_list("FIREBALL 4", assets.image`icon-fireball`, "x1.5 speed", "FIREBALL 3") // 60 *.6
-    custom.add_upgrade_to_list("FIREBALL 5", assets.image`icon-fireball`, "x3 damage", "FIREBALL 4") // 180 *.6
+    custom.add_upgrade_to_list("FIREBALL 5", assets.image`icon-fireball`, "x2 damage", "FIREBALL 4") // 120 *.6
 
     custom.add_upgrade_to_list("SPELLBOOK", assets.image`icon-book`, "circles to protect", "WEAPON")
     orbit_spawn_count = 0
     orbit_spawn_tick.rate = 18
-    orbit_angular_speed = 4
+    orbit_angular_speed = 6
     orbit_distance = 30
     orbit_duration = 3000
-    orbit_damage = 12
-    custom.add_upgrade_to_list("SPELLBOOK 2", assets.image`icon-book`, "x1.5 damage", "SPELLBOOK") // 18-36 *.33
-    custom.add_upgrade_to_list("SPELLBOOK 3", assets.image`icon-book`, "+1 book", "SPELLBOOK 2") // 18-54 *.33
-    custom.add_upgrade_to_list("SPELLBOOK 4", assets.image`icon-book`, "x1.5 speed", "SPELLBOOK 3") // 
-    custom.add_upgrade_to_list("SPELLBOOK 5", assets.image`icon-book`, "+2 book", "SPELLBOOK 4") // 24-90 *.33
+    orbit_damage = 20 // 12
+    custom.add_upgrade_to_list("SPELLBOOK 2", assets.image`icon-book`, "+1 book", "SPELLBOOK") // 20-40 *.33 (36)
+    custom.add_upgrade_to_list("SPELLBOOK 3", assets.image`icon-book`, "x1.5 damage", "SPELLBOOK 2") // 30-60 *.33 (54)
+    custom.add_upgrade_to_list("SPELLBOOK 4", assets.image`icon-book`, "+1 book", "SPELLBOOK 3") // 30-90 (54)
+    custom.add_upgrade_to_list("SPELLBOOK 5", assets.image`icon-book`, "x1.5 damage", "SPELLBOOK 4") // 45-135 *.33 (90)
 
     custom.add_upgrade_to_list("DIVINE AURA", assets.image`icon-aura`, "damage ring", "WEAPON")
     aura_spawn_count = 0
@@ -551,13 +554,13 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("GEM PRISM 2", assets.image`icon-prism`, "absorb gems every 10s", "GEM PRISM")
     custom.add_upgrade_to_list("GEM PRISM 3", assets.image`icon-prism`, "+1 XP per gem", "GEM PRISM 2")
 
-    custom.add_upgrade_to_list("PHOENIX FEATHER", assets.image`icon-wing`, "x1.1 move and dodge", "ACCESSORY")
-    custom.add_upgrade_to_list("PHOENIX FEATHER 2", assets.image`icon-wing`, "x1.2 move and dodge", "PHOENIX FEATHER")
-    custom.add_upgrade_to_list("PHOENIX FEATHER 3", assets.image`icon-wing`, "+15 HP on dodge", "PHOENIX FEATHER 2")
+    custom.add_upgrade_to_list("FAIRY FEATHER", assets.image`icon-wing`, "x1.1 move and dodge", "ACCESSORY")
+    custom.add_upgrade_to_list("FAIRY FEATHER 2", assets.image`icon-wing`, "x1.2 move and dodge", "FAIRY FEATHER")
+    custom.add_upgrade_to_list("FAIRY FEATHER 3", assets.image`icon-wing`, "+15 HP on dodge", "FAIRY FEATHER 2")
 
-    custom.add_upgrade_to_list("FLASH FLASK", assets.image`icon-flask`, "x1.1 all attack speed", "ACCESSORY")
-    custom.add_upgrade_to_list("FLASH FLASK 2", assets.image`icon-flask`, "x1.2 all attack speed", "FLASH FLASK")
-    custom.add_upgrade_to_list("FLASH FLASK 3", assets.image`icon-flask`, "+1 spell weapons", "FLASH FLASK 2")
+    custom.add_upgrade_to_list("MAGIC FLASK", assets.image`icon-flask`, "x1.1 all attack speed", "ACCESSORY")
+    custom.add_upgrade_to_list("MAGIC FLASK 2", assets.image`icon-flask`, "x1.2 all attack speed", "MAGIC FLASK")
+    custom.add_upgrade_to_list("MAGIC FLASK 3", assets.image`icon-flask`, "+1 spell weapons", "MAGIC FLASK 2")
     // spellbook, spark, fireball
 
     custom.add_upgrade_to_list("POWER CRYSTAL", assets.image`icon-crystal`, "x1.1 all damage", "ACCESSORY")
@@ -567,27 +570,37 @@ function setup_upgrade_menu() {
 
     custom.add_upgrade_to_list("AURA RING", assets.image`icon-ring`, "x1.2 all radius", "ACCESSORY")
     custom.add_upgrade_to_list("AURA RING 2", assets.image`icon-ring`, "x1.2 all radius", "AURA RING")
-    custom.add_upgrade_to_list("AURA RING 3", assets.image`icon-ring`, "x1.5 radius damage", "AURA RING 2")
+    custom.add_upgrade_to_list("AURA RING 3", assets.image`icon-ring`, "x2 radius damage", "AURA RING 2")
     // holy water, fireball, divine aura
 
     custom.add_upgrade_to_list("BLESSED CUP", assets.image`icon-cup`, "+2 HP per second", "ACCESSORY")
     custom.add_upgrade_to_list("BLESSED CUP 2", assets.image`icon-cup`, "x1.1 holy damage", "BLESSED CUP")
-    custom.add_upgrade_to_list("BLESSED CUP 3", assets.image`icon-cup`, "x1.5 holy intensity", "BLESSED CUP 2")
+    custom.add_upgrade_to_list("BLESSED CUP 3", assets.image`icon-cup`, "+holy powers ups", "BLESSED CUP 2")
     // holy water, cross, divine aura
 
-    add_build("FLASH SORCERESS", 10, ["SPELLBOOK", "SPARK", "FIREBALL", "FLASH FLASK 3"])
+    add_build("GRAND SORCERESS", 10, ["SPELLBOOK", "SPARK", "FIREBALL", "MAGIC FLASK 3"])
     add_build("SORCERESS", 8, ["SPELLBOOK", "SPARK", "FIREBALL"])
     add_build("CRYSTAL TRICKSTER", 10, ["CROSS", "SPARK", "SPELLBOOK", "POWER CRYSTAL 3"])
     add_build("TRICKSTER", 8, ["CROSS", "SPARK", "SPELLBOOK"])
-    add_build("AWAKENED ALCHEMIST", 10, ["HOLY WATER", "FIREBALL", "DIVINE AURA", "AURA RING 3"])
-    add_build("ALCHEMIST", 8, ["HOLY WATER", "FIREBALL", "DIVINE AURA"])
+    add_build("AURA MASTER", 10, ["HOLY WATER", "FIREBALL", "DIVINE AURA", "AURA RING 3"])
+    add_build("AURAMANCER", 8, ["HOLY WATER", "FIREBALL", "DIVINE AURA"])
     add_build("BLESSED PALADIN", 10, ["HOLY WATER", "CROSS", "DIVINE AURA", "BLESSED CUP 3"])
     add_build("PALADIN", 8, ["HOLY WATER", "CROSS", "DIVINE AURA"])
+
+    add_build("ULTIMATE SURVIVOR", 10, ["LIFE SHIELD 3", "FAIRY FEATHER 3", "GEM PRISM 3"])
+    add_build("SURVIVOR", 8, ["LIFE SHIELD", "FAIRY FEATHER", "GEM PRISM"])
+
+    add_build("MAGICIAN", 7, [], "SPARK 5")
     add_build("APPRENTICE", 15, [], "SPARK")
-    add_build("FIGHTER", 15, [], "CROSS")
-    add_build("PYROMANCER", 15, [], "FIREBALL")
-    add_build("GUARDIAN", 15, [], "DIVINE AURA")
-    add_build("PRIESTESS", 15, [], "HOLY WATER")
+    add_build("VETERAN", 7, [], "CROSS 5")
+    add_build("SOLDIER", 15, [], "CROSS")
+    add_build("PYROMANCER", 7, [], "FIREBALL 5")
+    add_build("FIRESTARTER", 15, [], "FIREBALL")
+    add_build("ORACLE", 7, [], "DIVINE AURA 5")
+    add_build("PRIESTESS", 15, [], "DIVINE AURA")
+    add_build("CHEMIST", 7, [], "HOLY WATER 5")
+    add_build("ALCHEMIST", 15, [], "HOLY WATER")
+    add_build("SAGE", 7, [], "SPELLBOOK 5")
     add_build("SCHOLAR", 15, [], "SPELLBOOK")
 }
 
@@ -604,21 +617,21 @@ function perform_upgrade(name: string) {
             hero_regen += 4
             break
 
-        case "FLASH FLASK":
+        case "MAGIC FLASK":
             spray_spawn_tick.rate *= 0.9
             tracer_spawn_tick.rate *= 0.9
             exploder_spawn_tick.rate *= 0.9
             orbit_spawn_tick.rate *= 0.9
             molotov_spawn_tick.rate *= 0.9
             break
-        case "FLASH FLASK 2":
+        case "MAGIC FLASK 2":
             spray_spawn_tick.rate *= 0.8
             tracer_spawn_tick.rate *= 0.8
             exploder_spawn_tick.rate *= 0.8
             orbit_spawn_tick.rate *= 0.8
             molotov_spawn_tick.rate *= 0.8
             break
-        case "FLASH FLASK 3":
+        case "MAGIC FLASK 3":
             bonus_magic_spawn = 1
             break
 
@@ -655,9 +668,9 @@ function perform_upgrade(name: string) {
             molotov_flame_scale *= 1.2
             break
         case "AURA RING 3":
-            exploder_explosion_damage *= 1.5
-            aura_tick_damage *= 1.5
-            molotov_damage *= 1.5
+            exploder_explosion_damage *= 2
+            aura_tick_damage *= 2
+            molotov_damage *= 2
             break
 
         case "GEM PRISM":
@@ -671,17 +684,17 @@ function perform_upgrade(name: string) {
             gem_bonus_xp += 1
             break
 
-        case "PHOENIX FEATHER":
+        case "FAIRY FEATHER":
             hero_speed += 10
             hero_dodge += 10
             adjust_hero_speed()
             break
-        case "PHOENIX FEATHER 2":
+        case "FAIRY FEATHER 2":
             hero_speed += 20
             hero_dodge += 20
             adjust_hero_speed()
             break
-        case "PHOENIX FEATHER 3":
+        case "FAIRY FEATHER 3":
             hero_dodge_heal = 15
             break
 
@@ -694,13 +707,14 @@ function perform_upgrade(name: string) {
             spray_damage *= 1.1
             break
         case "BLESSED CUP 3":
-            molotov_flame_duration *= 1.5
+            molotov_duration_min *= 0.5
+            molotov_duration_max *= 0.5
             aura_aoe_tick.rate *= 0.5
-            spray_speed *= 1.2
+            spray_inaccuracy = 0
             break
 
         case "CROSS":
-            spray_spawn_count += 3
+            spray_spawn_count += 2
             fire_on_next_tick(spray_spawn_tick)
             break
         case "CROSS 2":
@@ -749,25 +763,25 @@ function perform_upgrade(name: string) {
             exploder_duration = exploder_duration * 2 / 3
             break
         case "FIREBALL 5":
-            exploder_projectile_damage *= 3
-            exploder_explosion_damage *= 3
+            exploder_projectile_damage *= 2
+            exploder_explosion_damage *= 2
             break
 
         case "SPELLBOOK":
-            orbit_spawn_count += 2
+            orbit_spawn_count += 1
             fire_on_next_tick(orbit_spawn_tick)
             break
         case "SPELLBOOK 2":
-            orbit_damage *= 1.5
-            break
-        case "SPELLBOOK 3":
             orbit_spawn_count += 1
             break
+        case "SPELLBOOK 3":
+            orbit_damage *= 1.5
+            break
         case "SPELLBOOK 4":
-            orbit_angular_speed *= 1.5
+            orbit_spawn_count += 1
             break
         case "SPELLBOOK 5":
-            orbit_spawn_count += 2
+            orbit_damage *= 1.5
             break
 
         case "DIVINE AURA":
@@ -840,7 +854,7 @@ statusbars.onStatusReached(StatusBarKind.Experience, statusbars.StatusComparison
 statusbars.onZero(StatusBarKind.Health, function (status) {
     if (status == hero_health) {
         game.splash("DEFEAT", "Better luck next time...")
-        show_stats(false, true, true)
+        show_stats(enemy_extra_difficulty > 0, true, false, true)
         game.over(false)
     }
 })
@@ -996,6 +1010,10 @@ function setup_enemy_phase() {
         default:
             if(enemy_phase >= 20) {
                 enemy_extra_difficulty += 1
+                
+                for(let existing_enemy of sprites.allOfKind(SpriteKind.Enemy)) {
+                    tweak_enemy(existing_enemy)
+                }
 
                 const dice_roll_enemy = Math.pickRandom([
                     "LAVA ZOMBIE",
@@ -1070,7 +1088,7 @@ function spawn_enemy(name: string) {
         setup_enemy(new_enemy, name, 60, 25, 40, 2)
     } else if (name == "SKELETON MAGE") {
         new_enemy = sprites.create(assets.image`skeleton-mage`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 350, 30, 20, 3)
+        setup_enemy(new_enemy, name, 350 / GAME_PACE, 30, 20, 3)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
         sprites.setDataBoolean(new_enemy, "boss", true)
     } else if (name == "SLIME") {
@@ -1081,16 +1099,21 @@ function spawn_enemy(name: string) {
         setup_enemy(new_enemy, name, 48, 25, 35, 1)
     } else if (name == "SLIME KING") {
         new_enemy = sprites.create(assets.image`slime-king`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 800, 30, 30, 3)
+        setup_enemy(new_enemy, name, 800 / GAME_PACE, 30, 30, 3)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
         sprites.setDataBoolean(new_enemy, "boss", true)
     } else if (name == "TROLL") {
         new_enemy = sprites.create(assets.image`troll`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 2000, 50, 30, 3)
+        setup_enemy(new_enemy, name, 2000 / GAME_PACE, 50, 30, 3)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
         sprites.setDataBoolean(new_enemy, "boss", true)
     }
     custom.move_sprite_off_camera(new_enemy)
+}
+
+function tweak_enemy(enemy: Sprite) {
+    sprites.setDataNumber(enemy, "damage", sprites.readDataNumber(enemy, "damage") * (1.0 + enemy_extra_difficulty * ENEMY_DAMAGE_SCALE))
+    sprites.setDataNumber(enemy, "speed", sprites.readDataNumber(enemy, "speed") * (1.0 + enemy_extra_difficulty * ENEMY_SPEED_SCALE))
 }
 
 function setup_enemy(enemy: Sprite, name: string, health: number, damage: number, speed: number, drop_type: number) {
@@ -1185,7 +1208,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, othe
 
 scene.onOverlapTile(SpriteKind.Player, assets.tile`door-open-mid`, () => {
     game.splash("VICTORY", "You have lifted the curse!")
-    show_stats(true, false, true)
+    show_stats(true, false, true, true)
     game.over(true, effects.blizzard)
 })
 
@@ -1275,7 +1298,7 @@ function drop_gem(enemy:Sprite, image:Image, xp:number): Sprite {
     let new_drop = sprites.create(image, SpriteKind.PickUp)
     new_drop.z = Z_PICKUP
     new_drop.setFlag(SpriteFlag.Ghost, true)
-    sprites.setDataNumber(new_drop, "xp", xp)
+    sprites.setDataNumber(new_drop, "xp", xp * GAME_PACE)
     custom.move_sprite_on_top_of_another(new_drop, enemy)
     if(Math.percentChance(hero_auto_collect_chance)) {
         new_drop.follow(hero, GEM_FLY_SPEED)
@@ -1470,7 +1493,7 @@ function spawn_molotov() {
 function spawn_spray() {
     let spray_angle = hero_angle
     spray_angle -= spray_spawn_count * SPRAY_ANGLE_DELTA / 2
-    spray_angle += Math.randomRange(-15, 15)
+    spray_angle += Math.randomRange(-spray_inaccuracy, spray_inaccuracy)
     let weapon_image:Image = null
 
     for (let index = 0; index < spray_spawn_count; index++) {
@@ -1602,8 +1625,8 @@ game.onUpdate(function () {
         for (let pickup of sprites.allOfKind(SpriteKind.PickUp)) {
             distance = custom.get_distance_between(pickup, hero)
             if (distance < hero.width * 0.75) {
-                hero_xp.value += sprites.readDataNumber(pickup, "xp") + gem_bonus_xp
-                info.changeScoreBy(sprites.readDataNumber(pickup, "xp") + gem_bonus_xp)
+                hero_xp.value += sprites.readDataNumber(pickup, "xp") + gem_bonus_xp * GAME_PACE
+                info.changeScoreBy(sprites.readDataNumber(pickup, "xp") + gem_bonus_xp * GAME_PACE)
                 pickup.destroy()
             } else if (distance < hero_gem_collect_radius) {
                 pickup.follow(hero, GEM_FLY_SPEED)
@@ -1638,6 +1661,10 @@ game.onUpdate(function () {
     }
 })
 
+
+/**
+ * STATS SCREENS
+ */
 class SummaryDialog extends game.BaseDialog {
     line1:string
     line2: string
@@ -1713,7 +1740,11 @@ class SummaryDialog extends game.BaseDialog {
     }
 }
 
-function show_stats(winning: boolean, losing: boolean, end_game: boolean) {
+function tracked_total_sum(tracker_set:StatTracking[]): number {
+    return Math.round(tracker_set.reduce((count, next) => count + next.total, 0))
+}
+
+function show_stats(show_hero_stats: boolean, show_enemy_stats: boolean, winning: boolean, end_game: boolean) {
     pause_the_game()
     game.pushScene()
 
@@ -1725,8 +1756,7 @@ function show_stats(winning: boolean, losing: boolean, end_game: boolean) {
     const class_name = hero_class ? hero_class.name : "COLLECTOR"
     const class_color = hero_class ? hero_class.color : 15
     const upgrades = custom.get_obtained_upgrade_names()
-
-    const hero_summary = new SummaryDialog(class_name, `LV ${hero_level}`, class_color, "ITEM EFFECTIVENESS:", 3,
+    const hero_summary = new SummaryDialog(class_name, `LV ${hero_level}`, class_color, `TOTAL DAMAGE: ${tracked_total_sum(damage_tracker)}`, 3,
         damage_tracker
             .filter(tracked => upgrades.indexOf(tracked.name) >= 0)
             .map(tracker => ({
@@ -1738,7 +1768,7 @@ function show_stats(winning: boolean, losing: boolean, end_game: boolean) {
     )
 
     const panel = assets.image`castle-background`.clone()
-    if(winning) {
+    if(show_hero_stats) {
         panel.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
     }
     const button_prompt = sprites.create(assets.image`hero`, SpriteKind.NonInteractive)    
@@ -1758,12 +1788,12 @@ function show_stats(winning: boolean, losing: boolean, end_game: boolean) {
     scene.setBackgroundImage(panel)
     pause_stats()    
 
-    if(winning) {
+    if(show_hero_stats) {
         const winning_summary = new SummaryDialog(
             "HERO STATS",
             "",
             15,
-            `MONSTERS DEFEATED:`,
+            `TOTAL DEFEATED: ${tracked_total_sum(kill_tracker)}`,
             4,
             kill_tracker
                 .filter(stat => stat.total > 0)
@@ -1775,12 +1805,12 @@ function show_stats(winning: boolean, losing: boolean, end_game: boolean) {
 
     }
 
-    if(losing) {
+    if(show_enemy_stats) {
         const losing_summary = new SummaryDialog(
             "MONSTER STATS",
             `LV ${(enemy_phase+1).toString()}` + (enemy_extra_difficulty > 0 ? `(+${enemy_extra_difficulty})` : ""),
             15,
-            `DAMAGE TAKEN:`,
+            `DAMAGE TAKEN: ${tracked_total_sum(wound_tracker)}`,
             3,
             wound_tracker
                 .filter(stat => stat.total > 0)
@@ -1813,7 +1843,7 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, () => {
         }
     }
     if(custom.game_state_is(GameState.normal)) {
-        show_stats(CHEAT_MODE, CHEAT_MODE, false)
+        show_stats(CHEAT_MODE, CHEAT_MODE, false, false)
     }
 })
 
