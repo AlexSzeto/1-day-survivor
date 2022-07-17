@@ -1797,7 +1797,7 @@ function show_stats(winning: boolean, losing: boolean, end_game: boolean) {
     }
 
     if(end_game) {
-        pause(1000)
+        pause(500)
     }
     game.popScene()
     unpause_the_game()
