@@ -216,6 +216,30 @@ namespace custom {
         return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y))
     }
 
+
+    /**
+     * shift an image in the default palette one grade toward white
+     */
+    //% group="Utility"
+    //% block="color shift $image toward white"
+    //% image.shadow=variables_get
+    export function color_shift_white(image: Image): void {
+        image.replace(9, 1)
+        image.replace(13, 1)
+        image.replace(5, 1)
+        image.replace(3, 1)
+        image.replace(4, 5)
+        image.replace(7, 9)
+        image.replace(11, 13)
+        image.replace(2, 4)
+        image.replace(6, 9)
+        image.replace(12, 11)
+        image.replace(10, 3)
+        image.replace(14, 4)
+        image.replace(8, 6)
+        image.replace(15, 12)
+    }
+
     /**
      * place one sprite on top of another
      */

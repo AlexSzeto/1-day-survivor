@@ -48,6 +48,32 @@ const Z_UI = 19
 
 const MAX_UPGRADES = 6
 
+const zombie_flash = assets.image`zombie`.clone()
+const knight_flash = assets.image`knight`.clone()
+const lava_zombie_flash = assets.image`lava-zombie`.clone()
+const captain_flash = assets.image`captain`.clone()
+const skeleton_mage_flash = assets.image`skeleton-mage`.clone()
+const slime_flash = assets.image`slime`.clone()
+const tough_slime_flash = assets.image`tough-slime`.clone()
+const slime_king_flash = assets.image`slime-king`.clone()
+const mummy_flash = assets.image`mummy`.clone()
+const troll_flash = assets.image`troll`.clone()
+const ghost_flash = assets.image`ghost`.clone()
+const mean_spirit_flash = assets.image`mourner`.clone()
+
+custom.color_shift_white(zombie_flash)
+custom.color_shift_white(knight_flash)
+custom.color_shift_white(lava_zombie_flash)
+custom.color_shift_white(captain_flash)
+custom.color_shift_white(skeleton_mage_flash)
+custom.color_shift_white(slime_flash)
+custom.color_shift_white(tough_slime_flash)
+custom.color_shift_white(slime_king_flash)
+custom.color_shift_white(mummy_flash)
+custom.color_shift_white(troll_flash)
+custom.color_shift_white(ghost_flash)
+custom.color_shift_white(mean_spirit_flash)
+
 /*
 BALANCE CONSTANTS
 */
@@ -1053,58 +1079,43 @@ function spawn_enemy(name: string) {
         if(!(["SKELETON MAGE", "SLIME KING", "TROLL"].indexOf(name) >= 0)) {
             return
         }
-        // const destroy_candidate = enemies.reduce((farthest, target) => custom.get_distance_between(target, hero) > custom.get_distance_between(farthest, hero) ? target : farthest, enemies[0])
-        // despawn_enemy(destroy_candidate)
-        // spawn_over_enemy_tracker++
     }
 
     // CONTAINS GAME DESIGN
     let new_enemy: Sprite = null
     if (name == "ZOMBIE") {
-        new_enemy = sprites.create(assets.image`zombie`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 12, 10, 25, 1)
+        new_enemy = setup_enemy(assets.image`zombie`, zombie_flash, name, 12, 10, 25, 1)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "LAVA ZOMBIE") {
-        new_enemy = sprites.create(assets.image`lava-zombie`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 90, 20, 30, 2)
+        new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name, 90, 20, 30, 2)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "MUMMY") {
-        new_enemy = sprites.create(assets.image`mummy`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 30, 10, 25, 1)
+        new_enemy = setup_enemy(assets.image`mummy`, mummy_flash, name, 30, 10, 25, 1)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "KNIGHT") {
-        new_enemy = sprites.create(assets.image`knight`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 40, 15, 30, 1)
+        new_enemy = setup_enemy(assets.image`knight`, knight_flash, name, 40, 15, 30, 1)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "CAPTAIN") {
-        new_enemy = sprites.create(assets.image`captain`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 120, 30, 25, 2)
+        new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 120, 30, 25, 2)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "GHOST") {
-        new_enemy = sprites.create(assets.image`ghost`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 30, 20, 40, 1)
+        new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name, 30, 20, 40, 1)
     } else if (name == "MEAN SPIRIT") {
-        new_enemy = sprites.create(assets.image`mourner`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 60, 25, 40, 2)
+        new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 60, 25, 40, 2)
     } else if (name == "SKELETON MAGE") {
-        new_enemy = sprites.create(assets.image`skeleton-mage`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 350 / GAME_PACE, 30, 20, 3)
+        new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 350 / GAME_PACE, 30, 20, 3)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
         sprites.setDataBoolean(new_enemy, "boss", true)
     } else if (name == "SLIME") {
-        new_enemy = sprites.create(assets.image`slime`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 24, 15, 35, 1)
+        new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 24, 15, 35, 1)
     } else if (name == "TOUGH SLIME") {
-        new_enemy = sprites.create(assets.image`tough-slime`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 48, 25, 35, 1)
+        new_enemy =  setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 48, 25, 35, 1)
     } else if (name == "SLIME KING") {
-        new_enemy = sprites.create(assets.image`slime-king`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 800 / GAME_PACE, 30, 30, 3)
+        new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 800 / GAME_PACE, 30, 30, 3)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
         sprites.setDataBoolean(new_enemy, "boss", true)
     } else if (name == "TROLL") {
-        new_enemy = sprites.create(assets.image`troll`, SpriteKind.Enemy)
-        setup_enemy(new_enemy, name, 2000 / GAME_PACE, 50, 30, 3)
+        new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 2000 / GAME_PACE, 50, 30, 3)
         sprites.setDataBoolean(new_enemy, "multi_hit", true)
         sprites.setDataBoolean(new_enemy, "boss", true)
     }
@@ -1116,7 +1127,10 @@ function tweak_enemy(enemy: Sprite) {
     sprites.setDataNumber(enemy, "speed", sprites.readDataNumber(enemy, "speed") * (1.0 + enemy_extra_difficulty * ENEMY_SPEED_SCALE))
 }
 
-function setup_enemy(enemy: Sprite, name: string, health: number, damage: number, speed: number, drop_type: number) {
+function setup_enemy(main_image: Image, flash_image: Image, name: string, health: number, damage: number, speed: number, drop_type: number): Sprite {
+    const enemy = sprites.create(main_image, SpriteKind.Enemy)
+    sprites.setDataImage(enemy, "main_image", main_image)
+    sprites.setDataImage(enemy, "flash_image", flash_image)
     sprites.setDataString(enemy, "name", name)
     sprites.setDataNumber(enemy, "health", health * (1.0 + enemy_extra_difficulty * ENEMY_HEALTH_SCALE))
     sprites.setDataNumber(enemy, "damage", damage * (1.0 + enemy_extra_difficulty * ENEMY_DAMAGE_SCALE))
@@ -1126,8 +1140,10 @@ function setup_enemy(enemy: Sprite, name: string, health: number, damage: number
     sprites.setDataBoolean(enemy, "boss", false)
     sprites.setDataBoolean(enemy, "multi_hit", false)
     sprites.setDataBoolean(enemy, "attack_cooldown", false)
+    sprites.setDataNumber(enemy, "flash", -1)
     enemy.z = Z_ENEMY
     enemy.setFlag(SpriteFlag.GhostThroughWalls, true)
+    return enemy
 }
 
 /*
@@ -1354,6 +1370,9 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
             custom.move_sprite_on_top_of_another(new_treasure, enemy)
         }
         enemy.destroy(effects.disintegrate)
+    } else {
+        enemy.setImage(sprites.readDataImage(enemy, "flash_image"))
+        sprites.setDataNumber(enemy, "flash", 2)
     }
 }
 
@@ -1592,6 +1611,21 @@ function reset_enemy_attack_cooldown() {
         sprites.setDataBoolean(enemy, "attack_cooldown", false)
     }
 }
+
+game.onUpdateInterval(100, () => {
+    if(custom.game_state_is(GameState.normal)) {
+        for(let enemy of sprites.allOfKind(SpriteKind.Enemy)) {
+            let flash = sprites.readDataNumber(enemy, "flash")
+            if(flash > 0) {
+                flash--
+                sprites.setDataNumber(enemy, "flash", flash)
+                if(flash == 0) {
+                    enemy.setImage(sprites.readDataImage(enemy, "main_image"))
+                }
+            }
+        }
+    }
+})
 
 game.onUpdateInterval(250, () => {
     if(custom.game_state_is(GameState.normal)) {
