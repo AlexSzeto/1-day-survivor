@@ -35,7 +35,7 @@ const GEM_FLY_SPEED = 100
 BALANCE CONSTANTS
 */
 const ENEMY_DAMAGE_SCALE = 0.05
-const ENEMY_HEALTH_SCALE = 6 // 0.10
+const ENEMY_HEALTH_SCALE = 0.10
 const ENEMY_SPEED_SCALE = 0.20
 const ENEMY_MAX_SPEED = 90
 const ENEMY_TURN_RATE = 100
@@ -1032,32 +1032,29 @@ function setup_enemy_phase() {
             spawn_enemy("TROLL")
             cat_inside_chest = true
             break
-        case 18:
-        case 19:
-            custom.add_wave_data(1, 1, "TOUGH SLIME")
-            custom.add_wave_data(2, 1, "TOUGH SLIME")
-            custom.add_wave_data(3, 1, "TOUGH SLIME")
-            custom.add_wave_data(4, 1, "TOUGH SLIME")
-            custom.add_wave_data(5, 1, "TOUGH SLIME")
-            break
 
-
-        case 20:
-            custom.reset_wave_data()
-            custom.add_wave_data(1, 2, "MUMMY")
-            custom.add_wave_data(2, 2, "SLIME")
-            custom.add_wave_data(3, 2, "GHOST")
-            custom.add_wave_data(4, 2, "KNIGHT")
-            custom.add_wave_data(5, 2, "TOUGH SLIME")
-            break
-
-            
         default:
-            if(enemy_phase >= 20) {
-                enemy_extra_difficulty += 1                
+            if(enemy_phase < 20) {
+                custom.add_wave_data(1, 1, "TOUGH SLIME")
+                custom.add_wave_data(2, 1, "TOUGH SLIME")
+                custom.add_wave_data(3, 1, "TOUGH SLIME")
+                custom.add_wave_data(4, 1, "TOUGH SLIME")
+                custom.add_wave_data(5, 1, "TOUGH SLIME")
+            } else if (cat_inside_chest) {
+
+                if(enemy_extra_difficulty == 0) {
+                    custom.reset_wave_data()
+                    custom.add_wave_data(1, 2, "MUMMY")
+                    custom.add_wave_data(2, 2, "SLIME")
+                    custom.add_wave_data(3, 2, "GHOST")
+                    custom.add_wave_data(4, 2, "KNIGHT")
+                    custom.add_wave_data(5, 2, "TOUGH SLIME")
+                }
+
+                enemy_extra_difficulty += 1
                 effects.blizzard.startScreenEffect(1000)
-                
-                for(let existing_enemy of sprites.allOfKind(SpriteKind.Enemy)) {
+
+                for (let existing_enemy of sprites.allOfKind(SpriteKind.Enemy)) {
                     tweak_enemy(existing_enemy)
                 }
 
@@ -1070,18 +1067,18 @@ function setup_enemy_phase() {
                     "MEAN SPIRIT",
                 ])
                 const dice_roll_wave = Math.randomRange(1, 5)
-                if(custom.get_wave_enemy_count(dice_roll_wave) < MAX_ENEMIES) {
+                if (custom.get_wave_enemy_count(dice_roll_wave) < MAX_ENEMIES) {
                     custom.add_wave_data(dice_roll_wave, 1, dice_roll_enemy)
                 }
 
-                if(enemy_phase % 2 == 0 && cat_out_of_chest) {
+                if (enemy_phase % 2 == 0 && cat_out_of_chest) {
                     const dice_roll_boss = Math.pickRandom([
                         "SKELETON MAGE",
                         "SLIME KING",
                         "TROLL"
                     ])
                     spawn_enemy(dice_roll_boss)
-                }
+                }                
             }
             break
     }
@@ -1121,15 +1118,27 @@ function spawn_enemy(name: string) {
     } else if (name == "MEAN SPIRIT") {
         new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 60, 25, 40, 2, false)
     } else if (name == "SKELETON MAGE") {
-        new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 350 / game_pace, 30, 20, 3, true, true)
+        if(enemy_extra_difficulty <= 0) {
+            new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 350 / game_pace, 30, 20, 3, true, true)
+        } else {
+        new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 800 / game_pace, 30, 20, 3, true, true)
+        }
     } else if (name == "SLIME") {
         new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 24, 15, 35, 1)
     } else if (name == "TOUGH SLIME") {
-        new_enemy =  setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 48, 25, 35, 1)
+        new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 48, 25, 35, 1)
     } else if (name == "SLIME KING") {
-        new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 800 / game_pace, 30, 30, 3, true, true)
+        if (enemy_extra_difficulty <= 0) {
+            new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 800 / game_pace, 30, 30, 3, true, true)
+        } else {
+            new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 800 / game_pace, 30, 30, 3, true, true)
+        }
     } else if (name == "TROLL") {
-        new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 2000 / game_pace, 50, 30, 3, true, true)
+        if (enemy_extra_difficulty <= 0) {
+            new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 2000 / game_pace, 50, 30, 3, true, true)
+        } else {
+            new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 800 / game_pace, 50, 30, 3, true, true)
+        }
     }
     custom.move_sprite_off_camera(new_enemy)
 }
