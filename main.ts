@@ -34,9 +34,9 @@ const GEM_FLY_SPEED = 100
 /*
 BALANCE CONSTANTS
 */
-const ENEMY_DAMAGE_SCALE = 0.05
-const ENEMY_HEALTH_SCALE = 0.10
-const ENEMY_SPEED_SCALE = 0.20
+const ENEMY_DAMAGE_SCALE = 0.15
+const ENEMY_HEALTH_SCALE = 0.15
+const ENEMY_SPEED_SCALE = 0.15
 const ENEMY_MAX_SPEED = 90
 const ENEMY_TURN_RATE = 100
 const HEAL_DROP_CHANCE = 5
@@ -45,6 +45,11 @@ const HERO_UPGRADE_CHOICES = 3
 
 const ENEMY_KNOCKBACK_FRICTION = 15
 const WEAPON_KNOCKBACK_VELOCITY = 30
+
+const HYPER_PHASE_TICKS = 50
+const HYPER_XP_MULTIPLIER = 1.5
+const HYPER_BOSS_HP_SCALE = 0.5
+const HYPER_ENEMY_SPEED_SCALE = 1.2
 
 /*
 GFX CONSTANTS
@@ -93,7 +98,7 @@ custom.color_shift_white(mean_spirit_flash)
 GLOBALS
 */
 
-let game_pace = 1
+let hyper_mode = false
 
 type TickTracking = {
     rate: number,
@@ -308,7 +313,7 @@ let wound_tracker: StatTracking[] = make_enemy_stat()
 let enemy_attack_cooldown_tick: TickTracking = start_tick_track(reset_enemy_attack_cooldown)
 enemy_attack_cooldown_tick.rate = 3
 let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 4)
-let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100 / game_pace)
+let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100)
 let enemy_phase = 0
 let enemy_extra_difficulty = 0
 
@@ -362,16 +367,26 @@ let seen_intro: boolean = settings.readNumber("seen_intro") == 1
 let completed_game: boolean = settings.readNumber("completed_game") == 1
 
 const menu_image = assets.image`castle-background`.clone()
+let hero_foreground: Sprite = null
+let title_text: Sprite = null
 
 function start_main_menu() {
+
+    if(main_menu) {
+        main_menu.close()
+        title_text.destroy()
+        hero_foreground.destroy()
+        main_menu = null
+    }
+
     scene.setBackgroundImage(menu_image)
     menu_image.drawImage(assets.image`castle-background`.clone(), 0, 0)
-    let title_text = sprites.create(assets.image`title-text`, SpriteKind.NonInteractive)
+    title_text = sprites.create(assets.image`title-text`, SpriteKind.NonInteractive)
     title_text.left = 0
     title_text.top = 12
     title_text.vy = -24
     title_text.fy = 24
-    let hero_foreground = sprites.create(assets.image`hero-foreground`, SpriteKind.NonInteractive)
+    hero_foreground = sprites.create(assets.image`hero-foreground`, SpriteKind.NonInteractive)
     hero_foreground.right = scene.screenWidth()
     hero_foreground.top = 8
     hero_foreground.vy = -16
@@ -406,9 +421,11 @@ function start_main_menu() {
         main_menu.close()
         title_text.destroy()
         hero_foreground.destroy()
+        main_menu = null
         switch(selection) {
             case "HYPER MODE   ":
-                game_pace = 2
+                hyper_mode = true
+                enemy_phase_tick.rate = HYPER_PHASE_TICKS
             case "START   ":
                 if (!seen_intro) {
                     menu_image.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
@@ -502,8 +519,8 @@ function choose_upgrade(title: string) {
                 "You reached\n" +
                 "level " + hero_level + "!\n" +
                 "You feel slightly tougher.", DialogLayout.Bottom)
-            hero_health.max += 10
-            hero_health.value += 10
+            hero_health.max += 5
+            hero_health.value += 5
         }
     }
 }
@@ -966,8 +983,8 @@ function setup_enemy_phase() {
             break
         case 7:
             custom.reset_wave_data()
-            custom.add_wave_data(2, 3, "KNIGHT")
-            custom.add_wave_data(4, 3, "KNIGHT")
+            custom.add_wave_data(2, 2, "KNIGHT")
+            custom.add_wave_data(4, 2, "KNIGHT")
             custom.add_wave_data(3, 2, "GHOST")
             custom.add_wave_data(3, 1, "CAPTAIN")
             break
@@ -994,10 +1011,10 @@ function setup_enemy_phase() {
         case 12:
             custom.reset_wave_data()
             custom.add_wave_data(1, 1, "LAVA ZOMBIE")
-            custom.add_wave_data(2, 3, "ZOMBIE")
-            custom.add_wave_data(3, 3, "GHOST")
-            custom.add_wave_data(4, 3, "LAVA ZOMBIE")
-            custom.add_wave_data(5, 1, "ZOMBIE")
+            custom.add_wave_data(2, 2, "ZOMBIE")
+            custom.add_wave_data(3, 2, "GHOST")
+            custom.add_wave_data(4, 1, "LAVA ZOMBIE")
+            custom.add_wave_data(5, 2, "ZOMBIE")
             break
         case 13:
             custom.add_wave_data(1, 1, "LAVA ZOMBIE")
@@ -1005,17 +1022,17 @@ function setup_enemy_phase() {
             break
         case 14:
             custom.reset_wave_data()
-            custom.add_wave_data(1, 2, "LAVA ZOMBIE")
-            custom.add_wave_data(2, 1, "CAPTAIN")
-            custom.add_wave_data(3, 3, "MEAN SPIRIT")
-            custom.add_wave_data(4, 1, "CAPTAIN")
-            custom.add_wave_data(5, 2, "LAVA ZOMBIE")
+            custom.add_wave_data(1, 1, "LAVA ZOMBIE")
+            custom.add_wave_data(2, 1, "KNIGHT")
+            custom.add_wave_data(3, 2, "GHOST")
+            custom.add_wave_data(4, 1, "KNIGHT")
+            custom.add_wave_data(5, 1, "LAVA ZOMBIE")
             break
         case 15:
             custom.add_wave_data(1, 1, "LAVA ZOMBIE")
-            custom.add_wave_data(2, 2, "KNIGHT")
-            custom.add_wave_data(3, 2, "GHOST")
-            custom.add_wave_data(4, 2, "KNIGHT")
+            custom.add_wave_data(2, 1, "CAPTAIN")
+            custom.add_wave_data(3, 2, "MEAN SPIRIT")
+            custom.add_wave_data(4, 1, "CAPTAIN")
             custom.add_wave_data(5, 1, "LAVA ZOMBIE")
             break
 
@@ -1034,51 +1051,52 @@ function setup_enemy_phase() {
             break
 
         default:
-            if(enemy_phase < 20) {
-                custom.add_wave_data(1, 1, "TOUGH SLIME")
-                custom.add_wave_data(2, 1, "TOUGH SLIME")
-                custom.add_wave_data(3, 1, "TOUGH SLIME")
-                custom.add_wave_data(4, 1, "TOUGH SLIME")
-                custom.add_wave_data(5, 1, "TOUGH SLIME")
-            } else if (cat_inside_chest) {
+            if(enemy_phase >= 18) {
+                if (!cat_out_of_chest) {
+                    custom.add_wave_data(1, 1, "TOUGH SLIME")
+                    custom.add_wave_data(2, 1, "TOUGH SLIME")
+                    custom.add_wave_data(3, 1, "TOUGH SLIME")
+                    custom.add_wave_data(4, 1, "TOUGH SLIME")
+                    custom.add_wave_data(5, 1, "TOUGH SLIME")
+                } else {
+                    if (enemy_extra_difficulty == 0) {
+                        custom.reset_wave_data()
+                        custom.add_wave_data(1, 2, "MUMMY")
+                        custom.add_wave_data(2, 2, "SLIME")
+                        custom.add_wave_data(3, 2, "GHOST")
+                        custom.add_wave_data(4, 2, "KNIGHT")
+                        custom.add_wave_data(5, 2, "TOUGH SLIME")
+                    }
 
-                if(enemy_extra_difficulty == 0) {
-                    custom.reset_wave_data()
-                    custom.add_wave_data(1, 2, "MUMMY")
-                    custom.add_wave_data(2, 2, "SLIME")
-                    custom.add_wave_data(3, 2, "GHOST")
-                    custom.add_wave_data(4, 2, "KNIGHT")
-                    custom.add_wave_data(5, 2, "TOUGH SLIME")
-                }
+                    enemy_extra_difficulty += 1
+                    effects.blizzard.startScreenEffect(1000)
 
-                enemy_extra_difficulty += 1
-                effects.blizzard.startScreenEffect(1000)
+                    for (let existing_enemy of sprites.allOfKind(SpriteKind.Enemy)) {
+                        tweak_enemy(existing_enemy)
+                    }
 
-                for (let existing_enemy of sprites.allOfKind(SpriteKind.Enemy)) {
-                    tweak_enemy(existing_enemy)
-                }
-
-                const dice_roll_enemy = Math.pickRandom([
-                    "MUMMY",
-                    "KNIGHT",
-                    "TOUGH SLIME",
-                    "LAVA ZOMBIE",
-                    "CAPTAIN",
-                    "MEAN SPIRIT",
-                ])
-                const dice_roll_wave = Math.randomRange(1, 5)
-                if (custom.get_wave_enemy_count(dice_roll_wave) < MAX_ENEMIES) {
-                    custom.add_wave_data(dice_roll_wave, 1, dice_roll_enemy)
-                }
-
-                if (enemy_phase % 2 == 0 && cat_out_of_chest) {
-                    const dice_roll_boss = Math.pickRandom([
-                        "SKELETON MAGE",
-                        "SLIME KING",
-                        "TROLL"
+                    const dice_roll_enemy = Math.pickRandom([
+                        "MUMMY",
+                        "KNIGHT",
+                        "TOUGH SLIME",
+                        "LAVA ZOMBIE",
+                        "CAPTAIN",
+                        "MEAN SPIRIT",
                     ])
-                    spawn_enemy(dice_roll_boss)
-                }                
+                    const dice_roll_wave = Math.randomRange(1, 5)
+                    if (custom.get_wave_enemy_count(dice_roll_wave) < MAX_ENEMIES) {
+                        custom.add_wave_data(dice_roll_wave, 1, dice_roll_enemy)
+                    }
+
+                    if (enemy_phase % 2 == 0 && cat_out_of_chest) {
+                        const dice_roll_boss = Math.pickRandom([
+                            "SKELETON MAGE",
+                            "SLIME KING",
+                            "TROLL"
+                        ])
+                        spawn_enemy(dice_roll_boss)
+                    }
+                }
             }
             break
     }
@@ -1119,9 +1137,9 @@ function spawn_enemy(name: string) {
         new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 60, 25, 40, 2, false)
     } else if (name == "SKELETON MAGE") {
         if(enemy_extra_difficulty <= 0) {
-            new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 350 / game_pace, 30, 20, 3, true, true)
+            new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 350 * (hyper_mode ? HYPER_BOSS_HP_SCALE : 1), 30, 20, 3, true, true)
         } else {
-        new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 800 / game_pace, 30, 20, 3, true, true)
+            new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 800 * (hyper_mode ? HYPER_BOSS_HP_SCALE : 1), 30, 20, 3, true, true)
         }
     } else if (name == "SLIME") {
         new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 24, 15, 35, 1)
@@ -1129,15 +1147,15 @@ function spawn_enemy(name: string) {
         new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 48, 25, 35, 1)
     } else if (name == "SLIME KING") {
         if (enemy_extra_difficulty <= 0) {
-            new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 800 / game_pace, 30, 30, 3, true, true)
+            new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 800 * (hyper_mode ? HYPER_BOSS_HP_SCALE : 1), 30, 30, 3, true, true)
         } else {
-            new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 800 / game_pace, 30, 30, 3, true, true)
+            new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 800 * (hyper_mode ? HYPER_BOSS_HP_SCALE : 1), 30, 30, 3, true, true)
         }
     } else if (name == "TROLL") {
         if (enemy_extra_difficulty <= 0) {
-            new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 2000 / game_pace, 50, 30, 3, true, true)
+            new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 2000 * (hyper_mode ? HYPER_BOSS_HP_SCALE : 1), 50, 30, 3, true, true)
         } else {
-            new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 800 / game_pace, 50, 30, 3, true, true)
+            new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 800 * (hyper_mode ? HYPER_BOSS_HP_SCALE : 1), 50, 30, 3, true, true)
         }
     }
     custom.move_sprite_off_camera(new_enemy)
@@ -1156,7 +1174,7 @@ function setup_enemy(main_image: Image, flash_image: Image, name: string, health
     sprites.setDataNumber(enemy, "health", health * (1.0 + (boss ? 0 : enemy_extra_difficulty * ENEMY_HEALTH_SCALE)))
     sprites.setDataNumber(enemy, "damage", damage * (1.0 + enemy_extra_difficulty * ENEMY_DAMAGE_SCALE))
     sprites.setDataNumber(enemy, "drop_type", drop_type)
-    sprites.setDataNumber(enemy, "speed", Math.min(ENEMY_MAX_SPEED, speed * (1.0 + enemy_extra_difficulty * ENEMY_SPEED_SCALE)))
+    sprites.setDataNumber(enemy, "speed", Math.min(ENEMY_MAX_SPEED, speed * (hyper_mode ? HYPER_ENEMY_SPEED_SCALE : 1.0) * (1.0 + enemy_extra_difficulty * ENEMY_SPEED_SCALE)))
     enemy.follow(hero, speed, ENEMY_TURN_RATE)
     sprites.setDataBoolean(enemy, "boss", boss)
     sprites.setDataBoolean(enemy, "multi_hit", multi_hit)
@@ -1340,7 +1358,7 @@ function drop_gem(enemy:Sprite, image:Image, xp:number): Sprite {
     let new_drop = sprites.create(image, SpriteKind.PickUp)
     new_drop.z = Z_PICKUP
     new_drop.setFlag(SpriteFlag.Ghost, true)
-    sprites.setDataNumber(new_drop, "xp", xp * game_pace)
+    sprites.setDataNumber(new_drop, "xp", xp * (hyper_mode ? HYPER_XP_MULTIPLIER : 1))
     custom.move_sprite_on_top_of_another(new_drop, enemy)
     if(Math.percentChance(hero_auto_collect_chance)) {
         new_drop.follow(hero, GEM_FLY_SPEED)
@@ -1688,7 +1706,34 @@ game.onUpdateInterval(250, () => {
 /*
 GLOBAL ON FRAME EVENTS
 */
+
+
+let press_b = 0
+let b_released = true
+
 game.onUpdate(function () {
+
+    if(controller.B.isPressed()) {
+        if(b_released) {
+            b_released = false
+            if (custom.game_state_is(GameState.setup)) {
+                press_b++
+                if (press_b >= 10) {
+                    settings.remove("high-score")
+                    settings.writeNumber("seen_intro", 0)
+                    settings.writeNumber("completed_game", 0)
+                    start_main_menu()
+                    press_b = 0
+                }
+            } else if (custom.game_state_is(GameState.normal)) {
+                info.changeScoreBy(1)
+                show_stats(CHEAT_MODE, CHEAT_MODE, false, false)
+            }
+        }
+    } else {
+        b_released = true
+    }
+
     for (let moving_orbital of sprites.allOfKind(SpriteKind.Orbital)) {
         sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed)
         custom.aim_projectile_at_angle(
@@ -1705,8 +1750,8 @@ game.onUpdate(function () {
         for (let pickup of sprites.allOfKind(SpriteKind.PickUp)) {
             distance = custom.get_distance_between(pickup, hero)
             if (distance < hero.width * 0.75) {
-                hero_xp.value += sprites.readDataNumber(pickup, "xp") + gem_bonus_xp * game_pace
-                info.changeScoreBy(sprites.readDataNumber(pickup, "xp") + gem_bonus_xp * game_pace)
+                hero_xp.value += sprites.readDataNumber(pickup, "xp") + gem_bonus_xp
+                info.changeScoreBy(sprites.readDataNumber(pickup, "xp") + gem_bonus_xp)
                 pickup.destroy()
             } else if (distance < hero_gem_collect_radius) {
                 pickup.follow(hero, GEM_FLY_SPEED)
@@ -1858,9 +1903,9 @@ function show_stats(show_hero_stats: boolean, show_enemy_stats: boolean, winning
     button_prompt.setFlag(SpriteFlag.Invisible, true)
 
     const pause_stats = () => {
-        pause(500)
+        pause(200)
         button_prompt.setFlag(SpriteFlag.Invisible, false)
-        game.waitAnyButton()
+        controller.A.pauseUntil(ControllerButtonEvent.Pressed)
         button_prompt.setFlag(SpriteFlag.Invisible, true)
     }
 
@@ -1912,21 +1957,6 @@ function show_stats(show_hero_stats: boolean, show_enemy_stats: boolean, winning
     game.popScene()
     unpause_the_game()
 }
-
-let press_b = 0
-controller.B.onEvent(ControllerButtonEvent.Pressed, () => {
-    if (custom.game_state_is(GameState.setup)) {
-        press_b++
-        if(press_b >= 10) {
-            settings.remove("high-score")
-            settings.writeNumber("seen_intro", 0)
-            settings.writeNumber("completed_game", 0)
-        }
-    }
-    if(custom.game_state_is(GameState.normal)) {        
-        show_stats(CHEAT_MODE, CHEAT_MODE, false, false)
-    }
-})
 
 /*
 MAIN
