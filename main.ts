@@ -21,7 +21,6 @@ namespace StatusBarKind {
 TESTING
 */
 const CHEAT_MODE = false
-const GAME_PACE = 2.0
 
 /*
 PERFORMANCE CONSTANTS
@@ -33,6 +32,21 @@ const DEFAULT_WEAPON_LIFESPAN = 800
 const GEM_FLY_SPEED = 100
 
 /*
+BALANCE CONSTANTS
+*/
+const ENEMY_DAMAGE_SCALE = 0.05
+const ENEMY_HEALTH_SCALE = 6 // 0.10
+const ENEMY_SPEED_SCALE = 0.20
+const ENEMY_MAX_SPEED = 90
+const ENEMY_TURN_RATE = 100
+const HEAL_DROP_CHANCE = 5
+const SPRAY_ANGLE_DELTA = 120 / 5
+const HERO_UPGRADE_CHOICES = 3
+
+const ENEMY_KNOCKBACK_FRICTION = 15
+const WEAPON_KNOCKBACK_VELOCITY = 30
+
+/*
 GFX CONSTANTS
 */
 const Z_FLAME = 10
@@ -40,11 +54,12 @@ const Z_PICKUP = 11
 const Z_TREASURE_FOOD = 12
 const Z_NPC = 13
 const Z_ENEMY = 14
-const Z_PROJECTILE = 15
-const Z_HERO = 16
-const Z_AURA = 17
-const Z_EXPLOSION = 18
-const Z_UI = 19
+const Z_DODGE_SHADOW = 15
+const Z_PROJECTILE = 16
+const Z_HERO = 17
+const Z_AURA = 18
+const Z_EXPLOSION = 19
+const Z_UI = 20
 
 const MAX_UPGRADES = 6
 
@@ -75,19 +90,11 @@ custom.color_shift_white(ghost_flash)
 custom.color_shift_white(mean_spirit_flash)
 
 /*
-BALANCE CONSTANTS
-*/
-const ENEMY_DAMAGE_SCALE = 0.1
-const ENEMY_HEALTH_SCALE = 0.05
-const ENEMY_SPEED_SCALE = 0.1
-const ENEMY_TURN_RATE = 100
-const HEAL_DROP_CHANCE = 5
-const SPRAY_ANGLE_DELTA = 120 / 5
-const HERO_UPGRADE_CHOICES = 5
-
-/*
 GLOBALS
 */
+
+let game_pace = 1
+
 type TickTracking = {
     rate: number,
     count: number,
@@ -301,7 +308,7 @@ let wound_tracker: StatTracking[] = make_enemy_stat()
 let enemy_attack_cooldown_tick: TickTracking = start_tick_track(reset_enemy_attack_cooldown)
 enemy_attack_cooldown_tick.rate = 3
 let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 4)
-let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100 / GAME_PACE)
+let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100 / game_pace)
 let enemy_phase = 0
 let enemy_extra_difficulty = 0
 
@@ -332,7 +339,7 @@ type HeroBuild = {
 let hero_builds:HeroBuild[] = []
 
 let gem_bonus_xp = 0
-let weapon_pushback = 0
+let weapon_knockback = 0
 let aura_weapon: Sprite = null
 let upgrade_menu: miniMenu.MenuSprite = null
 let upgrade_ui: Image = image.create((assets.image`icon-spark`.width + 2) * MAX_UPGRADES, assets.image`icon-spark`.height)
@@ -352,6 +359,7 @@ MAIN MENU
 
 let main_menu: miniMenu.MenuSprite = null
 let seen_intro: boolean = settings.readNumber("seen_intro") == 1
+let completed_game: boolean = settings.readNumber("completed_game") == 1
 
 const menu_image = assets.image`castle-background`.clone()
 
@@ -369,11 +377,20 @@ function start_main_menu() {
     hero_foreground.vy = -16
     hero_foreground.fy = 16
     game.setDialogFrame(assets.image`dialog-frame`)
-    main_menu = miniMenu.createMenu(
-        miniMenu.createMenuItem("START   "),
-        miniMenu.createMenuItem("THE STORY   "),
-        miniMenu.createMenuItem("HOW TO PLAY   ")
-    )
+    if (completed_game) {
+        main_menu = miniMenu.createMenu(
+            miniMenu.createMenuItem("START   "),
+            miniMenu.createMenuItem("HYPER MODE   "),
+            miniMenu.createMenuItem("THE STORY   "),
+            miniMenu.createMenuItem("HOW TO PLAY   ")
+        )
+    } else {
+        main_menu = miniMenu.createMenu(
+            miniMenu.createMenuItem("START   "),
+            miniMenu.createMenuItem("THE STORY   "),
+            miniMenu.createMenuItem("HOW TO PLAY   ")
+        )
+    }
     main_menu.z = Z_UI
     main_menu.setFrame(assets.image`dialog-frame`)
     const menu_height = 16 + 12 * 3
@@ -389,8 +406,10 @@ function start_main_menu() {
         main_menu.close()
         title_text.destroy()
         hero_foreground.destroy()
-        switch(selectedIndex) {
-            case 0:
+        switch(selection) {
+            case "HYPER MODE   ":
+                game_pace = 2
+            case "START   ":
                 if (!seen_intro) {
                     menu_image.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
                     show_intro()
@@ -400,12 +419,12 @@ function start_main_menu() {
                 setup_game()
                 choose_upgrade("STARTING WEAPON")
                 break
-            case 1:
+            case "THE STORY   ":
                 menu_image.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
                 show_intro()
                 start_main_menu()
                 break
-            case 2:
+            case "HOW TO PLAY   ":
                 show_instructions()
                 start_main_menu()
                 break
@@ -591,7 +610,7 @@ function setup_upgrade_menu() {
 
     custom.add_upgrade_to_list("POWER CRYSTAL", assets.image`icon-crystal`, "x1.1 all damage", "ACCESSORY")
     custom.add_upgrade_to_list("POWER CRYSTAL 2", assets.image`icon-crystal`, "x1.2 all damage", "POWER CRYSTAL")
-    custom.add_upgrade_to_list("POWER CRYSTAL 3", assets.image`icon-crystal`, "+weapon pushback", "POWER CRYSTAL 2")
+    custom.add_upgrade_to_list("POWER CRYSTAL 3", assets.image`icon-crystal`, "+weapon knockback", "POWER CRYSTAL 2")
     // cross, spark, spellbook
 
     custom.add_upgrade_to_list("AURA RING", assets.image`icon-ring`, "x1.2 all radius", "ACCESSORY")
@@ -680,7 +699,7 @@ function perform_upgrade(name: string) {
             molotov_damage *= 1.2
             break
         case "POWER CRYSTAL 3":
-            weapon_pushback = 30
+            weapon_knockback = WEAPON_KNOCKBACK_VELOCITY
             break
 
         case "AURA RING":
@@ -1035,13 +1054,17 @@ function setup_enemy_phase() {
             
         default:
             if(enemy_phase >= 20) {
-                enemy_extra_difficulty += 1
+                enemy_extra_difficulty += 1                
+                effects.blizzard.startScreenEffect(1000)
                 
                 for(let existing_enemy of sprites.allOfKind(SpriteKind.Enemy)) {
                     tweak_enemy(existing_enemy)
                 }
 
                 const dice_roll_enemy = Math.pickRandom([
+                    "MUMMY",
+                    "KNIGHT",
+                    "TOUGH SLIME",
                     "LAVA ZOMBIE",
                     "CAPTAIN",
                     "MEAN SPIRIT",
@@ -1085,39 +1108,28 @@ function spawn_enemy(name: string) {
     let new_enemy: Sprite = null
     if (name == "ZOMBIE") {
         new_enemy = setup_enemy(assets.image`zombie`, zombie_flash, name, 12, 10, 25, 1)
-        sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "LAVA ZOMBIE") {
         new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name, 90, 20, 30, 2)
-        sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "MUMMY") {
         new_enemy = setup_enemy(assets.image`mummy`, mummy_flash, name, 30, 10, 25, 1)
-        sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "KNIGHT") {
         new_enemy = setup_enemy(assets.image`knight`, knight_flash, name, 40, 15, 30, 1)
-        sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "CAPTAIN") {
         new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 120, 30, 25, 2)
-        sprites.setDataBoolean(new_enemy, "multi_hit", true)
     } else if (name == "GHOST") {
-        new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name, 30, 20, 40, 1)
+        new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name, 30, 20, 40, 1, false)
     } else if (name == "MEAN SPIRIT") {
-        new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 60, 25, 40, 2)
+        new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 60, 25, 40, 2, false)
     } else if (name == "SKELETON MAGE") {
-        new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 350 / GAME_PACE, 30, 20, 3)
-        sprites.setDataBoolean(new_enemy, "multi_hit", true)
-        sprites.setDataBoolean(new_enemy, "boss", true)
+        new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 350 / game_pace, 30, 20, 3, true, true)
     } else if (name == "SLIME") {
         new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 24, 15, 35, 1)
     } else if (name == "TOUGH SLIME") {
         new_enemy =  setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 48, 25, 35, 1)
     } else if (name == "SLIME KING") {
-        new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 800 / GAME_PACE, 30, 30, 3)
-        sprites.setDataBoolean(new_enemy, "multi_hit", true)
-        sprites.setDataBoolean(new_enemy, "boss", true)
+        new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 800 / game_pace, 30, 30, 3, true, true)
     } else if (name == "TROLL") {
-        new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 2000 / GAME_PACE, 50, 30, 3)
-        sprites.setDataBoolean(new_enemy, "multi_hit", true)
-        sprites.setDataBoolean(new_enemy, "boss", true)
+        new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 2000 / game_pace, 50, 30, 3, true, true)
     }
     custom.move_sprite_off_camera(new_enemy)
 }
@@ -1127,20 +1139,21 @@ function tweak_enemy(enemy: Sprite) {
     sprites.setDataNumber(enemy, "speed", sprites.readDataNumber(enemy, "speed") * (1.0 + enemy_extra_difficulty * ENEMY_SPEED_SCALE))
 }
 
-function setup_enemy(main_image: Image, flash_image: Image, name: string, health: number, damage: number, speed: number, drop_type: number): Sprite {
+function setup_enemy(main_image: Image, flash_image: Image, name: string, health: number, damage: number, speed: number, drop_type: number, multi_hit: boolean = true, boss: boolean = false): Sprite {
     const enemy = sprites.create(main_image, SpriteKind.Enemy)
     sprites.setDataImage(enemy, "main_image", main_image)
     sprites.setDataImage(enemy, "flash_image", flash_image)
     sprites.setDataString(enemy, "name", name)
-    sprites.setDataNumber(enemy, "health", health * (1.0 + enemy_extra_difficulty * ENEMY_HEALTH_SCALE))
+    sprites.setDataNumber(enemy, "health", health * (1.0 + (boss ? 0 : enemy_extra_difficulty * ENEMY_HEALTH_SCALE)))
     sprites.setDataNumber(enemy, "damage", damage * (1.0 + enemy_extra_difficulty * ENEMY_DAMAGE_SCALE))
     sprites.setDataNumber(enemy, "drop_type", drop_type)
-    sprites.setDataNumber(enemy, "speed", speed * (1.0 + enemy_extra_difficulty * ENEMY_SPEED_SCALE))
+    sprites.setDataNumber(enemy, "speed", Math.min(ENEMY_MAX_SPEED, speed * (1.0 + enemy_extra_difficulty * ENEMY_SPEED_SCALE)))
     enemy.follow(hero, speed, ENEMY_TURN_RATE)
-    sprites.setDataBoolean(enemy, "boss", false)
-    sprites.setDataBoolean(enemy, "multi_hit", false)
+    sprites.setDataBoolean(enemy, "boss", boss)
+    sprites.setDataBoolean(enemy, "multi_hit", multi_hit)
     sprites.setDataBoolean(enemy, "attack_cooldown", false)
-    sprites.setDataNumber(enemy, "flash", -1)
+    sprites.setDataNumber(enemy, "flash", 0)
+    sprites.setDataNumber(enemy, "stun", 0)
     enemy.z = Z_ENEMY
     enemy.setFlag(SpriteFlag.GhostThroughWalls, true)
     return enemy
@@ -1153,6 +1166,7 @@ ENEMY EVENTS
 function move_hero_to_dodge(target:Sprite) {
     let shadow = sprites.create(assets.image`hero-shadow`, SpriteKind.VisualEffects)
     custom.move_sprite_on_top_of_another(shadow, hero)
+    shadow.z = Z_DODGE_SHADOW
     shadow.setFlag(SpriteFlag.Ghost, true)
     shadow.destroy(effects.disintegrate, 600)
     custom.aim_projectile_at_sprite(hero, target, AimType.velocity, hero_dodge_speed)
@@ -1224,6 +1238,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, othe
 
 scene.onOverlapTile(SpriteKind.Player, assets.tile`door-open-mid`, () => {
     game.splash("VICTORY", "You have lifted the curse!")
+    settings.writeNumber("completed_game", 1)
     show_stats(true, false, true, true)
     game.over(true, effects.blizzard)
 })
@@ -1267,6 +1282,8 @@ function setup_game () {
 
     if(CHEAT_MODE) {
         enemy_phase = 20
+        setup_enemy_phase()
+        enemy_phase = 21
         for(let i=0; i<24; i++) {
             get_random_upgrade(true, "")
         }
@@ -1314,7 +1331,7 @@ function drop_gem(enemy:Sprite, image:Image, xp:number): Sprite {
     let new_drop = sprites.create(image, SpriteKind.PickUp)
     new_drop.z = Z_PICKUP
     new_drop.setFlag(SpriteFlag.Ghost, true)
-    sprites.setDataNumber(new_drop, "xp", xp * GAME_PACE)
+    sprites.setDataNumber(new_drop, "xp", xp * game_pace)
     custom.move_sprite_on_top_of_another(new_drop, enemy)
     if(Math.percentChance(hero_auto_collect_chance)) {
         new_drop.follow(hero, GEM_FLY_SPEED)
@@ -1322,7 +1339,7 @@ function drop_gem(enemy:Sprite, image:Image, xp:number): Sprite {
     return new_drop
 }
 
-function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, damage: number, pushback: number) {
+function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, damage: number, knockback: number) {
     const drops: Sprite[] = sprites.allOfKind(SpriteKind.PickUp)
     let new_drop: Sprite = null
     if (drops.length >= MAX_DROPS) {
@@ -1331,10 +1348,17 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
     sprites.changeDataNumberBy(enemy, "health", -damage)
     damage_tracker.find(value => value.name == name).total += damage
 
-    if(pushback > 0) {
-        let pushback_scale = pushback / Math.sqrt((enemy.x - sx) * (enemy.x - sx) + (enemy.y -sy) * (enemy.y -sy))
-        enemy.vx += (enemy.x - sx) * pushback_scale
-        enemy.vy += (enemy.y - sy) * pushback_scale
+    if(knockback > 0) {
+        enemy.follow(null)
+
+        let knockback_scale = knockback / Math.sqrt((enemy.x - sx) * (enemy.x - sx) + (enemy.y -sy) * (enemy.y -sy))
+        enemy.vx = (enemy.x - sx) * knockback_scale
+        enemy.vy = (enemy.y - sy) * knockback_scale
+        sprites.setDataNumber(enemy, "stun", 3)
+        enemy.fx = ENEMY_KNOCKBACK_FRICTION
+        enemy.fy = ENEMY_KNOCKBACK_FRICTION
+
+        // this resets velocity, unlike setting it to 0 which still preserved momentum
     }
 
     if (sprites.readDataNumber(enemy, "health") <= 0) {
@@ -1430,7 +1454,7 @@ sprites.onDestroyed(SpriteKind.Molotov, function (sprite) {
 })
 
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
-    deal_enemy_damage(otherSprite.x - sprite.vx, otherSprite.y - sprite.vy, otherSprite, sprites.readDataString(sprite, "name"), sprites.readDataNumber(sprite, "damage"), weapon_pushback)
+    deal_enemy_damage(otherSprite.x - sprite.vx, otherSprite.y - sprite.vy, otherSprite, sprites.readDataString(sprite, "name"), sprites.readDataNumber(sprite, "damage"), weapon_knockback)
     sprite.destroy()
 })
 
@@ -1449,11 +1473,11 @@ sprites.onDestroyed(SpriteKind.Explosive, function (sprite) {
     explosion.lifespan = 500
     sprites.setDataNumber(explosion, "damage", exploder_explosion_damage)
     sprites.setDataString(explosion, "name", "FIREBALL")
-    damage_enemies_in_aura(explosion, weapon_pushback)
+    damage_enemies_in_aura(explosion, weapon_knockback)
 })
 
 sprites.onOverlap(SpriteKind.Orbital, SpriteKind.Enemy, function (sprite, otherSprite) {
-    deal_enemy_damage(hero.x, hero.y, otherSprite, sprites.readDataString(sprite, "name"), sprites.readDataNumber(sprite, "damage"), weapon_pushback / 2)
+    deal_enemy_damage(hero.x, hero.y, otherSprite, sprites.readDataString(sprite, "name"), sprites.readDataNumber(sprite, "damage"), weapon_knockback / 2)
     sprite.destroy()
 })
 
@@ -1614,15 +1638,28 @@ function reset_enemy_attack_cooldown() {
 
 game.onUpdateInterval(100, () => {
     if(custom.game_state_is(GameState.normal)) {
-        for(let enemy of sprites.allOfKind(SpriteKind.Enemy)) {
-            let flash = sprites.readDataNumber(enemy, "flash")
-            if(flash > 0) {
-                flash--
-                sprites.setDataNumber(enemy, "flash", flash)
-                if(flash == 0) {
+        let status = 0
+        for(let enemy of sprites.allOfKind(SpriteKind.Enemy)) {            
+            status = sprites.readDataNumber(enemy, "flash")
+            if(status > 0) {
+                status--
+                sprites.setDataNumber(enemy, "flash", status)
+                if(status == 0) {
                     enemy.setImage(sprites.readDataImage(enemy, "main_image"))
                 }
             }
+
+            status = sprites.readDataNumber(enemy, "stun")
+            if (status > 0) {
+                status--
+                sprites.setDataNumber(enemy, "stun", status)
+                if (status == 0) {
+                    enemy.fx = 0
+                    enemy.fy = 0
+                    enemy.follow(hero, sprites.readDataNumber(enemy, "speed"))
+                }
+            }
+
         }
     }
 })
@@ -1659,8 +1696,8 @@ game.onUpdate(function () {
         for (let pickup of sprites.allOfKind(SpriteKind.PickUp)) {
             distance = custom.get_distance_between(pickup, hero)
             if (distance < hero.width * 0.75) {
-                hero_xp.value += sprites.readDataNumber(pickup, "xp") + gem_bonus_xp * GAME_PACE
-                info.changeScoreBy(sprites.readDataNumber(pickup, "xp") + gem_bonus_xp * GAME_PACE)
+                hero_xp.value += sprites.readDataNumber(pickup, "xp") + gem_bonus_xp * game_pace
+                info.changeScoreBy(sprites.readDataNumber(pickup, "xp") + gem_bonus_xp * game_pace)
                 pickup.destroy()
             } else if (distance < hero_gem_collect_radius) {
                 pickup.follow(hero, GEM_FLY_SPEED)
@@ -1874,9 +1911,10 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, () => {
         if(press_b >= 10) {
             settings.remove("high-score")
             settings.writeNumber("seen_intro", 0)
+            settings.writeNumber("completed_game", 0)
         }
     }
-    if(custom.game_state_is(GameState.normal)) {
+    if(custom.game_state_is(GameState.normal)) {        
         show_stats(CHEAT_MODE, CHEAT_MODE, false, false)
     }
 })
