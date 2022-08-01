@@ -263,7 +263,6 @@ namespace custom {
         const et = target.y - target.height / 2 * box_scale
         const eb = target.y + target.height / 2 * box_scale
 
-
         return (pr >= el && pl <= er) && (pb >= et && pt <= eb)
     }
 

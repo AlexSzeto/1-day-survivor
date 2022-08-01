@@ -17,12 +17,18 @@ namespace StatusBarKind {
     export const Experience = StatusBarKind.create()
 }
 
+enum SpeedSetupType {
+    Pause,
+    Unpause,
+    Init
+}
+
 /*
 TESTING
 */
-const DEBUG_MODE = false
-const DEBUG_START_LEVEL = 16
-const DEBUG_START_PHASE = 18
+let DEBUG_MODE = false
+let DEBUG_START_LEVEL = 16
+let DEBUG_START_PHASE = 18
 
 const CHEAT_MODE = false
 
@@ -397,6 +403,19 @@ const menu_image = assets.image`castle-background`.clone()
 let hero_foreground: Sprite = null
 let title_text: Sprite = null
 
+function setup_menu(menu: miniMenu.MenuSprite, rows: number) {
+    menu.z = Z_UI
+    menu.setFrame(assets.image`dialog-frame`)
+    const menu_height = 16 + 12 * rows
+    menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, menu_height)
+    menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, menu.width + 12)
+    menu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
+    menu.setStyleProperty(miniMenu.StyleKind.DefaultAndSelected, miniMenu.StyleProperty.Alignment, miniMenu.Alignment.Center)
+    menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
+    menu.left = (scene.screenWidth() - menu.width) / 2
+    menu.bottom = scene.screenHeight() - 10
+}
+
 function start_main_menu() {
 
     if(main_menu) {
@@ -419,30 +438,20 @@ function start_main_menu() {
     hero_foreground.vy = -16
     hero_foreground.fy = 16
     game.setDialogFrame(assets.image`dialog-frame`)
+    const main_menu_items = [
+        miniMenu.createMenuItem("START   "),
+        miniMenu.createMenuItem("THE STORY   "),
+        miniMenu.createMenuItem("HOW TO PLAY   "),
+    ]
+
     if (completed_game) {
-        main_menu = miniMenu.createMenu(
-            miniMenu.createMenuItem("START   "),
-            miniMenu.createMenuItem("HYPER MODE   "),
-            miniMenu.createMenuItem("THE STORY   "),
-            miniMenu.createMenuItem("HOW TO PLAY   ")
-        )
-    } else {
-        main_menu = miniMenu.createMenu(
-            miniMenu.createMenuItem("START   "),
-            miniMenu.createMenuItem("THE STORY   "),
-            miniMenu.createMenuItem("HOW TO PLAY   ")
-        )
+        main_menu_items.insertAt(1, miniMenu.createMenuItem("HYPER MODE   "))
     }
-    main_menu.z = Z_UI
-    main_menu.setFrame(assets.image`dialog-frame`)
-    const menu_height = 16 + 12 * 3
-    main_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, menu_height)
-    main_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, main_menu.width + 12)
-    main_menu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
-    main_menu.setStyleProperty(miniMenu.StyleKind.DefaultAndSelected, miniMenu.StyleProperty.Alignment, miniMenu.Alignment.Center)
-    main_menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
-    main_menu.left = (scene.screenWidth() - main_menu.width) / 2
-    main_menu.bottom = scene.screenHeight() - 10
+    if (info.highScore() > 0) {
+        main_menu_items.push(miniMenu.createMenuItem(`HI SCORE ${info.highScore()}   `))
+    }
+    main_menu = miniMenu.createMenuFromArray(main_menu_items)
+    setup_menu(main_menu, 3)
 
     main_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
         main_menu.close()
@@ -476,6 +485,28 @@ function start_main_menu() {
                 show_instructions()
                 start_main_menu()
                 break
+            default:
+                menu_image.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
+                menu_image.drawTransparentImage(assets.image`title-text`, 0, 0)
+                const reset_menu = miniMenu.createMenu(
+                    miniMenu.createMenuItem("YES"),
+                    miniMenu.createMenuItem("NO")
+                )
+                reset_menu.title = miniMenu.createMenuItem("RESET RECORDS?")
+                setup_menu(reset_menu, 2)
+                reset_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, 120)
+                reset_menu.left = (scene.screenWidth() - reset_menu.width) / 2
+                reset_menu.columns = 2
+                reset_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
+                    reset_menu.close()
+                    reset_menu.destroy()
+                    if(selection == "YES") {
+                        settings.remove("high-score")
+                        settings.writeNumber("seen_intro", 0)
+                        settings.writeNumber("completed_game", 0)
+                    }
+                    start_main_menu()
+                })
         }
     })
 }
@@ -1157,67 +1188,65 @@ function spawn_enemy(name: string) {
 
         // TIER 1 (expected player damage = 12-45)
         case "ZOMBIE":
-            new_enemy = setup_enemy(assets.image`zombie`, zombie_flash, name, 12, 10, 18, 1)
+            new_enemy = setup_enemy(assets.image`zombie`, zombie_flash, name, 12, 10, 18, 50, 1)
             break
         case "KNIGHT":
-            new_enemy = setup_enemy(assets.image`knight`, knight_flash, name, 40, 15, 22, 1)
+            new_enemy = setup_enemy(assets.image`knight`, knight_flash, name, 40, 15, 22, 100, 1)
             break
         case "MUMMY":
-            new_enemy = setup_enemy(assets.image`mummy`, mummy_flash, name, 50, 20, 26, 1, false)
+            new_enemy = setup_enemy(assets.image`mummy`, mummy_flash, name, 50, 20, 26, 40, 1, false)
             break
 
         // BOSS TAKES ~8 HITS
         case "SKELETON MAGE":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 360, 35, 20, 3, true, true)
+                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 360, 35, 20, 100, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1000 / ENEMY_HEALTH_BONUS_BASE, 40, 30, 3, true, true)
+                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1000 / ENEMY_HEALTH_BONUS_BASE, 40, 30, 100, 3, true, true)
             }
             break
 
         // TIER 2 (expected player damage = 45-90)
         case "SLIME":
-            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 45, 20, 34, 1, false)
+            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 45, 20, 34, 50, 1, false)
             break
         case "TOUGH SLIME":
-            new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 70, 25, 38, 1)
+            new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 70, 25, 38, 100, 1)
             break
         case "GHOST":
-            new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name, 30, 20, 38, 2, false)
+            new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name, 30, 20, 38, 80, 2, false)
             break
 
         // BOSS TAKES ~9 HITS
         case "SLIME KING":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 810, 40, 30, 3, true, true)
+                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 810, 40, 30, 100, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 600 / ENEMY_HEALTH_BONUS_BASE, 20, 40, 3, true, true)
+                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 600 / ENEMY_HEALTH_BONUS_BASE, 20, 40, 100, 3, true, true)
             }
             break
 
         // TIER 3 (expected player damage = 90-180)
         case "LAVA ZOMBIE":
-            new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name, 90, 20, 30, 2, false)
+            new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name, 90, 20, 30, 60, 2, false)
             break
         case "CAPTAIN":
-            new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 240, 30, 24, 2)
+            new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 240, 30, 24, 100, 2)
             break
         case "MEAN SPIRIT":
-            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 70, 25, 42, 2, false)
+            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 70, 25, 42, 80, 2, false)
             break
 
         // END GAME (expected player damage = 180-270)
         // BOSS TAKES ~10 HITS
         case "TROLL":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1800, 50, 30, 3, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1800, 50, 30, 100, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1400 / ENEMY_HEALTH_BONUS_BASE, 100, 20, 3, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1400 / ENEMY_HEALTH_BONUS_BASE, 100, 20, 100, 3, true, true)
             }
             break
     }
-
-    custom.move_sprite_off_camera(new_enemy)
 }
 
 function scale_value(base: number, hyper_base: number, bonus_base: number, bonus_scale: number, use_bonus: Boolean = true, cap: number = 0): number {
@@ -1233,7 +1262,31 @@ function tweak_enemy(enemy: Sprite) {
     sprites.setDataNumber(enemy, "speed", adjusted_speed)
 }
 
-function setup_enemy(main_image: Image, flash_image: Image, name: string, health: number, damage: number, speed: number, drop_type: number, multi_hit: boolean = true, boss: boolean = false): Sprite {
+function set_enemy_velocity(enemy: Sprite, setupType: SpeedSetupType) {
+    const speed = sprites.readDataNumber(enemy, "speed")
+    const turn = sprites.readDataNumber(enemy, "turn")
+    if (setupType == SpeedSetupType.Pause || sprites.readDataNumber(enemy, "stun") > 0) {
+        sprites.setDataNumber(enemy, "fvx", enemy.vx)
+        sprites.setDataNumber(enemy, "fvy", enemy.vy)
+        enemy.follow(null)
+        enemy.vx = 0
+        enemy.vy = 0
+    }
+    else if(sprites.readDataBoolean(enemy, "follow")) {
+        enemy.follow(hero, speed, turn)
+        enemy.vx = sprites.readDataNumber(enemy, "fvx")
+        enemy.vy = sprites.readDataNumber(enemy, "fvy")
+    } else if(setupType == SpeedSetupType.Init) {
+        custom.aim_projectile_at_sprite(
+            enemy, hero, AimType.velocity, speed
+        )
+    } else {
+        enemy.vx = sprites.readDataNumber(enemy, "fvx")
+        enemy.vy = sprites.readDataNumber(enemy, "fvy")
+    }
+}
+
+function setup_enemy(main_image: Image, flash_image: Image, name: string, health: number, damage: number, speed: number, follow_chance: number, drop_type: number, multi_hit: boolean = true, boss: boolean = false): Sprite {
     const enemy = sprites.create(main_image, SpriteKind.Enemy)
     sprites.setDataImage(enemy, "main_image", main_image)
     sprites.setDataImage(enemy, "flash_image", flash_image)
@@ -1247,7 +1300,9 @@ function setup_enemy(main_image: Image, flash_image: Image, name: string, health
     sprites.setDataNumber(enemy, "speed", adjusted_speed)
     const adjusted_turn = scale_value(ENEMY_TURN_RATE, ENEMY_TURN_HYPER_BASE, ENEMY_TURN_BONUS_BASE, ENEMY_TURN_SCALE, !boss)
     sprites.setDataNumber(enemy, "turn", adjusted_turn)
-    enemy.follow(hero, adjusted_speed, adjusted_turn)
+    sprites.setDataBoolean(enemy, "follow", Math.percentChance(follow_chance))
+    custom.move_sprite_off_camera(enemy)
+    set_enemy_velocity(enemy, SpeedSetupType.Init)
     sprites.setDataBoolean(enemy, "boss", boss)
     sprites.setDataBoolean(enemy, "multi_hit", multi_hit)
     sprites.setDataBoolean(enemy, "attack_cooldown", false)
@@ -1401,8 +1456,8 @@ GAME ACTIONS
 */
 
 function unpause_the_game() {
-    for (let upgrade_icon of sprites.allOfKind(SpriteKind.Enemy)) {
-        upgrade_icon.follow(hero, sprites.readDataNumber(upgrade_icon, "speed"), ENEMY_TURN_RATE)
+    for (let enemy of sprites.allOfKind(SpriteKind.Enemy)) {
+        set_enemy_velocity(enemy, SpeedSetupType.Unpause)
     }
     if (aura_spawn_count > 0) {
         aura_weapon.setFlag(SpriteFlag.Invisible, false)
@@ -1413,8 +1468,8 @@ function unpause_the_game() {
 
 function pause_the_game() {
     custom.set_game_state(GameState.menu)
-    for (let value2 of sprites.allOfKind(SpriteKind.Enemy)) {
-        value2.follow(hero, 0)
+    for (let enemy of sprites.allOfKind(SpriteKind.Enemy)) {
+        set_enemy_velocity(enemy, SpeedSetupType.Pause)
     }
     sprites.destroyAllSpritesOfKind(SpriteKind.Orbital)
     sprites.destroyAllSpritesOfKind(SpriteKind.Flame)
@@ -1462,7 +1517,7 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
         const stun_amount = Math.randomRange(1, 3)
         if(stun_amount > 0) {
             sprites.setDataNumber(enemy, "stun", stun_amount)
-            enemy.follow(null)
+            set_enemy_velocity(enemy, SpeedSetupType.Pause)
         }
     }
 
@@ -1749,7 +1804,7 @@ game.onUpdateInterval(100, () => {
                 if (status == 0) {
                     enemy.fx = 0
                     enemy.fy = 0
-                    enemy.follow(hero, sprites.readDataNumber(enemy, "speed"))
+                    set_enemy_velocity(enemy, SpeedSetupType.Unpause)
                 }
             }
 
@@ -1800,11 +1855,7 @@ game.onUpdate(function () {
             if (custom.game_state_is(GameState.setup)) {
                 press_b++
                 if (press_b >= 10) {
-                    settings.remove("high-score")
-                    settings.writeNumber("seen_intro", 0)
-                    settings.writeNumber("completed_game", 0)
-                    start_main_menu()
-                    press_b = 0
+                    DEBUG_MODE = true
                 }
             } else if (custom.game_state_is(GameState.normal)) {
                 show_stats(DEBUG_MODE, DEBUG_MODE || enemy_extra_difficulty > 0, false, false)
@@ -1862,12 +1913,11 @@ game.onUpdate(function () {
         const pb = hero.y + hero.width / 2 * 0.8
 
         const enemies = sprites.allOfKind(SpriteKind.Enemy)
-        if(enemies.length > MAX_ENEMIES / 2) {
-            for (let enemy of enemies) {
-                distance = custom.get_distance_between(enemy, hero)
-                if (distance > scene.screenWidth() * 3 / 4) {
-                    custom.move_sprite_off_camera(enemy)
-                }
+        for (let enemy of enemies) {
+            distance = custom.get_distance_between(enemy, hero)
+            if (enemy.isOutOfScreen(game.currentScene().camera)) {
+                custom.move_sprite_off_camera(enemy)
+                set_enemy_velocity(enemy, SpeedSetupType.Init)
             }
         }
 
