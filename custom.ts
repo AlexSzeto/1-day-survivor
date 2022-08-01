@@ -51,20 +51,22 @@ namespace custom {
      * add upgrade to the master list
      */
     //% group="Upgrades"
-    //% block="add upgrade to master list with name $name $icon description $description || which requires $prerequisite"
-    export function add_upgrade_to_list(name: string, icon: Image, description: string, prerequisite?: string): void {
-        upgrades_available_list.push({
-            name,
-            icon,
-            description,
-            prerequisite
-        })
-        upgrades_master_list.push({
-            name,
-            icon,
-            description,
-            prerequisite
-        })
+    //% block="add upgrade to master list with name $name $icon description $description || which requires $prerequisite with weight $weight"
+    export function add_upgrade_to_list(name: string, icon: Image, description: string, prerequisite?: string, weight: number = 1): void {
+        for(let i=0; i<weight; i++) {
+            upgrades_available_list.push({
+                name,
+                icon,
+                description,
+                prerequisite
+            })
+            upgrades_master_list.push({
+                name,
+                icon,
+                description,
+                prerequisite
+            })
+        }
     }
 
     /**
@@ -78,13 +80,15 @@ namespace custom {
         const basic_armors_count = upgrades_obtained.reduce((count, upgrade) => (upgrade.prerequisite == "ACCESSORY") ? count + 1 : count, 0)
         const eligible_list = upgrades_available_list
            .filter(upgrade => 
-               (
-                   include_basic_items && (
-                       ((upgrade.prerequisite == "WEAPON") && basic_weapons_count < max_basic_weapons)
-                       || ((upgrade.prerequisite == "ACCESSORY") && basic_armors_count < max_basic_accessories && upgrades_obtained.length > 0)
-                   )
-               )
-               || upgrades_obtained.some(existing_upgrade => existing_upgrade.name == upgrade.prerequisite)
+                (
+                    (
+                        include_basic_items && (
+                            ((upgrade.prerequisite == "WEAPON") && basic_weapons_count < max_basic_weapons)
+                            || ((upgrade.prerequisite == "ACCESSORY") && basic_armors_count < max_basic_accessories && upgrades_obtained.length > 0)
+                        )
+                    )
+                    || upgrades_obtained.some(existing_upgrade => existing_upgrade.name == upgrade.prerequisite)
+               ) && !upgrades_obtained.some(existing_upgrade => existing_upgrade.name == upgrade.name)
             )
         
         let choices: UpgradeData[] = []
@@ -94,7 +98,7 @@ namespace custom {
         } else {
             for (let count = 0; count < max; count++) {
                 let choice = Math.pickRandom(eligible_list)
-                while (choices.indexOf(choice) >= 0) {
+                while (choices.some(existing_choice => existing_choice.name == choice.name)) {
                     choice = Math.pickRandom(eligible_list)
                 }
                 choices.push(choice)
