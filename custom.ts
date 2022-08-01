@@ -29,19 +29,12 @@ namespace custom {
         prerequisite: string;
     }
 
-    type SpawnData = {
-        name: string
-        count: number
-    }
-
     type CollisionBox = {
         l: number;
         r: number;
         t: number;
         b: number;
     }
-
-    type WaveData = SpawnData[]
 
     const upgrades_master_list: UpgradeData[] = []
     const upgrades_available_list: UpgradeData[] = []
@@ -51,7 +44,7 @@ namespace custom {
     let max_basic_accessories: number = 3
     let current_game_state: GameState = GameState.setup
 
-    let spawn_waves: WaveData[] = [[],[],[],[],[]]
+    let spawn_wave: string[]
     let current_wave: number = 0
 
     /**
@@ -423,7 +416,7 @@ namespace custom {
     //% group="Spawn Waves"
     //% block="reset spawn wave data"
     export function reset_wave_data(): void {
-        spawn_waves = [[], [], [], [], []]
+        spawn_wave = []
         current_wave = 0
     }
 
@@ -431,38 +424,43 @@ namespace custom {
      * add wave data
      */
     //% group="Spawn Waves"
-    //% block="insert $count of $name into wave $wave"
-    export function add_wave_data(wave: number = 1, count: number = 1, name:string, ): void {
-        spawn_waves[wave - 1].unshift({
-            name,
-            count
-        })
+    //% block="insert $count of $name into spawn wave"
+    export function add_wave_data(name: string, count: number = 1): void {
+        for(let i=0; i<count; i++) {
+            spawn_wave.push(name)
+        }
     }
 
     /**
-     * advance to the next wave
+     * add a random enemy out of a list to the top of the wave data
      */
     //% group="Spawn Waves"
-    //% block="advance to the next wave"
-    export function advance_wave(): void {
-        current_wave = (current_wave + 1) % spawn_waves.length
+    //% block="insert a random pick from $names into top of spawn wave"
+    export function add_priority_random_enemy_to_wave(names: string[]): void {
+        spawn_wave.unshift(names[Math.randomRange(0, names.length-1)])
     }
-
 
     /**
      * get a linear list of enemy names to spawn from the next spawn wave
      */
     //% group="Spawn Waves"
     //% block="list of current spawn wave enemies"
-    export function get_wave_enemy_list(): string[]
+    export function get_next_wave_enemy_name(): string
     {
-        const list: string[] = []        
-        spawn_waves[current_wave].forEach(spawn => {
-            for(let i=0; i<spawn.count; i++) {
-                list.push(spawn.name)
+        const enemies = sprites.allOfKind(SpriteKind.Enemy)
+        for(let name of spawn_wave) {
+            let enemy_exists = false
+            for(let enemy of enemies) {
+                if(!enemy_exists && sprites.readDataString(enemy, "name") == name) {
+                    enemies.removeElement(enemy)
+                    enemy_exists = true
+                }
             }
-        })
-        return list
+            if(!enemy_exists) {
+                return name
+            }
+        }
+        return null
     }
 
 
@@ -470,9 +468,9 @@ namespace custom {
      * get a count of spawns from a spawn wave
      */
     //% group="Spawn Waves"
-    //% block="list of spawn wave enemies from $wave"
-    export function get_wave_enemy_count(wave: number): number {
-        return spawn_waves[wave - 1].reduce((count, spawn) => count += spawn.count, 0)
+    //% block="count of current enemy wave list"
+    export function get_wave_enemy_count(): number {
+        return spawn_wave.length
     }
 
 }

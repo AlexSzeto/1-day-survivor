@@ -34,10 +34,10 @@ const GEM_FLY_SPEED = 100
 /*
 BALANCE CONSTANTS
 */
-const ENEMY_DAMAGE_SCALE = 0.15
-const ENEMY_HEALTH_SCALE = 0.15
+const ENEMY_DAMAGE_SCALE = 0.10
+const ENEMY_HEALTH_SCALE = 0.20
 const ENEMY_SPEED_SCALE = 0.15
-const ENEMY_MAX_SPEED = 90
+const ENEMY_MAX_SPEED = 75
 const ENEMY_TURN_RATE = 100
 const SPRAY_ANGLE_DELTA = 120 / 5
 
@@ -577,12 +577,12 @@ function setup_upgrade_menu() {
     orbit_spawn_tick.rate = 16
     orbit_angular_speed = 6
     orbit_distance = 30
-    orbit_duration = 3000
+    orbit_duration = 2400
     orbit_damage = 12 // 12-24
-    custom.add_upgrade_to_list("SPELLBOOK 2", assets.image`icon-book`, "x2 damage", "SPELLBOOK") // 24-48 *.33
-    custom.add_upgrade_to_list("SPELLBOOK 3", assets.image`icon-book`, "x1.25 attack speed", "SPELLBOOK 2") // 24-48 *.75
-    custom.add_upgrade_to_list("SPELLBOOK 4", assets.image`icon-book`, "+1 book", "SPELLBOOK 3") // 24-72 *.75
-    custom.add_upgrade_to_list("SPELLBOOK 5", assets.image`icon-book`, "x2 damage", "SPELLBOOK 4") // 48-144 *.75
+    custom.add_upgrade_to_list("SPELLBOOK 2", assets.image`icon-book`, "x1.5 damage", "SPELLBOOK") // 18-36 *.33
+    custom.add_upgrade_to_list("SPELLBOOK 3", assets.image`icon-book`, "x1.25 attack speed", "SPELLBOOK 2") // 18-36 *.75
+    custom.add_upgrade_to_list("SPELLBOOK 4", assets.image`icon-book`, "+1 book", "SPELLBOOK 3") // 18-54 *.75
+    custom.add_upgrade_to_list("SPELLBOOK 5", assets.image`icon-book`, "x2 damage", "SPELLBOOK 4") // 36-108 *.75
 
     custom.add_upgrade_to_list("DIVINE AURA", assets.image`icon-aura`, "damage ring", "WEAPON")
     aura_spawn_count = 0
@@ -835,10 +835,11 @@ function perform_upgrade(name: string) {
             fire_on_next_tick(orbit_spawn_tick)
             break
         case "SPELLBOOK 2":
-            orbit_damage *= 2
+            orbit_damage *= 1.5
             break
         case "SPELLBOOK 3":
             orbit_spawn_tick.rate *= 0.75
+            orbit_duration *= 0.75
             break
         case "SPELLBOOK 4":
             orbit_spawn_count += 1
@@ -951,101 +952,95 @@ function setup_enemy_phase() {
     switch(enemy_phase) {
         case 0:
             custom.reset_wave_data()
-            custom.add_wave_data(1, 2, "ZOMBIE")
+            custom.add_wave_data("ZOMBIE", 2)
             break
         case 1:
-            custom.add_wave_data(2, 1, "KNIGHT")
-            custom.add_wave_data(3, 2, "ZOMBIE")
+            custom.reset_wave_data()
+            custom.add_wave_data("KNIGHT", 1)
+            custom.add_wave_data("ZOMBIE", 2)
             break
         case 2:
-            custom.add_wave_data(4, 1, "KNIGHT")
-            custom.add_wave_data(5, 2, "ZOMBIE")
+            custom.add_wave_data("KNIGHT", 1)
+            custom.add_wave_data("ZOMBIE", 2)
             break
 
 
         // Player Lv 5
         case 3:
             custom.reset_wave_data()
-            custom.add_wave_data(1, 1, "MUMMY")
-            custom.add_wave_data(3, 1, "MUMMY")
-            custom.add_wave_data(5, 1, "MUMMY")
+            custom.add_wave_data("MUMMY", 3)
             spawn_enemy("SKELETON MAGE")
             break
 
 
         case 5:
             custom.reset_wave_data()
-            custom.add_wave_data(2, 3, "ZOMBIE")
-            custom.add_wave_data(4, 2, "KNIGHT")
-            custom.add_wave_data(3, 1, "GHOST")
+            custom.add_wave_data("MUMMY", 3)
+            custom.add_wave_data("KNIGHT", 2)
+            custom.add_wave_data("GHOST", 1)
             break
         case 6:
-            custom.add_wave_data(1, 1, "GHOST")
-            custom.add_wave_data(5, 1, "GHOST")
+            custom.reset_wave_data()
+            custom.add_wave_data("SLIME", 1)
+            custom.add_wave_data("KNIGHT", 3)
+            custom.add_wave_data("GHOST", 2)
             break
         case 7:
             custom.reset_wave_data()
-            custom.add_wave_data(2, 2, "KNIGHT")
-            custom.add_wave_data(4, 2, "KNIGHT")
-            custom.add_wave_data(3, 2, "GHOST")
-            custom.add_wave_data(3, 1, "CAPTAIN")
+            custom.add_wave_data("SLIME", 2)
+            custom.add_wave_data("GHOST", 2)
+            custom.add_wave_data("KNIGHT", 1)
+            custom.add_wave_data("CAPTAIN", 1)
             break
         case 8:
-            custom.add_wave_data(1, 2, "SLIME")
-            custom.add_wave_data(2, 1, "TOUGH SLIME")
-            custom.add_wave_data(3, 2, "SLIME")
-            custom.add_wave_data(4, 1, "TOUGH SLIME")
-            custom.add_wave_data(5, 2, "SLIME")
+            custom.reset_wave_data()
+            custom.add_wave_data("SLIME", 2)
+            custom.add_wave_data("TOUGH SLIME", 1)
+            custom.add_wave_data("SLIME", 2)
+            custom.add_wave_data("TOUGH SLIME", 1)
             break
 
 
         case 9:
             custom.reset_wave_data()
-            custom.add_wave_data(1, 1, "SLIME")
-            custom.add_wave_data(2, 1, "SLIME")
-            custom.add_wave_data(3, 1, "SLIME")
-            custom.add_wave_data(4, 1, "SLIME")
-            custom.add_wave_data(5, 1, "SLIME")
+            custom.add_wave_data("SLIME", 5)
             spawn_enemy("SLIME KING")
             break
         
 
         case 12:
             custom.reset_wave_data()
-            custom.add_wave_data(1, 1, "LAVA ZOMBIE")
-            custom.add_wave_data(2, 2, "ZOMBIE")
-            custom.add_wave_data(3, 2, "GHOST")
-            custom.add_wave_data(4, 1, "LAVA ZOMBIE")
-            custom.add_wave_data(5, 2, "ZOMBIE")
+            custom.add_wave_data("LAVA ZOMBIE", 2)
+            custom.add_wave_data("ZOMBIE", 2)
+            custom.add_wave_data("GHOST", 1)
+            custom.add_wave_data("LAVA ZOMBIE", 1)
             break
         case 13:
-            custom.add_wave_data(1, 1, "LAVA ZOMBIE")
-            custom.add_wave_data(5, 1, "LAVA ZOMBIE")
+            custom.reset_wave_data()
+            custom.add_wave_data("LAVA ZOMBIE", 2)
+            custom.add_wave_data("GHOST", 1)
+            custom.add_wave_data("LAVA ZOMBIE", 2)
+            custom.add_wave_data("MEAN SPIRIT", 1)
             break
         case 14:
             custom.reset_wave_data()
-            custom.add_wave_data(1, 1, "LAVA ZOMBIE")
-            custom.add_wave_data(2, 1, "KNIGHT")
-            custom.add_wave_data(3, 2, "GHOST")
-            custom.add_wave_data(4, 1, "KNIGHT")
-            custom.add_wave_data(5, 1, "LAVA ZOMBIE")
+            custom.add_wave_data("LAVA ZOMBIE", 3)
+            custom.add_wave_data("KNIGHT", 1)
+            custom.add_wave_data("CAPTAIN", 1)
+            custom.add_wave_data("MEAN SPIRIT", 1)
             break
         case 15:
-            custom.add_wave_data(1, 1, "LAVA ZOMBIE")
-            custom.add_wave_data(2, 1, "CAPTAIN")
-            custom.add_wave_data(3, 2, "MEAN SPIRIT")
-            custom.add_wave_data(4, 1, "CAPTAIN")
-            custom.add_wave_data(5, 1, "LAVA ZOMBIE")
+            custom.reset_wave_data()
+            custom.add_wave_data("TOUGH SLIME", 2)
+            custom.add_wave_data("MEAN SPIRIT", 1)
+            custom.add_wave_data("CAPTAIN", 2)
+            custom.add_wave_data("MEAN SPIRIT", 1)
             break
 
 
         case 16:
             custom.reset_wave_data()
-            custom.add_wave_data(1, 2, "TOUGH SLIME")
-            custom.add_wave_data(2, 2, "TOUGH SLIME")
-            custom.add_wave_data(3, 2, "TOUGH SLIME")
-            custom.add_wave_data(4, 2, "TOUGH SLIME")
-            custom.add_wave_data(5, 2, "TOUGH SLIME")
+            custom.add_wave_data("TOUGH SLIME", 6)
             break
         case 17:
             spawn_enemy("TROLL")
@@ -1055,19 +1050,11 @@ function setup_enemy_phase() {
         default:
             if(enemy_phase >= 18) {
                 if (!cat_out_of_chest) {
-                    custom.add_wave_data(1, 1, "TOUGH SLIME")
-                    custom.add_wave_data(2, 1, "TOUGH SLIME")
-                    custom.add_wave_data(3, 1, "TOUGH SLIME")
-                    custom.add_wave_data(4, 1, "TOUGH SLIME")
-                    custom.add_wave_data(5, 1, "TOUGH SLIME")
+                    // no change
                 } else {
                     if (enemy_extra_difficulty == 0) {
                         custom.reset_wave_data()
-                        custom.add_wave_data(1, 2, "MUMMY")
-                        custom.add_wave_data(2, 2, "SLIME")
-                        custom.add_wave_data(3, 2, "GHOST")
-                        custom.add_wave_data(4, 2, "KNIGHT")
-                        custom.add_wave_data(5, 2, "TOUGH SLIME")
+                        custom.add_priority_random_enemy_to_wave(["MUMMY", "SLIME", "GHOST", "KNIGHT", "TOUGH SLIME"])
                     }
 
                     enemy_extra_difficulty += 1
@@ -1077,18 +1064,7 @@ function setup_enemy_phase() {
                         tweak_enemy(existing_enemy)
                     }
 
-                    const dice_roll_enemy = Math.pickRandom([
-                        "MUMMY",
-                        "KNIGHT",
-                        "TOUGH SLIME",
-                        "LAVA ZOMBIE",
-                        "CAPTAIN",
-                        "MEAN SPIRIT",
-                    ])
-                    const dice_roll_wave = Math.randomRange(1, 5)
-                    if (custom.get_wave_enemy_count(dice_roll_wave) < MAX_ENEMIES) {
-                        custom.add_wave_data(dice_roll_wave, 1, dice_roll_enemy)
-                    }
+                    custom.add_priority_random_enemy_to_wave(["MUMMY", "LAVA ZOMBIE", "GHOST", "MEAN SPIRIT", "KNIGHT", "CAPTAIN"])
 
                     if (enemy_phase % 2 == 0 && cat_out_of_chest) {
                         const dice_roll_boss = Math.pickRandom([
@@ -1165,7 +1141,7 @@ function spawn_enemy(name: string) {
 
 function tweak_enemy(enemy: Sprite) {
     sprites.setDataNumber(enemy, "damage", sprites.readDataNumber(enemy, "damage") * (1.0 + enemy_extra_difficulty * ENEMY_DAMAGE_SCALE))
-    sprites.setDataNumber(enemy, "speed", sprites.readDataNumber(enemy, "speed") * (1.0 + enemy_extra_difficulty * ENEMY_SPEED_SCALE))
+    sprites.setDataNumber(enemy, "speed", Math.min(ENEMY_MAX_SPEED, sprites.readDataNumber(enemy, "speed") * (1.0 + enemy_extra_difficulty * ENEMY_SPEED_SCALE)))
 }
 
 function setup_enemy(main_image: Image, flash_image: Image, name: string, health: number, damage: number, speed: number, drop_type: number, multi_hit: boolean = true, boss: boolean = false): Sprite {
@@ -1655,11 +1631,12 @@ function next_enemy_phase() {
 }
 
 function spawn_enemy_wave() {
-    let list = custom.get_wave_enemy_list()
-    for (let next_enemy of list) {
-        spawn_enemy(next_enemy)
+    for(let i=0; i<MAX_ENEMIES; i++) {
+        const next_enemy = custom.get_next_wave_enemy_name()
+        if (next_enemy != null) {
+            spawn_enemy(next_enemy)
+        }
     }
-    custom.advance_wave()
 }
 
 function reset_enemy_attack_cooldown() {
