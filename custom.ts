@@ -44,7 +44,7 @@ namespace custom {
     let max_basic_accessories: number = 3
     let current_game_state: GameState = GameState.setup
 
-    let spawn_wave: string[]
+    let spawn_wave: string[] = []
     let current_wave: number = 0
 
     /**
@@ -437,7 +437,7 @@ namespace custom {
     //% group="Spawn Waves"
     //% block="insert a random pick from $names into top of spawn wave"
     export function add_priority_random_enemy_to_wave(names: string[]): void {
-        spawn_wave.unshift(names[Math.randomRange(0, names.length-1)])
+        spawn_wave.unshift(Math.pickRandom(names))
     }
 
     /**
