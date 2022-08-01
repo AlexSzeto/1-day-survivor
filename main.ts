@@ -20,7 +20,7 @@ namespace StatusBarKind {
 /*
 TESTING
 */
-const CHEAT_MODE = false
+const DEBUG_MODE = false
 
 /*
 PERFORMANCE CONSTANTS
@@ -39,9 +39,10 @@ const ENEMY_HEALTH_SCALE = 0.15
 const ENEMY_SPEED_SCALE = 0.15
 const ENEMY_MAX_SPEED = 90
 const ENEMY_TURN_RATE = 100
-const HEAL_DROP_CHANCE = 5
 const SPRAY_ANGLE_DELTA = 120 / 5
+
 const HERO_UPGRADE_CHOICES = 3
+const HERO_STARTING_CHOICES = 3
 
 const ENEMY_KNOCKBACK_FRICTION = 15
 const WEAPON_KNOCKBACK_VELOCITY = 30
@@ -316,6 +317,7 @@ let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 4)
 let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100)
 let enemy_phase = 0
 let enemy_extra_difficulty = 0
+let heal_drop_chance = 5
 
 let hero: Sprite = null
 let hero_health: StatusBarSprite = null
@@ -353,7 +355,7 @@ let upgrade_ui_sprite: Sprite = null
 let cat_inside_chest = false
 let cat_out_of_chest = false
 
-if(CHEAT_MODE) {
+if(DEBUG_MODE) {
     hero_dodge = 100
     hero_auto_collect_chance = 100
 }
@@ -434,7 +436,7 @@ function start_main_menu() {
                 }
                 scene.setBackgroundColor(12)
                 setup_game()
-                choose_upgrade("STARTING WEAPON")
+                choose_upgrade("STARTING WEAPON", HERO_STARTING_CHOICES)
                 break
             case "THE STORY   ":
                 menu_image.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
@@ -491,8 +493,8 @@ function get_random_upgrade (include_basic_items:boolean, message: string) {
     }
 }
 
-function choose_upgrade(title: string) {
-    let upgrade_list = custom.get_upgrade_choices(HERO_UPGRADE_CHOICES, true)
+function choose_upgrade(title: string, choices: number) {
+    let upgrade_list = custom.get_upgrade_choices(choices, true)
     if (upgrade_list.length > 0) {
         pause_the_game()
         effects.confetti.startScreenEffect()
@@ -501,7 +503,7 @@ function choose_upgrade(title: string) {
         upgrade_menu.setTitle(title)
         upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, scene.screenWidth() - 20)
         upgrade_menu.setFrame(assets.image`dialog-frame`)
-        upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, 32 + 14 * upgrade_list.length)
+        upgrade_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, 32 + 14 * Math.min(5, upgrade_list.length))
         upgrade_menu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
         upgrade_menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
         upgrade_menu.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Padding, 4)
@@ -514,7 +516,7 @@ function choose_upgrade(title: string) {
             unpause_the_game()
         })
     } else {
-        if(!CHEAT_MODE) {
+        if(!DEBUG_MODE) {
             game.showLongText(
                 "You reached\n" +
                 "level " + hero_level + "!\n" +
@@ -537,7 +539,7 @@ function add_build(name: string, color: number, prerequsites: string[] = null, s
 }
 
 function setup_upgrade_menu() {
-    custom.add_upgrade_to_list("CROSS", assets.image`icon-cross`, "throw 3 crosses", "WEAPON")
+    custom.add_upgrade_to_list("CROSS", assets.image`icon-cross`, "throw 2 crosses", "WEAPON")
     spray_spawn_count = 0
     spray_speed = 100
     spray_spawn_tick.rate = 6
@@ -572,15 +574,15 @@ function setup_upgrade_menu() {
 
     custom.add_upgrade_to_list("SPELLBOOK", assets.image`icon-book`, "circles to protect", "WEAPON")
     orbit_spawn_count = 0
-    orbit_spawn_tick.rate = 18
+    orbit_spawn_tick.rate = 16
     orbit_angular_speed = 6
     orbit_distance = 30
     orbit_duration = 3000
-    orbit_damage = 20 // 12
-    custom.add_upgrade_to_list("SPELLBOOK 2", assets.image`icon-book`, "+1 book", "SPELLBOOK") // 20-40 *.33 (36)
-    custom.add_upgrade_to_list("SPELLBOOK 3", assets.image`icon-book`, "x1.5 damage", "SPELLBOOK 2") // 30-60 *.33 (54)
-    custom.add_upgrade_to_list("SPELLBOOK 4", assets.image`icon-book`, "+1 book", "SPELLBOOK 3") // 30-90 (54)
-    custom.add_upgrade_to_list("SPELLBOOK 5", assets.image`icon-book`, "x1.5 damage", "SPELLBOOK 4") // 45-135 *.33 (90)
+    orbit_damage = 12 // 12-24
+    custom.add_upgrade_to_list("SPELLBOOK 2", assets.image`icon-book`, "x2 damage", "SPELLBOOK") // 24-48 *.33
+    custom.add_upgrade_to_list("SPELLBOOK 3", assets.image`icon-book`, "x1.25 attack speed", "SPELLBOOK 2") // 24-48 *.75
+    custom.add_upgrade_to_list("SPELLBOOK 4", assets.image`icon-book`, "+1 book", "SPELLBOOK 3") // 24-72 *.75
+    custom.add_upgrade_to_list("SPELLBOOK 5", assets.image`icon-book`, "x2 damage", "SPELLBOOK 4") // 48-144 *.75
 
     custom.add_upgrade_to_list("DIVINE AURA", assets.image`icon-aura`, "damage ring", "WEAPON")
     aura_spawn_count = 0
@@ -616,9 +618,9 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("GEM PRISM 2", assets.image`icon-prism`, "absorb gems every 10s", "GEM PRISM")
     custom.add_upgrade_to_list("GEM PRISM 3", assets.image`icon-prism`, "+1 XP per gem", "GEM PRISM 2")
 
-    custom.add_upgrade_to_list("FAIRY FEATHER", assets.image`icon-wing`, "x1.1 move and dodge", "ACCESSORY")
-    custom.add_upgrade_to_list("FAIRY FEATHER 2", assets.image`icon-wing`, "x1.2 move and dodge", "FAIRY FEATHER")
-    custom.add_upgrade_to_list("FAIRY FEATHER 3", assets.image`icon-wing`, "+15 HP on dodge", "FAIRY FEATHER 2")
+    custom.add_upgrade_to_list("FAIRY FEATHER", assets.image`icon-wing`, "x2 potion drops", "ACCESSORY")
+    custom.add_upgrade_to_list("FAIRY FEATHER 2", assets.image`icon-wing`, "x1.25 move and dodge", "FAIRY FEATHER")
+    custom.add_upgrade_to_list("FAIRY FEATHER 3", assets.image`icon-wing`, "+30 HP on dodge", "FAIRY FEATHER 2")
 
     custom.add_upgrade_to_list("MAGIC FLASK", assets.image`icon-flask`, "x1.1 all attack speed", "ACCESSORY")
     custom.add_upgrade_to_list("MAGIC FLASK 2", assets.image`icon-flask`, "x1.2 all attack speed", "MAGIC FLASK")
@@ -747,17 +749,16 @@ function perform_upgrade(name: string) {
             break
 
         case "FAIRY FEATHER":
-            hero_speed += 10
-            hero_dodge += 10
+            heal_drop_chance *= 2
             adjust_hero_speed()
             break
         case "FAIRY FEATHER 2":
-            hero_speed += 20
-            hero_dodge += 20
+            hero_speed += 25
+            hero_dodge += 25
             adjust_hero_speed()
             break
         case "FAIRY FEATHER 3":
-            hero_dodge_heal = 15
+            hero_dodge_heal = 30
             break
 
         case "BLESSED CUP":
@@ -830,20 +831,20 @@ function perform_upgrade(name: string) {
             break
 
         case "SPELLBOOK":
-            orbit_spawn_count += 1
+            orbit_spawn_count += 2
             fire_on_next_tick(orbit_spawn_tick)
             break
         case "SPELLBOOK 2":
-            orbit_spawn_count += 1
+            orbit_damage *= 2
             break
         case "SPELLBOOK 3":
-            orbit_damage *= 1.5
+            orbit_spawn_tick.rate *= 0.75
             break
         case "SPELLBOOK 4":
             orbit_spawn_count += 1
             break
         case "SPELLBOOK 5":
-            orbit_damage *= 1.5
+            orbit_damage *= 2
             break
 
         case "DIVINE AURA":
@@ -910,13 +911,14 @@ statusbars.onStatusReached(StatusBarKind.Experience, statusbars.StatusComparison
     status.value = 0
     status.max = Math.floor(status.max + hero_xp_increment)
     hero_level += 1
-    choose_upgrade("YOU REACHED LV. " + hero_level + "!")
+    choose_upgrade("YOU REACHED LV. " + hero_level + "!", HERO_UPGRADE_CHOICES)
 })
 
 statusbars.onZero(StatusBarKind.Health, function (status) {
     if (status == hero_health) {
         game.splash("DEFEAT", "Better luck next time...")
         show_stats(enemy_extra_difficulty > 0, true, false, true)
+        game.setGameOverSound(false, new music.Melody(""))
         game.over(false)
     }
 })
@@ -1132,9 +1134,9 @@ function spawn_enemy(name: string) {
     } else if (name == "CAPTAIN") {
         new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 120, 30, 25, 2)
     } else if (name == "GHOST") {
-        new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name, 30, 20, 40, 1, false)
+        new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name, 30, 18, 40, 1, false)
     } else if (name == "MEAN SPIRIT") {
-        new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 60, 25, 40, 2, false)
+        new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 60, 22, 40, 2, false)
     } else if (name == "SKELETON MAGE") {
         if(enemy_extra_difficulty <= 0) {
             new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 350 * (hyper_mode ? HYPER_BOSS_HP_SCALE : 1), 30, 20, 3, true, true)
@@ -1144,7 +1146,7 @@ function spawn_enemy(name: string) {
     } else if (name == "SLIME") {
         new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 24, 15, 35, 1)
     } else if (name == "TOUGH SLIME") {
-        new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 48, 25, 35, 1)
+        new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 48, 20, 35, 1)
     } else if (name == "SLIME KING") {
         if (enemy_extra_difficulty <= 0) {
             new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 800 * (hyper_mode ? HYPER_BOSS_HP_SCALE : 1), 30, 30, 3, true, true)
@@ -1210,7 +1212,8 @@ function wound_hero(target:Sprite) {
     scene.cameraShake(Math.constrain(Math.floor(sprites.readDataNumber(target, "damage") / hero_health.max * 16), 2, 8), 250)
 }
 
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (hero_sprite, enemy) {
+// sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (hero_sprite, enemy) {
+function hero_enemy_overlap(hero_sprite: Sprite, enemy: Sprite) {
     if (!(sprites.readDataBoolean(enemy, "attack_cooldown"))) {
         if (Math.percentChance(hero_dodge)) {
             move_hero_to_dodge(enemy)
@@ -1224,7 +1227,8 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (hero_sprite, en
             }
         }
     }
-})
+}
+// })
 
 /*
 PICKUPS
@@ -1267,6 +1271,7 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`door-open-mid`, () => {
     game.splash("VICTORY", "You have lifted the curse!")
     settings.writeNumber("completed_game", 1)
     show_stats(true, false, true, true)
+    game.setGameOverSound(true, new music.Melody(""))
     game.over(true, effects.blizzard)
 })
 
@@ -1307,7 +1312,7 @@ function setup_game () {
     setup_upgrade_menu()
     enemy_phase = 0
 
-    if(CHEAT_MODE) {
+    if(DEBUG_MODE) {
         enemy_phase = 20
         setup_enemy_phase()
         enemy_phase = 21
@@ -1391,7 +1396,7 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
     if (sprites.readDataNumber(enemy, "health") <= 0) {
         kill_tracker.find(tracker => tracker.name == sprites.readDataString(enemy, "name")).total += 1
         if (sprites.readDataNumber(enemy, "drop_type") > 0
-            && Math.percentChance(HEAL_DROP_CHANCE)
+            && Math.percentChance(heal_drop_chance)
             && sprites.allOfKind(SpriteKind.Food).length < MAX_FOOD) {
             let new_food = sprites.create(assets.image`health-potion`, SpriteKind.Food)
             new_food.z = Z_TREASURE_FOOD
@@ -1480,11 +1485,6 @@ sprites.onDestroyed(SpriteKind.Molotov, function (sprite) {
     sprites.setDataString(flame_weapon, "name", "HOLY WATER")
 })
 
-sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
-    deal_enemy_damage(otherSprite.x - sprite.vx, otherSprite.y - sprite.vy, otherSprite, sprites.readDataString(sprite, "name"), sprites.readDataNumber(sprite, "damage"), weapon_knockback)
-    sprite.destroy()
-})
-
 sprites.onDestroyed(SpriteKind.Explosive, function (sprite) {
     let explosion = sprites.create(assets.image`area32x32`, SpriteKind.VisualEffects)
     animation.runImageAnimation(
@@ -1503,15 +1503,20 @@ sprites.onDestroyed(SpriteKind.Explosive, function (sprite) {
     damage_enemies_in_aura(explosion, weapon_knockback)
 })
 
-sprites.onOverlap(SpriteKind.Orbital, SpriteKind.Enemy, function (sprite, otherSprite) {
-    deal_enemy_damage(hero.x, hero.y, otherSprite, sprites.readDataString(sprite, "name"), sprites.readDataNumber(sprite, "damage"), weapon_knockback / 2)
-    sprite.destroy()
-})
+// sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
+//     deal_enemy_damage(otherSprite.x - sprite.vx, otherSprite.y - sprite.vy, otherSprite, sprites.readDataString(sprite, "name"), sprites.readDataNumber(sprite, "damage"), weapon_knockback)
+//     sprite.destroy()
+// })
 
-sprites.onOverlap(SpriteKind.Explosive, SpriteKind.Enemy, function (sprite, otherSprite) {
-    deal_enemy_damage(0, 0, otherSprite, sprites.readDataString(sprite, "name"), sprites.readDataNumber(sprite, "damage"), 0)
-    sprite.destroy()
-})
+// sprites.onOverlap(SpriteKind.Orbital, SpriteKind.Enemy, function (sprite, otherSprite) {
+//     deal_enemy_damage(hero.x, hero.y, otherSprite, sprites.readDataString(sprite, "name"), sprites.readDataNumber(sprite, "damage"), weapon_knockback / 2)
+//     sprite.destroy()
+// })
+
+// sprites.onOverlap(SpriteKind.Explosive, SpriteKind.Enemy, function (sprite, otherSprite) {
+//     deal_enemy_damage(0, 0, otherSprite, sprites.readDataString(sprite, "name"), sprites.readDataNumber(sprite, "damage"), 0)
+//     sprite.destroy()
+// })
 
 /*
 TICK EVENTS
@@ -1727,7 +1732,7 @@ game.onUpdate(function () {
                 }
             } else if (custom.game_state_is(GameState.normal)) {
                 info.changeScoreBy(1)
-                show_stats(CHEAT_MODE, CHEAT_MODE, false, false)
+                show_stats(DEBUG_MODE, DEBUG_MODE, false, false)
             }
         }
     } else {
@@ -1770,6 +1775,11 @@ game.onUpdate(function () {
             }
         }
 
+        const pl = hero.x - hero.width / 2 * 0.8
+        const pr = hero.x + hero.width / 2 * 0.8
+        const pt = hero.y - hero.width / 2 * 0.8
+        const pb = hero.y + hero.width / 2 * 0.8
+
         const enemies = sprites.allOfKind(SpriteKind.Enemy)
         if(enemies.length > MAX_ENEMIES / 2) {
             for (let enemy of enemies) {
@@ -1777,6 +1787,43 @@ game.onUpdate(function () {
                 if (distance > scene.screenWidth() * 3 / 4) {
                     custom.move_sprite_off_camera(enemy)
                 }
+            }
+        }
+
+        for (let enemy of enemies) {
+
+            let projectiles = sprites.allOfKind(SpriteKind.Projectile)
+            for (let projectile of projectiles) {
+                if(custom.box_collision(enemy, projectile)) {
+                    deal_enemy_damage(enemy.x - projectile.vx, enemy.y - projectile.vy, enemy, sprites.readDataString(projectile, "name"), sprites.readDataNumber(projectile, "damage"), weapon_knockback)
+                    projectile.destroy()
+                }
+            }
+
+            projectiles = sprites.allOfKind(SpriteKind.Explosive)
+            for (let projectile of projectiles) {
+                if (custom.box_collision(enemy, projectile)) {
+                    deal_enemy_damage(0, 0, enemy, sprites.readDataString(projectile, "name"), sprites.readDataNumber(projectile, "damage"), 0)
+                    projectile.destroy()
+                }
+            }
+
+            projectiles = sprites.allOfKind(SpriteKind.Orbital)
+            for (let projectile of projectiles) {
+                if (custom.box_collision(enemy, projectile)) {
+                    deal_enemy_damage(hero.x, hero.y, enemy, sprites.readDataString(projectile, "name"), sprites.readDataNumber(projectile, "damage"), weapon_knockback / 2)
+                    projectile.destroy()
+                }
+            }
+
+            const min_vert = (enemy.height < enemy.width) ? (enemy.height / 2 * 0.8) : (enemy.width / 2 * 0.8)
+            const el = enemy.x - enemy.width / 2 * 0.8
+            const er = enemy.x + enemy.width / 2 * 0.8
+            const et = enemy.y - min_vert
+            const eb = enemy.y + min_vert
+
+            if ((pr >= el && pl <= er) && (pb >= et && pt <= eb)) {
+                hero_enemy_overlap(hero, enemy)
             }
         }
 

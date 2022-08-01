@@ -34,6 +34,13 @@ namespace custom {
         count: number
     }
 
+    type CollisionBox = {
+        l: number;
+        r: number;
+        t: number;
+        b: number;
+    }
+
     type WaveData = SpawnData[]
 
     const upgrades_master_list: UpgradeData[] = []
@@ -238,6 +245,29 @@ namespace custom {
         image.replace(14, 4)
         image.replace(8, 6)
         image.replace(15, 12)
+    }
+
+    /**
+     * check if the box containing the two sprites collide
+     */
+    //% group="Sprite"
+    //% block="$source and $target has colliding sprite boxes || multiply box scale by $box_scale"
+    //% source.shadow=variables_get
+    //% target.shadow=variables_get
+    export function box_collision(source: Sprite, target: Sprite, box_scale: number = 1.0): boolean {
+
+        const pl = source.x - source.width / 2 * box_scale
+        const pr = source.x + source.width / 2 * box_scale
+        const pt = source.y - source.height / 2 * box_scale
+        const pb = source.y + source.height / 2 * box_scale
+        
+        const el = target.x - target.width / 2 * box_scale
+        const er = target.x + target.width / 2 * box_scale
+        const et = target.y - target.height / 2 * box_scale
+        const eb = target.y + target.height / 2 * box_scale
+
+
+        return (pr >= el && pl <= er) && (pb >= et && pt <= eb)
     }
 
     /**
