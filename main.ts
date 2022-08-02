@@ -1172,17 +1172,17 @@ function setup_enemy_phase(mock: boolean = false) {
                             "TROLL"
                         ])
 
-                        switch(dice_roll_boss) {
-                            case "SKELETON MAGE":
-                                custom.add_priority_wave_data("MUMMY", 2)
-                                break
-                            case "SLIME KING":
-                                custom.add_priority_wave_data("SLIME", 2)
-                                break
-                            case "TROLL":
-                                custom.add_priority_wave_data("TOUGH SLIME", 2)
-                                break
-                        }
+                        // switch(dice_roll_boss) {
+                        //     case "SKELETON MAGE":
+                        //         custom.add_priority_wave_data("MUMMY", 2)
+                        //         break
+                        //     case "SLIME KING":
+                        //         custom.add_priority_wave_data("SLIME", 2)
+                        //         break
+                        //     case "TROLL":
+                        //         custom.add_priority_wave_data("TOUGH SLIME", 2)
+                        //         break
+                        // }
 
                         spawn_enemy(dice_roll_boss)
                     }
@@ -1805,7 +1805,7 @@ function spawn_orbit() {
             hero
             )
             sprites.setDataString(new_weapon, "name", "SPELLBOOK")
-            sprites.setDataNumber(new_weapon, "dist", 0)
+            // sprites.setDataNumber(new_weapon, "dist", 0)
             sprites.setDataNumber(new_weapon, "damage", orbit_damage)
         }
     }
@@ -1936,32 +1936,32 @@ game.onUpdate(function () {
                 press_b++
                 if (press_b >= 10) {
                     DEBUG_MODE = true
-                    switch(game.askForNumber("START LEVEL?", 1)) {
-                        case 1:
-                            DEBUG_START_PHASE = 3
-                            DEBUG_START_LEVEL = 5
-                            break
-                        case 2:
-                            DEBUG_START_PHASE = 5
-                            DEBUG_START_LEVEL = 6
-                            break
-                        case 3:
-                            DEBUG_START_PHASE = 9
-                            DEBUG_START_LEVEL = 10
-                            break
-                        case 4:
-                            DEBUG_START_PHASE = 12
-                            DEBUG_START_LEVEL = 11
-                            break
-                        case 5:
-                            DEBUG_START_PHASE = 17
-                            DEBUG_START_LEVEL = 15
-                            break
-                        default:
-                            DEBUG_START_PHASE = 18
-                            DEBUG_START_LEVEL = 16
-                            break
-                    }
+                    // switch (game.askForNumber("START LEVEL?", 1)) {
+                    //     case 1:
+                    //         DEBUG_START_PHASE = 3
+                    //         DEBUG_START_LEVEL = 5
+                    //         break
+                    //     case 2:
+                    //         DEBUG_START_PHASE = 5
+                    //         DEBUG_START_LEVEL = 6
+                    //         break
+                    //     case 3:
+                    //         DEBUG_START_PHASE = 9
+                    //         DEBUG_START_LEVEL = 10
+                    //         break
+                    //     case 4:
+                    //         DEBUG_START_PHASE = 12
+                    //         DEBUG_START_LEVEL = 11
+                    //         break
+                    //     case 5:
+                    //         DEBUG_START_PHASE = 17
+                    //         DEBUG_START_LEVEL = 15
+                    //         break
+                    //     default:
+                    //         DEBUG_START_PHASE = 18
+                    //         DEBUG_START_LEVEL = 16
+                    //         break
+                    // }
                 }
             } else if (custom.game_state_is(GameState.normal)) {
                 show_stats(DEBUG_MODE, DEBUG_MODE || enemy_extra_difficulty > 0, false, false)
@@ -2059,19 +2059,17 @@ game.onUpdate(function () {
             }
         }
 
-        if (custom.game_state_is(GameState.normal)) {
-            const screen_diagonal = Math.sqrt(scene.screenWidth() / 2 * scene.screenWidth() / 2 + scene.screenHeight() / 2 * scene.screenHeight() / 2) + 10
-            const enemies = sprites.allOfKind(SpriteKind.Enemy)
-            for (let enemy of enemies) {
-                let distance = custom.get_distance_between(enemy, hero)
-                if (distance > screen_diagonal) {
-                    despawn_enemy(enemy)
-                    // custom.move_sprite_off_camera(enemy)
-                    // sprites.setDataBoolean(enemy, "follow", Math.percentChance(sprites.readDataNumber(enemy, "follow_chance")))
-                    // set_enemy_velocity(enemy, SpeedSetupType.Init)
-                }
-            }
-        }
+        // if (custom.game_state_is(GameState.normal)) {
+        //     const screen_diagonal = Math.sqrt(scene.screenWidth() / 2 * scene.screenWidth() / 2 + scene.screenHeight() / 2 * scene.screenHeight() / 2) + 10
+        //     const enemies = sprites.allOfKind(SpriteKind.Enemy)
+        //     for (let enemy of enemies) {
+        //         let distance = custom.get_distance_between(enemy, hero)
+        //         if (distance > screen_diagonal) {
+        //             despawn_enemy(enemy)
+
+        //         }
+        //     }
+        // }
 
         if (aura_spawn_count > 0) {
             aura_weapon.setPosition(hero.x, hero.y)
