@@ -264,9 +264,7 @@ namespace custom {
         const et = target.y - target.height / 2 * box_scale
         const eb = target.y + target.height / 2 * box_scale
 
-        return (source.flags & sprites.Flag.Destroyed) == 0 &&
-        (target.flags & sprites.Flag.Destroyed) == 0 &&
-        (pr >= el && pl <= er) && (pb >= et && pt <= eb)
+        return !(source.flags & sprites.Flag.Destroyed) && !(target.flags & sprites.Flag.Destroyed) && (pr >= el && pl <= er) && (pb >= et && pt <= eb)
     }
 
     /**

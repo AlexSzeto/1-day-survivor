@@ -198,6 +198,10 @@ let spray_inaccuracy = 30
 
 let bonus_magic_spawn = 0
 
+let press_b = 0
+let b_released = true
+let prev_timestamp = 0 // game.runtime()
+
 type StatTracking = {
     name: string
     total: number
@@ -628,7 +632,7 @@ function setup_upgrade_menu() {
     exploder_duration = 750
     exploder_spawn_tick.rate = 10
     exploder_projectile_damage = 0
-    exploder_explosion_damage = 2 // 20
+    exploder_explosion_damage = 20
     exploder_explosion_scale = 1.0
     custom.add_upgrade_to_list("FIREBALL 2", assets.image`icon-fireball`, "x2 damage", "FIREBALL") // 40 *.6
     custom.add_upgrade_to_list("FIREBALL 3", assets.image`icon-fireball`, "x1.5 radius", "FIREBALL 2") // 40 *.6
@@ -1357,11 +1361,7 @@ function set_enemy_velocity(enemy: Sprite, setupType: SpeedSetupType) {
     }
 }
 
-function setup_enemy(main_image: Image, flash_image: Image, name: string, 
-    health: number, damage: number, speed: number, turn: number,
-    follow_chance: number, drop_type: number,
-    multi_hit: boolean = true, boss: boolean = false): Sprite {
-
+function setup_enemy(main_image: Image, flash_image: Image, name: string, health: number, damage: number, speed: number, turn: number, follow_chance: number, drop_type: number, multi_hit: boolean = true, boss: boolean = false): Sprite {
     const enemy = sprites.create(main_image, SpriteKind.Enemy)
     sprites.setDataImage(enemy, "main_image", main_image)
     sprites.setDataImage(enemy, "flash_image", flash_image)
@@ -1593,7 +1593,7 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
         enemy.fx = ENEMY_KNOCKBACK_FRICTION
         enemy.fy = ENEMY_KNOCKBACK_FRICTION
 
-        const stun_amount = 3 // Math.randomRange(1, 3)
+        const stun_amount = 2
         if(stun_amount > 0) {
             sprites.setDataNumber(enemy, "stun", stun_amount)
             set_enemy_velocity(enemy, SpeedSetupType.Pause)
@@ -1922,11 +1922,6 @@ game.onUpdateInterval(250, () => {
 /*
 GLOBAL ON FRAME EVENTS
 */
-
-
-let press_b = 0
-let b_released = true
-let prev_timestamp = game.runtime()
 
 game.onUpdate(function () {
 
