@@ -54,15 +54,15 @@ const ENEMY_HEALTH_SCALE = 0.06
 const ENEMY_SPEED_SCALE = 0.05
 const ENEMY_TURN_SCALE = 0.05
 
-const ENEMY_MAX_SPEED = 70
-const ENEMY_MAX_DAMAGE = 60
+const ENEMY_MAX_SPEED = 60
+const ENEMY_MAX_DAMAGE = 100
 
 const ENEMY_TURN_RATE = 100
 const SPRAY_ANGLE_DELTA = 120 / 5
 
 const HERO_UPGRADE_CHOICES = 3
 const HERO_STARTING_CHOICES = 3
-const HERO_FIRST_LEVEL_UP_XP = 6
+const HERO_FIRST_LEVEL_UP_XP = 10
 const HERO_LEVEL_UP_SCALING = 6
 
 const ENEMY_KNOCKBACK_FRICTION = 15
@@ -77,7 +77,7 @@ const ENEMY_TURN_HYPER_BASE = 2.00
 const HYPER_WAVE_TICKS = 4
 const HYPER_PHASE_TICKS = 50
 const HYPER_XP_MULTIPLIER = 1.5
-const HYPER_BOSS_HP_SCALE = 0.90
+const HYPER_BOSS_HP_SCALE = 1.0
 const HYPER_HERO_SPEED = 100
 
 /*
@@ -88,12 +88,13 @@ const Z_PICKUP = 11
 const Z_TREASURE_FOOD = 12
 const Z_NPC = 13
 const Z_ENEMY = 14
-const Z_DODGE_SHADOW = 15
-const Z_PROJECTILE = 16
-const Z_HERO = 17
-const Z_AURA = 18
-const Z_EXPLOSION = 19
-const Z_UI = 20
+const Z_BOSS = 15
+const Z_DODGE_SHADOW = 16
+const Z_PROJECTILE = 17
+const Z_HERO = 18
+const Z_AURA = 19
+const Z_EXPLOSION = 20
+const Z_UI = 21
 
 const MAX_UPGRADES = 6
 
@@ -174,6 +175,7 @@ let orbit_refresh_rate = 0
 let orbit_duration = 0
 let orbit_distance = 0
 let orbit_angular_speed = 0
+let orbit_expand_speed = 0
 
 let explosive_spawn_count = 0
 let exploder_spawn_tick: TickTracking = start_tick_track(spawn_explosive)
@@ -195,6 +197,10 @@ let spray_speed = 0
 let spray_inaccuracy = 30
 
 let bonus_magic_spawn = 0
+
+let press_b = 0
+let b_released = true
+let prev_timestamp = 0
 
 type StatTracking = {
     name: string
@@ -341,8 +347,9 @@ let wound_tracker: StatTracking[] = make_enemy_stat()
 
 let enemy_attack_cooldown_tick: TickTracking = start_tick_track(reset_enemy_attack_cooldown)
 enemy_attack_cooldown_tick.rate = 3
-let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 12)
+let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 8)
 let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100)
+let enemy_spawn_per_wave = 4
 let enemy_phase = 0
 let enemy_extra_difficulty = 0
 let heal_drop_chance = 5
@@ -351,7 +358,7 @@ let hero: Sprite = null
 let hero_health: StatusBarSprite = null
 let hero_xp: StatusBarSprite = null
 let hero_xp_increment: number = 0
-let hero_speed = 80
+let hero_speed = 70
 let hero_regen = 0
 let hero_regen_tick: TickTracking = start_tick_track(regenerate_hero, 4)
 let hero_auto_collect_tick: TickTracking = null
@@ -549,7 +556,7 @@ function get_random_upgrade (include_basic_items:boolean, message: string) {
         }
     } else {
         game.showLongText("You found gold coins!", DialogLayout.Bottom)
-        info.changeScoreBy(100)
+        info.changeScoreBy(20)
     }
 }
 
@@ -634,8 +641,9 @@ function setup_upgrade_menu() {
 
     custom.add_upgrade_to_list("SPELLBOOK", assets.image`icon-book`, "circles to protect", "WEAPON", 2)
     orbit_spawn_count = 0
-    orbit_spawn_tick.rate = 16
-    orbit_angular_speed = 6
+    orbit_spawn_tick.rate = 18
+    orbit_angular_speed = 6 // 160 DEBUGGING
+    orbit_expand_speed = 120
     orbit_distance = 30
     orbit_duration = 2400
     orbit_damage = 12 // 12-24
@@ -692,9 +700,9 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("POWER CRYSTAL 3", assets.image`icon-crystal`, "+weapon knockback, -25 max HP", "POWER CRYSTAL 2")
     // cross, spark, spellbook
 
-    custom.add_upgrade_to_list("AURA RING", assets.image`icon-ring`, "x1.2 all radius", "ACCESSORY")
+    custom.add_upgrade_to_list("AURA RING", assets.image`icon-ring`, "x1.1 all radius", "ACCESSORY")
     custom.add_upgrade_to_list("AURA RING 2", assets.image`icon-ring`, "x1.2 all radius", "AURA RING")
-    custom.add_upgrade_to_list("AURA RING 3", assets.image`icon-ring`, "x2 radius damage, -25 max HP", "AURA RING 2")
+    custom.add_upgrade_to_list("AURA RING 3", assets.image`icon-ring`, "x1.3 radius damage, -25 max HP", "AURA RING 2")
     // holy water, fireball, divine aura
 
     custom.add_upgrade_to_list("BLESSED CUP", assets.image`icon-cup`, "+2 HP per second", "ACCESSORY")
@@ -756,6 +764,8 @@ function perform_upgrade(name: string) {
             orbit_spawn_tick.rate *= 0.8
             molotov_spawn_tick.rate *= 0.8
             molotov_flame_duration *= 0.8
+            exploder_duration *= 1.2
+            molotov_duration_max *= 1.2
             break
         case "MAGIC FLASK 3":
             bonus_magic_spawn = 1
@@ -787,9 +797,9 @@ function perform_upgrade(name: string) {
             break
 
         case "AURA RING":
-            exploder_explosion_scale *= 1.2
-            aura_scale *= 1.2
-            molotov_flame_scale *= 1.2
+            exploder_explosion_scale *= 1.1
+            aura_scale *= 1.1
+            molotov_flame_scale *= 1.1
             break
         case "AURA RING 2":
             exploder_explosion_scale *= 1.2
@@ -797,9 +807,9 @@ function perform_upgrade(name: string) {
             molotov_flame_scale *= 1.2
             break
         case "AURA RING 3":
-            exploder_explosion_damage *= 2
-            aura_tick_damage *= 2
-            molotov_damage *= 2
+            exploder_explosion_damage *= 1.3
+            aura_tick_damage *= 1.3
+            molotov_damage *= 1.3
             hero_health.max -= 25
             break
 
@@ -1842,10 +1852,6 @@ game.onUpdateInterval(250, () => {
 /*
 GLOBAL ON FRAME EVENTS
 */
-
-
-let press_b = 0
-let b_released = true
 
 game.onUpdate(function () {
 
