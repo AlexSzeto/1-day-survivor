@@ -1172,17 +1172,17 @@ function setup_enemy_phase(mock: boolean = false) {
                             "TROLL"
                         ])
 
-                        switch(dice_roll_boss) {
-                            case "SKELETON MAGE":
-                                custom.add_priority_wave_data("MUMMY", 2)
-                                break
-                            case "SLIME KING":
-                                custom.add_priority_wave_data("SLIME", 2)
-                                break
-                            case "TROLL":
-                                custom.add_priority_wave_data("TOUGH SLIME", 2)
-                                break
-                        }
+                        // switch(dice_roll_boss) {
+                        //     case "SKELETON MAGE":
+                        //         custom.add_priority_wave_data("MUMMY", 2)
+                        //         break
+                        //     case "SLIME KING":
+                        //         custom.add_priority_wave_data("SLIME", 2)
+                        //         break
+                        //     case "TROLL":
+                        //         custom.add_priority_wave_data("TOUGH SLIME", 2)
+                        //         break
+                        // }
 
                         spawn_enemy(dice_roll_boss)
                     }
