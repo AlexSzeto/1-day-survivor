@@ -1172,17 +1172,17 @@ function setup_enemy_phase(mock: boolean = false) {
                             "TROLL"
                         ])
 
-                        // switch(dice_roll_boss) {
-                        //     case "SKELETON MAGE":
-                        //         custom.add_priority_wave_data("MUMMY", 2)
-                        //         break
-                        //     case "SLIME KING":
-                        //         custom.add_priority_wave_data("SLIME", 2)
-                        //         break
-                        //     case "TROLL":
-                        //         custom.add_priority_wave_data("TOUGH SLIME", 2)
-                        //         break
-                        // }
+                        switch(dice_roll_boss) {
+                            case "SKELETON MAGE":
+                                custom.add_priority_wave_data("MUMMY", 2)
+                                break
+                            case "SLIME KING":
+                                custom.add_priority_wave_data("SLIME", 2)
+                                break
+                            case "TROLL":
+                                custom.add_priority_wave_data("TOUGH SLIME", 2)
+                                break
+                        }
 
                         spawn_enemy(dice_roll_boss)
                     }
@@ -1520,11 +1520,8 @@ function setup_game () {
     enemy_phase = 0
 
     if(DEBUG_MODE) {
-        // for (let i = 1; i < DEBUG_START_PHASE; i++) {
-        //     enemy_phase = i
-        //     setup_enemy_phase(true)
-        // }
         enemy_phase = DEBUG_START_PHASE
+        cat_out_of_chest = true
         for(let i=1; i<DEBUG_START_LEVEL; i++) {
             hero_level_up(hero_xp)
         }
@@ -1711,7 +1708,7 @@ sprites.onDestroyed(SpriteKind.Explosive, function (sprite) {
     explosion.lifespan = 500
     sprites.setDataNumber(explosion, "damage", exploder_explosion_damage)
     sprites.setDataString(explosion, "name", "FIREBALL")
-    damage_enemies_in_aura(explosion, weapon_knockback)
+    damage_enemies_in_aura(explosion, weapon_knockback * 2)
 })
 
 /*
@@ -1805,7 +1802,6 @@ function spawn_orbit() {
             hero
             )
             sprites.setDataString(new_weapon, "name", "SPELLBOOK")
-            // sprites.setDataNumber(new_weapon, "dist", 0)
             sprites.setDataNumber(new_weapon, "damage", orbit_damage)
         }
     }
@@ -1936,32 +1932,6 @@ game.onUpdate(function () {
                 press_b++
                 if (press_b >= 10) {
                     DEBUG_MODE = true
-                    // switch (game.askForNumber("START LEVEL?", 1)) {
-                    //     case 1:
-                    //         DEBUG_START_PHASE = 3
-                    //         DEBUG_START_LEVEL = 5
-                    //         break
-                    //     case 2:
-                    //         DEBUG_START_PHASE = 5
-                    //         DEBUG_START_LEVEL = 6
-                    //         break
-                    //     case 3:
-                    //         DEBUG_START_PHASE = 9
-                    //         DEBUG_START_LEVEL = 10
-                    //         break
-                    //     case 4:
-                    //         DEBUG_START_PHASE = 12
-                    //         DEBUG_START_LEVEL = 11
-                    //         break
-                    //     case 5:
-                    //         DEBUG_START_PHASE = 17
-                    //         DEBUG_START_LEVEL = 15
-                    //         break
-                    //     default:
-                    //         DEBUG_START_PHASE = 18
-                    //         DEBUG_START_LEVEL = 16
-                    //         break
-                    // }
                 }
             } else if (custom.game_state_is(GameState.normal)) {
                 show_stats(DEBUG_MODE, DEBUG_MODE || enemy_extra_difficulty > 0, false, false)
@@ -2012,10 +1982,6 @@ game.onUpdate(function () {
                 pick_up_treasure(pickup)
             }
         }
-    // }
-
-    // if (custom.game_state_is(GameState.normal)) {
-    //     const enemies = sprites.allOfKind(SpriteKind.Enemy)
 
         const pl = hero.x - hero.width / 2 * 0.8
         const pr = hero.x + hero.width / 2 * 0.8
@@ -2067,18 +2033,6 @@ game.onUpdate(function () {
                 hero_enemy_overlap(hero, enemy)
             }
         }
-
-        // if (custom.game_state_is(GameState.normal)) {
-        //     const screen_diagonal = Math.sqrt(scene.screenWidth() / 2 * scene.screenWidth() / 2 + scene.screenHeight() / 2 * scene.screenHeight() / 2) + 10
-        //     const enemies = sprites.allOfKind(SpriteKind.Enemy)
-        //     for (let enemy of enemies) {
-        //         let distance = custom.get_distance_between(enemy, hero)
-        //         if (distance > screen_diagonal) {
-        //             despawn_enemy(enemy)
-
-        //         }
-        //     }
-        // }
 
         if (aura_spawn_count > 0) {
             aura_weapon.setPosition(hero.x, hero.y)
