@@ -1203,7 +1203,6 @@ function despawn_enemy(destroy_candidate: Sprite) {
 function spawn_enemy(name: string) {
     const enemies: Sprite[] = sprites.allOfKind(SpriteKind.Enemy)
     if (enemies.length >= MAX_ENEMIES) {
-
         if(!(["SKELETON MAGE", "SLIME KING", "TROLL"].indexOf(name) >= 0)) {
             return
         }
@@ -1215,62 +1214,107 @@ function spawn_enemy(name: string) {
 
         // TIER 1 (expected player damage = 12-45)
         case "ZOMBIE":
-            new_enemy = setup_enemy(assets.image`zombie`, zombie_flash, name, 12, 10, 18, 50, 1)
+            new_enemy = setup_enemy(assets.image`zombie`, zombie_flash, name, 
+            12, 10,
+            25, 100,
+            100, 1)
             break
         case "KNIGHT":
-            new_enemy = setup_enemy(assets.image`knight`, knight_flash, name, 40, 15, 22, 100, 1)
+            new_enemy = setup_enemy(assets.image`knight`, knight_flash, name,
+            45, 20,
+            25, 800,
+            100, 1)
             break
         case "MUMMY":
-            new_enemy = setup_enemy(assets.image`mummy`, mummy_flash, name, 50, 20, 26, 40, 1, false)
+            new_enemy = setup_enemy(assets.image`mummy`, mummy_flash, name,
+            20, 25,
+            40, 0,
+            0, 1, false)
             break
 
         // BOSS TAKES ~8 HITS
         case "SKELETON MAGE":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 360, 35, 20, 100, 3, true, true)
+                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 
+                360, 40,
+                20, 400,
+                100, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1000 / ENEMY_HEALTH_BONUS_BASE, 40, 30, 100, 3, true, true)
+                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 
+                900 / ENEMY_HEALTH_BONUS_BASE, 60,
+                50, 0,
+                0, 3, true, true)
             }
             break
 
         // TIER 2 (expected player damage = 45-90)
-        case "SLIME":
-            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 45, 20, 34, 50, 1, false)
+        case "LAVA ZOMBIE":
+            new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name,
+            60, 35,
+            25, 400,
+            100, 1)
             break
-        case "TOUGH SLIME":
-            new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 70, 25, 38, 100, 1)
+        case "SLIME":
+            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name,
+            40, 25,
+            35, 100,
+            50, 1, false)
             break
         case "GHOST":
-            new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name, 30, 20, 38, 80, 2, false)
+            new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name,
+            25, 25,
+            45, 100,
+            90, 1, false)
             break
 
         // BOSS TAKES ~9 HITS
         case "SLIME KING":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 810, 40, 30, 100, 3, true, true)
+                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 
+                810, 40,
+                30, 400,
+                100, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 600 / ENEMY_HEALTH_BONUS_BASE, 20, 40, 100, 3, true, true)
+                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name,
+                600 / ENEMY_HEALTH_BONUS_BASE, 20,
+                45, 100,
+                100, 3, true, true)
             }
             break
 
         // TIER 3 (expected player damage = 90-180)
-        case "LAVA ZOMBIE":
-            new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name, 90, 20, 30, 60, 2, false)
+        case "TOUGH SLIME":
+            new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name,
+            120, 35,
+            40, 100,
+            25, 1)
             break
         case "CAPTAIN":
-            new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 240, 30, 24, 100, 2)
+            new_enemy = setup_enemy(assets.image`captain`, captain_flash, name,
+            360, 40,
+            30, 800,
+            100, 2)
             break
         case "MEAN SPIRIT":
-            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 70, 25, 42, 80, 2, false)
+            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name,
+            60, 30,
+            45, 100,
+            90, 2, false)
             break
 
         // END GAME (expected player damage = 180-270)
         // BOSS TAKES ~10 HITS
         case "TROLL":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1800, 50, 30, 100, 3, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 
+                1800, 60,
+                25, 1600,
+                100, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1400 / ENEMY_HEALTH_BONUS_BASE, 100, 20, 100, 3, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name,
+                1200 / ENEMY_HEALTH_BONUS_BASE, 90,
+                40, 1600,
+                100, 3, true, true)
             }
             break
     }
