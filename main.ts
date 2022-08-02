@@ -1520,8 +1520,11 @@ function setup_game () {
     enemy_phase = 0
 
     if(DEBUG_MODE) {
+        for (let i = 1; i < DEBUG_START_PHASE; i++) {
+            enemy_phase = i
+            setup_enemy_phase(true)
+        }
         enemy_phase = DEBUG_START_PHASE
-        cat_out_of_chest = true
         for(let i=1; i<DEBUG_START_LEVEL; i++) {
             hero_level_up(hero_xp)
         }
@@ -1594,7 +1597,7 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
         enemy.fx = ENEMY_KNOCKBACK_FRICTION
         enemy.fy = ENEMY_KNOCKBACK_FRICTION
 
-        const stun_amount = Math.randomRange(1, 3)
+        const stun_amount = 2
         if(stun_amount > 0) {
             sprites.setDataNumber(enemy, "stun", stun_amount)
             set_enemy_velocity(enemy, SpeedSetupType.Pause)
@@ -1708,7 +1711,7 @@ sprites.onDestroyed(SpriteKind.Explosive, function (sprite) {
     explosion.lifespan = 500
     sprites.setDataNumber(explosion, "damage", exploder_explosion_damage)
     sprites.setDataString(explosion, "name", "FIREBALL")
-    damage_enemies_in_aura(explosion, weapon_knockback * 2)
+    damage_enemies_in_aura(explosion, weapon_knockback)
 })
 
 /*
@@ -1802,6 +1805,7 @@ function spawn_orbit() {
             hero
             )
             sprites.setDataString(new_weapon, "name", "SPELLBOOK")
+            sprites.setDataNumber(new_weapon, "dist", 0)
             sprites.setDataNumber(new_weapon, "damage", orbit_damage)
         }
     }
@@ -1932,6 +1936,32 @@ game.onUpdate(function () {
                 press_b++
                 if (press_b >= 10) {
                     DEBUG_MODE = true
+                    switch(game.askForNumber("START LEVEL?", 1)) {
+                        case 1:
+                            DEBUG_START_PHASE = 3
+                            DEBUG_START_LEVEL = 5
+                            break
+                        case 2:
+                            DEBUG_START_PHASE = 5
+                            DEBUG_START_LEVEL = 6
+                            break
+                        case 3:
+                            DEBUG_START_PHASE = 9
+                            DEBUG_START_LEVEL = 10
+                            break
+                        case 4:
+                            DEBUG_START_PHASE = 12
+                            DEBUG_START_LEVEL = 11
+                            break
+                        case 5:
+                            DEBUG_START_PHASE = 17
+                            DEBUG_START_LEVEL = 15
+                            break
+                        default:
+                            DEBUG_START_PHASE = 18
+                            DEBUG_START_LEVEL = 16
+                            break
+                    }
                 }
             } else if (custom.game_state_is(GameState.normal)) {
                 show_stats(DEBUG_MODE, DEBUG_MODE || enemy_extra_difficulty > 0, false, false)
@@ -1982,20 +2012,15 @@ game.onUpdate(function () {
                 pick_up_treasure(pickup)
             }
         }
+    }
+
+    if (custom.game_state_is(GameState.normal)) {
+        const enemies = sprites.allOfKind(SpriteKind.Enemy)
 
         const pl = hero.x - hero.width / 2 * 0.8
         const pr = hero.x + hero.width / 2 * 0.8
         const pt = hero.y - hero.width / 2 * 0.8
         const pb = hero.y + hero.width / 2 * 0.8
-
-        const enemies = sprites.allOfKind(SpriteKind.Enemy)
-        for (let enemy of enemies) {
-            distance = custom.get_distance_between(enemy, hero)
-            if (enemy.isOutOfScreen(game.currentScene().camera)) {
-                custom.move_sprite_off_camera(enemy)
-                set_enemy_velocity(enemy, SpeedSetupType.Init)
-            }
-        }
 
         for (let enemy of enemies) {
 
@@ -2031,6 +2056,20 @@ game.onUpdate(function () {
 
             if ((pr >= el && pl <= er) && (pb >= et && pt <= eb)) {
                 hero_enemy_overlap(hero, enemy)
+            }
+        }
+
+        if (custom.game_state_is(GameState.normal)) {
+            const screen_diagonal = Math.sqrt(scene.screenWidth() / 2 * scene.screenWidth() / 2 + scene.screenHeight() / 2 * scene.screenHeight() / 2) + 10
+            const enemies = sprites.allOfKind(SpriteKind.Enemy)
+            for (let enemy of enemies) {
+                let distance = custom.get_distance_between(enemy, hero)
+                if (distance > screen_diagonal) {
+                    despawn_enemy(enemy)
+                    // custom.move_sprite_off_camera(enemy)
+                    // sprites.setDataBoolean(enemy, "follow", Math.percentChance(sprites.readDataNumber(enemy, "follow_chance")))
+                    // set_enemy_velocity(enemy, SpeedSetupType.Init)
+                }
             }
         }
 
