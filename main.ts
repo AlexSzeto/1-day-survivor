@@ -1030,120 +1030,121 @@ function adjust_hero_speed() {
 ENEMY SPAWNING
 */
 // CONTAINS GAME DESIGN
-function setup_enemy_phase() {
+function setup_enemy_phase(mock: boolean = false) {
     switch(enemy_phase) {
         // TIER 1
         case 0:
             custom.reset_wave_data()
-            custom.add_wave_data("ZOMBIE", 2)
+            custom.add_wave_data("ZOMBIE", 3)
             break
         case 1:
             custom.reset_wave_data()
             custom.add_wave_data("KNIGHT", 1)
-            custom.add_wave_data("ZOMBIE", 2)
+            custom.add_wave_data("ZOMBIE", 3)
             break
         case 2:
-            custom.add_wave_data("KNIGHT", 1)
-            custom.add_wave_data("ZOMBIE", 2)
+            custom.reset_wave_data()
+            custom.add_wave_data("KNIGHT", 2)
+            custom.add_wave_data("ZOMBIE", 4)
             break
         case 3:
             custom.reset_wave_data()
-            custom.add_wave_data("MUMMY", 3)
-            spawn_enemy("SKELETON MAGE")
+            custom.add_wave_data("MUMMY", 4)
+            if(!mock) {
+                spawn_enemy("SKELETON MAGE")
+            }
             break
 
 
         // TIER 2 
         case 5:
             custom.reset_wave_data()
-            custom.add_wave_data("KNIGHT", 3)
-            custom.add_wave_data("MUMMY", 2)
-            custom.add_wave_data("GHOST", 1)
+            custom.add_wave_data("MUMMY", 4)
+            custom.add_wave_data("LAVA ZOMBIE", 2)
             break
         case 6:
             custom.reset_wave_data()
-            custom.add_wave_data("SLIME", 1)
-            custom.add_wave_data("MUMMY", 3)
+            custom.add_wave_data("LAVA ZOMBIE", 4)
             custom.add_wave_data("GHOST", 2)
             break
         case 7:
             custom.reset_wave_data()
-            custom.add_wave_data("SLIME", 1)
-            custom.add_wave_data("TOUGH SLIME", 1)
-            custom.add_wave_data("MUMMY", 2)
+            custom.add_wave_data("SLIME", 2)
+            custom.add_wave_data("LAVA ZOMBIE", 2)
             custom.add_wave_data("GHOST", 2)
             break
         case 8:
             custom.reset_wave_data()
-            custom.add_wave_data("SLIME", 2)
-            custom.add_wave_data("TOUGH SLIME", 1)
-            custom.add_wave_data("SLIME", 2)
-            custom.add_wave_data("GHOST", 1)
+            custom.add_wave_data("SLIME", 3)
+            custom.add_wave_data("GHOST", 3)
             break
         case 9:
             custom.reset_wave_data()
             custom.add_wave_data("SLIME", 4)
-            spawn_enemy("SLIME KING")
+            custom.add_wave_data("GHOST", 1)
+            if(!mock) {
+                spawn_enemy("SLIME KING")
+            }
             break
         
 
         // TIER 3
         case 12:
             custom.reset_wave_data()
-            custom.add_wave_data("LAVA ZOMBIE", 2)
-            custom.add_wave_data("ZOMBIE", 2)
-            custom.add_wave_data("GHOST", 1)
-            custom.add_wave_data("LAVA ZOMBIE", 1)
+            custom.add_wave_data("SLIME", 4)
+            custom.add_wave_data("TOUGH SLIME", 2)
             break
         case 13:
-            custom.reset_wave_data()
-            custom.add_wave_data("LAVA ZOMBIE", 2)
-            custom.add_wave_data("GHOST", 1)
-            custom.add_wave_data("LAVA ZOMBIE", 2)
-            custom.add_wave_data("MEAN SPIRIT", 1)
-            break
-        case 14:
-            custom.reset_wave_data()
-            custom.add_wave_data("LAVA ZOMBIE", 3)
-            custom.add_wave_data("KNIGHT", 1)
-            custom.add_wave_data("CAPTAIN", 1)
-            custom.add_wave_data("MEAN SPIRIT", 1)
-            break
-        case 15:
-            custom.reset_wave_data()
-            custom.add_wave_data("TOUGH SLIME", 2)
-            custom.add_wave_data("MEAN SPIRIT", 1)
-            custom.add_wave_data("CAPTAIN", 2)
-            custom.add_wave_data("MEAN SPIRIT", 1)
-            break
-
-
-        // END GAME
-        case 16:
             custom.reset_wave_data()
             custom.add_wave_data("TOUGH SLIME", 4)
             custom.add_wave_data("MEAN SPIRIT", 2)
             break
+        case 14:
+            custom.reset_wave_data()
+            custom.add_wave_data("TOUGH SLIME", 4)
+            custom.add_wave_data("MEAN SPIRIT", 1)
+            custom.add_wave_data("CAPTAIN", 1)
+            break
+        case 15:
+            custom.reset_wave_data()
+            custom.add_wave_data("TOUGH SLIME", 3)
+            custom.add_wave_data("MEAN SPIRIT", 2)
+            custom.add_wave_data("CAPTAIN", 1)
+            break
+        case 16:
+            custom.reset_wave_data()
+            custom.add_wave_data("MEAN SPIRIT", 3)
+            custom.add_wave_data("TOUGH SLIME", 2)
+            custom.add_wave_data("CAPTAIN", 1)
+            break
+
+        // END GAME
         case 17:
             custom.reset_wave_data()
-            custom.add_wave_data("TOUGH SLIME", 5)
-            spawn_enemy("TROLL")
-            cat_inside_chest = true
+            custom.add_wave_data("CAPTAIN", 1)
+            custom.add_wave_data("TOUGH SLIME", 2)
+            custom.add_wave_data("MEAN SPIRIT", 2)
+            if(!mock) {
+                spawn_enemy("TROLL")
+                cat_inside_chest = true
+            } else {
+                cat_inside_chest = false
+                cat_out_of_chest = true                
+            }
             break
 
         default:
             if(enemy_phase >= 18) {
                 if (!cat_out_of_chest) {
-                    custom.reset_wave_data()
-                    custom.add_wave_data("TOUGH SLIME", 6)
+
                 } else if (cat_mercy_phases > 0) {
                     cat_mercy_phases--
-                    custom.add_priority_random_enemy_to_wave(["KNIGHT", "MUMMY", "SLIME", "TOUGH SLIME", "GHOST"])
+                    custom.add_priority_random_enemy_to_wave(["ZOMBIE", "KNIGHT", "MUMMY", "LAVA ZOMBIE", "SLIME", "GHOST"])
                 } else {
                     if (enemy_extra_difficulty == 0) {
                         custom.reset_wave_data()
                         for(let i=0; i<MAX_ENEMIES; i++) {
-                            custom.add_priority_random_enemy_to_wave(["ZOMBIE", "KNIGHT", "MUMMY", "SLIME", "GHOST"])
+                            custom.add_priority_random_enemy_to_wave(["ZOMBIE", "KNIGHT", "MUMMY", "LAVA ZOMBIE", "SLIME"])
                         }
                     }
 
@@ -1154,10 +1155,14 @@ function setup_enemy_phase() {
                         tweak_enemy(existing_enemy)
                     }
 
-                    if (enemy_extra_difficulty <= 4) {
-                        custom.add_priority_random_enemy_to_wave(["MUMMY", "GHOST", "SLIME", "TOUGH SLIME"])
+                    if (enemy_extra_difficulty <= 2) {
+                        custom.add_priority_random_enemy_to_wave(["LAVA ZOMBIE", "SLIME"])
+                    } else if (enemy_extra_difficulty <= 4) {
+                        custom.add_priority_random_enemy_to_wave(["GHOST", "MEAN SPIRIT"])
+                    } else if (enemy_extra_difficulty <= 6) {
+                        custom.add_priority_random_enemy_to_wave(["TOUGH SLIME", "CAPTAIN"])
                     } else {
-                        custom.add_priority_random_enemy_to_wave(["TOUGH SLIME", "LAVA ZOMBIE", "MEAN SPIRIT", "CAPTAIN"])
+                        custom.add_priority_random_enemy_to_wave(["TOUGH SLIME", "CAPTAIN", "GHOST", "MEAN SPIRIT"])
                     }
 
                     if(enemy_phase % 2 == 0) {                        
@@ -1166,6 +1171,18 @@ function setup_enemy_phase() {
                             "SLIME KING",
                             "TROLL"
                         ])
+
+                        switch(dice_roll_boss) {
+                            case "SKELETON MAGE":
+                                custom.add_priority_wave_data("MUMMY", 2)
+                                break
+                            case "SLIME KING":
+                                custom.add_priority_wave_data("SLIME", 2)
+                                break
+                            case "TROLL":
+                                custom.add_priority_wave_data("TOUGH SLIME", 2)
+                                break
+                        }
 
                         spawn_enemy(dice_roll_boss)
                     }
