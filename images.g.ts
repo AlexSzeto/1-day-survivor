@@ -1173,22 +1173,22 @@ f 6 6 8 c 4 4 4 4 e 8 6 6 f
             case "image26":
             case "mourner":return img`
 . . . . . a a a a a a . . . . . 
-. . . . a 3 3 3 3 3 3 a . . . . 
-a . . . a d 1 1 1 1 d a . . . a 
-3 c . a 4 1 1 1 1 1 1 4 a . c 3 
-a c . a 4 1 a 1 1 a 1 4 a . c a 
-. . . a 4 c 1 1 1 1 c 4 a . . . 
-. c c a 4 1 1 a a 1 1 4 a c c . 
+. . . . a 6 9 9 9 9 6 a . . . . 
+a . . . a 7 1 1 1 1 7 a . . . a 
+6 c . a 7 1 1 1 1 1 1 7 a . c 6 
+a c . a 6 1 a 1 1 a 1 6 a . c a 
+. . . a 6 c 1 1 1 1 c 6 a . . . 
+. c c a 6 1 1 a a 1 1 6 a c c . 
 . a 1 c a 1 c 1 1 c 1 a c 1 a . 
-. a d 1 c d 1 1 1 1 d c 1 d a . 
-. c a d 3 c 3 d d 3 c 3 d a c . 
-. . c a 3 4 d 1 1 d 4 3 a c . . 
-. . . c a 4 1 1 1 1 4 a c . . . 
-. . . . c a d 1 1 d a c . . . . 
-. . . c a 3 1 1 1 d a c . . . . 
-. . . c a 3 1 1 1 4 a . . . . . 
-. . . . c a 4 1 4 a c . . . . . 
-. . . . . c a 4 4 4 a c . . . . 
+. a 9 1 c 7 1 1 1 1 7 c 1 9 a . 
+. c a 9 7 c 7 9 9 7 c 7 9 a c . 
+. . c a 7 6 9 1 1 9 6 7 a c . . 
+. . . c a 6 1 1 1 1 6 a c . . . 
+. . . . c a 7 1 1 7 a c . . . . 
+. . . c a 9 1 1 1 7 a c . . . . 
+. . . c a 9 1 1 1 6 a . . . . . 
+. . . . c a 7 1 6 a c . . . . . 
+. . . . . c a 6 6 6 a c . . . . 
 . . . . . . c c c c c c c . . . 
 `;
         }

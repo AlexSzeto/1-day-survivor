@@ -62,7 +62,7 @@ const SPRAY_ANGLE_DELTA = 120 / 5
 
 const HERO_UPGRADE_CHOICES = 3
 const HERO_STARTING_CHOICES = 3
-const HERO_FIRST_LEVEL_UP_XP = 10
+const HERO_FIRST_LEVEL_UP_XP = 6
 const HERO_LEVEL_UP_SCALING = 6
 
 const ENEMY_KNOCKBACK_FRICTION = 15
@@ -74,10 +74,10 @@ const ENEMY_HEALTH_HYPER_BASE = 0.90
 const ENEMY_SPEED_HYPER_BASE = 1.20
 const ENEMY_TURN_HYPER_BASE = 2.00
 
-const HYPER_WAVE_TICKS = 4
+const HYPER_WAVE_TICKS = 2
 const HYPER_PHASE_TICKS = 50
 const HYPER_XP_MULTIPLIER = 1.5
-const HYPER_BOSS_HP_SCALE = 1.0
+const HYPER_BOSS_HP_SCALE = 0.90
 const HYPER_HERO_SPEED = 100
 
 /*
@@ -86,15 +86,14 @@ GFX CONSTANTS
 const Z_FLAME = 10
 const Z_PICKUP = 11
 const Z_TREASURE_FOOD = 12
-const Z_ENEMY = 13
-const Z_BOSS = 14
-const Z_NPC = 15
-const Z_DODGE_SHADOW = 16
-const Z_PROJECTILE = 17
-const Z_HERO = 18
-const Z_AURA = 19
-const Z_EXPLOSION = 20
-const Z_UI = 21
+const Z_NPC = 13
+const Z_ENEMY = 14
+const Z_DODGE_SHADOW = 15
+const Z_PROJECTILE = 16
+const Z_HERO = 17
+const Z_AURA = 18
+const Z_EXPLOSION = 19
+const Z_UI = 20
 
 const MAX_UPGRADES = 6
 
@@ -345,7 +344,7 @@ let enemy_attack_cooldown_tick: TickTracking = start_tick_track(reset_enemy_atta
 enemy_attack_cooldown_tick.rate = 3
 let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 8)
 let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100)
-let enemy_spawn_per_wave = 4
+let enemy_spawn_per_wave = 2
 let enemy_phase = 0
 let enemy_extra_difficulty = 0
 let heal_drop_chance = 5
@@ -1199,6 +1198,7 @@ function despawn_enemy(destroy_candidate: Sprite) {
 function spawn_enemy(name: string) {
     const enemies: Sprite[] = sprites.allOfKind(SpriteKind.Enemy)
     if (enemies.length >= MAX_ENEMIES) {
+
         if(!(["SKELETON MAGE", "SLIME KING", "TROLL"].indexOf(name) >= 0)) {
             return
         }
@@ -1212,20 +1212,20 @@ function spawn_enemy(name: string) {
         case "ZOMBIE":
             new_enemy = setup_enemy(assets.image`zombie`, zombie_flash, name, 
             12, 10,
-            25, 100,
+            26, 150,
             100, 1)
             break
         case "KNIGHT":
             new_enemy = setup_enemy(assets.image`knight`, knight_flash, name,
-            45, 20,
-            25, 800,
+            48, 20,
+            24, 100,
             100, 1)
             break
         case "MUMMY":
             new_enemy = setup_enemy(assets.image`mummy`, mummy_flash, name,
-            20, 25,
-            40, 0,
-            0, 1, false)
+            36, 25,
+            30, 250,
+            75, 1, false)
             break
 
         // BOSS TAKES ~8 HITS
@@ -1233,13 +1233,13 @@ function spawn_enemy(name: string) {
             if (enemy_extra_difficulty <= 0) {
                 new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 
                 360, 40,
-                20, 400,
+                20, 150,
                 100, 3, true, true)
             } else {
                 new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 
-                900 / ENEMY_HEALTH_BONUS_BASE, 60,
-                50, 0,
-                0, 3, true, true)
+                1000 / ENEMY_HEALTH_BONUS_BASE, 60,
+                30, 800,
+                100, 3, true, true)
             }
             break
 
@@ -1247,19 +1247,19 @@ function spawn_enemy(name: string) {
         case "LAVA ZOMBIE":
             new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name,
             60, 35,
-            25, 400,
+            28, 200,
             100, 1)
             break
         case "SLIME":
             new_enemy = setup_enemy(assets.image`slime`, slime_flash, name,
-            40, 25,
-            35, 100,
+            80, 25,
+            34, 100,
             50, 1, false)
             break
         case "GHOST":
             new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name,
-            25, 25,
-            45, 100,
+            45, 25,
+            44, 50,
             90, 1, false)
             break
 
@@ -1268,12 +1268,12 @@ function spawn_enemy(name: string) {
             if (enemy_extra_difficulty <= 0) {
                 new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 
                 810, 40,
-                30, 400,
+                30, 100,
                 100, 3, true, true)
             } else {
                 new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name,
                 600 / ENEMY_HEALTH_BONUS_BASE, 20,
-                45, 100,
+                44, 100,
                 100, 3, true, true)
             }
             break
@@ -1281,20 +1281,20 @@ function spawn_enemy(name: string) {
         // TIER 3 (expected player damage = 90-180)
         case "TOUGH SLIME":
             new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name,
-            120, 35,
-            40, 100,
-            25, 1)
+            160, 35,
+            34, 200,
+            50, 1)
             break
         case "CAPTAIN":
             new_enemy = setup_enemy(assets.image`captain`, captain_flash, name,
-            360, 40,
-            30, 800,
+            420, 40,
+            28, 400,
             100, 2)
             break
         case "MEAN SPIRIT":
             new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name,
-            60, 30,
-            45, 100,
+            90, 30,
+            40, 100,
             90, 2, false)
             break
 
@@ -1304,12 +1304,12 @@ function spawn_enemy(name: string) {
             if (enemy_extra_difficulty <= 0) {
                 new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 
                 1800, 60,
-                25, 1600,
+                30, 600,
                 100, 3, true, true)
             } else {
                 new_enemy = setup_enemy(assets.image`troll`, troll_flash, name,
-                1200 / ENEMY_HEALTH_BONUS_BASE, 90,
-                40, 1600,
+                1400 / ENEMY_HEALTH_BONUS_BASE, 90,
+                30, 800,
                 100, 3, true, true)
             }
             break
@@ -1384,7 +1384,7 @@ function setup_enemy(main_image: Image, flash_image: Image, name: string,
     sprites.setDataBoolean(enemy, "attack_cooldown", false)
     sprites.setDataNumber(enemy, "flash", 0)
     sprites.setDataNumber(enemy, "stun", 0)
-    enemy.z = boss ? Z_BOSS : Z_ENEMY
+    enemy.z = Z_ENEMY
     enemy.setFlag(SpriteFlag.GhostThroughWalls, true)
     return enemy
 }
@@ -1937,33 +1937,6 @@ game.onUpdate(function () {
                 press_b++
                 if (press_b >= 10) {
                     DEBUG_MODE = true
-                    switch(game.askForNumber("START LEVEL?", 1)) {
-                        case 1:
-                            DEBUG_START_PHASE = 3
-                            DEBUG_START_LEVEL = 5
-                            break
-                        case 2:
-                            DEBUG_START_PHASE = 5
-                            DEBUG_START_LEVEL = 6
-                            break
-                        case 3:
-                            DEBUG_START_PHASE = 9
-                            DEBUG_START_LEVEL = 10
-                            break
-                        case 4:
-                            DEBUG_START_PHASE = 12
-                            DEBUG_START_LEVEL = 11
-                            break
-                        case 5:
-                            DEBUG_START_PHASE = 17
-                            DEBUG_START_LEVEL = 15
-                            break
-                        default:
-                            DEBUG_START_PHASE = 18
-                            DEBUG_START_LEVEL = 16
-                            break
-                    }
-
                 }
             } else if (custom.game_state_is(GameState.normal)) {
                 show_stats(DEBUG_MODE, DEBUG_MODE || enemy_extra_difficulty > 0, false, false)
