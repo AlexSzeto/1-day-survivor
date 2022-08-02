@@ -1520,10 +1520,10 @@ function setup_game () {
     enemy_phase = 0
 
     if(DEBUG_MODE) {
-        for (let i = 1; i < DEBUG_START_PHASE; i++) {
-            enemy_phase = i
-            setup_enemy_phase(true)
-        }
+        // for (let i = 1; i < DEBUG_START_PHASE; i++) {
+        //     enemy_phase = i
+        //     setup_enemy_phase(true)
+        // }
         enemy_phase = DEBUG_START_PHASE
         for(let i=1; i<DEBUG_START_LEVEL; i++) {
             hero_level_up(hero_xp)
@@ -1597,7 +1597,7 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
         enemy.fx = ENEMY_KNOCKBACK_FRICTION
         enemy.fy = ENEMY_KNOCKBACK_FRICTION
 
-        const stun_amount = 2
+        const stun_amount = Math.randomRange(1, 3)
         if(stun_amount > 0) {
             sprites.setDataNumber(enemy, "stun", stun_amount)
             set_enemy_velocity(enemy, SpeedSetupType.Pause)
@@ -2012,15 +2012,24 @@ game.onUpdate(function () {
                 pick_up_treasure(pickup)
             }
         }
-    }
+    // }
 
-    if (custom.game_state_is(GameState.normal)) {
-        const enemies = sprites.allOfKind(SpriteKind.Enemy)
+    // if (custom.game_state_is(GameState.normal)) {
+    //     const enemies = sprites.allOfKind(SpriteKind.Enemy)
 
         const pl = hero.x - hero.width / 2 * 0.8
         const pr = hero.x + hero.width / 2 * 0.8
         const pt = hero.y - hero.width / 2 * 0.8
         const pb = hero.y + hero.width / 2 * 0.8
+
+        const enemies = sprites.allOfKind(SpriteKind.Enemy)
+        for (let enemy of enemies) {
+            distance = custom.get_distance_between(enemy, hero)
+            if (enemy.isOutOfScreen(game.currentScene().camera)) {
+                custom.move_sprite_off_camera(enemy)
+                set_enemy_velocity(enemy, SpeedSetupType.Init)
+            }
+        }
 
         for (let enemy of enemies) {
 
