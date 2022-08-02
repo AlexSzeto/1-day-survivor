@@ -642,7 +642,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("SPELLBOOK", assets.image`icon-book`, "circles to protect", "WEAPON", 2)
     orbit_spawn_count = 0
     orbit_spawn_tick.rate = 18
-    orbit_angular_speed = 6 // 160 DEBUGGING
+    orbit_angular_speed = 160
     orbit_expand_speed = 120
     orbit_distance = 30
     orbit_duration = 2400
@@ -1336,28 +1336,36 @@ function tweak_enemy(enemy: Sprite) {
 function set_enemy_velocity(enemy: Sprite, setupType: SpeedSetupType) {
     const speed = sprites.readDataNumber(enemy, "speed")
     const turn = sprites.readDataNumber(enemy, "turn")
+    
     if (setupType == SpeedSetupType.Pause || sprites.readDataNumber(enemy, "stun") > 0) {
-        sprites.setDataNumber(enemy, "fvx", enemy.vx)
-        sprites.setDataNumber(enemy, "fvy", enemy.vy)
+        if(enemy.vx != 0 || enemy.vy != 0) {
+            sprites.setDataNumber(enemy, "fvx", enemy.vx)
+            sprites.setDataNumber(enemy, "fvy", enemy.vy)
+        }
         enemy.follow(null)
         enemy.vx = 0
         enemy.vy = 0
     }
-    else if(sprites.readDataBoolean(enemy, "follow")) {
-        enemy.follow(hero, speed, turn)
-        enemy.vx = sprites.readDataNumber(enemy, "fvx")
-        enemy.vy = sprites.readDataNumber(enemy, "fvy")
-    } else if(setupType == SpeedSetupType.Init) {
-        custom.aim_projectile_at_sprite(
-            enemy, hero, AimType.velocity, speed
-        )
-    } else {
-        enemy.vx = sprites.readDataNumber(enemy, "fvx")
-        enemy.vy = sprites.readDataNumber(enemy, "fvy")
+    else {
+        const follow = sprites.readDataBoolean(enemy, "follow")
+        if (follow) {
+            enemy.follow(hero, speed, turn)
+        }
+
+        if (setupType == SpeedSetupType.Init) {
+            custom.aim_projectile_at_sprite(enemy, hero, AimType.velocity, speed)
+        } else if (setupType == SpeedSetupType.Unpause) {
+            enemy.vx = sprites.readDataNumber(enemy, "fvx")
+            enemy.vy = sprites.readDataNumber(enemy, "fvy")
+        }
     }
 }
 
-function setup_enemy(main_image: Image, flash_image: Image, name: string, health: number, damage: number, speed: number, follow_chance: number, drop_type: number, multi_hit: boolean = true, boss: boolean = false): Sprite {
+function setup_enemy(main_image: Image, flash_image: Image, name: string, 
+    health: number, damage: number, speed: number, turn: number,
+    follow_chance: number, drop_type: number,
+    multi_hit: boolean = true, boss: boolean = false): Sprite {
+
     const enemy = sprites.create(main_image, SpriteKind.Enemy)
     sprites.setDataImage(enemy, "main_image", main_image)
     sprites.setDataImage(enemy, "flash_image", flash_image)
@@ -1369,8 +1377,9 @@ function setup_enemy(main_image: Image, flash_image: Image, name: string, health
     sprites.setDataNumber(enemy, "drop_type", drop_type)
     const adjusted_speed = scale_value(speed, ENEMY_SPEED_HYPER_BASE, ENEMY_SPEED_BONUS_BASE, ENEMY_SPEED_SCALE, !boss, ENEMY_MAX_SPEED)
     sprites.setDataNumber(enemy, "speed", adjusted_speed)
-    const adjusted_turn = scale_value(ENEMY_TURN_RATE, ENEMY_TURN_HYPER_BASE, ENEMY_TURN_BONUS_BASE, ENEMY_TURN_SCALE, !boss)
+    const adjusted_turn = scale_value(turn, ENEMY_TURN_HYPER_BASE, ENEMY_TURN_BONUS_BASE, ENEMY_TURN_SCALE, !boss)
     sprites.setDataNumber(enemy, "turn", adjusted_turn)
+    sprites.setDataNumber(enemy, "follow_chance", follow_chance)
     sprites.setDataBoolean(enemy, "follow", Math.percentChance(follow_chance))
     custom.move_sprite_off_camera(enemy)
     set_enemy_velocity(enemy, SpeedSetupType.Init)
@@ -1379,7 +1388,7 @@ function setup_enemy(main_image: Image, flash_image: Image, name: string, health
     sprites.setDataBoolean(enemy, "attack_cooldown", false)
     sprites.setDataNumber(enemy, "flash", 0)
     sprites.setDataNumber(enemy, "stun", 0)
-    enemy.z = Z_ENEMY
+    enemy.z = boss ? Z_BOSS : Z_ENEMY
     enemy.setFlag(SpriteFlag.GhostThroughWalls, true)
     return enemy
 }
