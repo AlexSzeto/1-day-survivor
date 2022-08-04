@@ -45,7 +45,8 @@ namespace custom {
     let current_game_state: GameState = GameState.setup
 
     let spawn_wave: string[] = []
-    let current_wave: number = 0
+    let current_wave_position: number = 0
+    let max_wave_length: number = 6
 
     /**
      * add upgrade to the master list
@@ -263,7 +264,9 @@ namespace custom {
         const et = target.y - target.height / 2 * box_scale
         const eb = target.y + target.height / 2 * box_scale
 
-        return (pr >= el && pl <= er) && (pb >= et && pt <= eb)
+        return (source.flags & sprites.Flag.Destroyed) == 0 &&
+        (target.flags & sprites.Flag.Destroyed) == 0 &&
+        (pr >= el && pl <= er) && (pb >= et && pt <= eb)
     }
 
     /**
@@ -301,19 +304,28 @@ namespace custom {
     //% block="move $target out of camera"
     //% target.shadow=variables_get
     export function move_sprite_off_camera(target: Sprite): void {
-        const spawn_pixel: number = Math.randomRange(0, scene.screenWidth() * 2 + scene.screenHeight() * 2)
+        let spawn_pixel: number = Math.randomRange(0, scene.screenWidth() * 2 + scene.screenHeight() * 2)
         if(spawn_pixel < scene.screenWidth()) {
-            target.y = scene.cameraProperty(CameraProperty.Y) - scene.screenWidth() / 2 - target.height / 2
+            target.y = scene.cameraTop() - target.height / 2
             target.x = scene.cameraLeft() + spawn_pixel
-        } else if (spawn_pixel < scene.screenWidth() + scene.screenHeight()) {
+            return
+        }
+        spawn_pixel -= scene.screenWidth()
+        if (spawn_pixel < scene.screenHeight()) {
             target.x = scene.cameraLeft() + scene.screenWidth() + target.width / 2
-            target.y = scene.cameraTop() + spawn_pixel - scene.screenWidth()
-        } else if (spawn_pixel < scene.screenWidth() * 2 + scene.screenHeight()) {
-            target.y = scene.cameraTop() + scene.screenHeight() / 2 + scene.screenWidth() / 2 + target.height / 2
-            target.x = scene.cameraLeft() + spawn_pixel - scene.screenWidth() - scene.screenHeight()
-        } else {
+            target.y = scene.cameraTop() + spawn_pixel
+            return
+        }
+        spawn_pixel -= scene.screenHeight()
+        if (spawn_pixel < scene.screenWidth()) {
+            target.y = scene.cameraTop() + scene.screenHeight() + target.height / 2
+            target.x = scene.cameraLeft() + spawn_pixel
+            return
+        }
+        spawn_pixel -= scene.screenWidth()
+        {
             target.x = scene.cameraLeft() - target.width / 2
-            target.y = scene.cameraTop() + spawn_pixel - scene.screenWidth() * 2 - scene.screenHeight()
+            target.y = scene.cameraTop() + spawn_pixel
         }
     }
 
@@ -420,14 +432,14 @@ namespace custom {
     //% block="reset spawn wave data"
     export function reset_wave_data(): void {
         spawn_wave = []
-        current_wave = 0
+        current_wave_position = 0
     }
 
     /**
      * add wave data
      */
     //% group="Spawn Waves"
-    //% block="insert $count of $name into spawn wave"
+    //% block="insert $count of $name into back of spawn wave"
     export function add_wave_data(name: string, count: number = 1): void {
         for(let i=0; i<count; i++) {
             spawn_wave.push(name)
@@ -435,7 +447,18 @@ namespace custom {
     }
 
     /**
-     * add a random enemy out of a list to the top of the wave data
+     * add priority wave data
+     */
+    //% group="Spawn Waves"
+    //% block="insert $count of $name into front of spawn wave"
+    export function add_priority_wave_data(name: string, count: number = 1): void {
+        for (let i = 0; i < count; i++) {
+            spawn_wave.unshift(name)
+        }
+    }
+
+    /**
+     * add a random enemy out of a list to the front of the wave data
      */
     //% group="Spawn Waves"
     //% block="insert a random pick from $names into top of spawn wave"
@@ -448,22 +471,28 @@ namespace custom {
      */
     //% group="Spawn Waves"
     //% block="list of current spawn wave enemies"
-    export function get_next_wave_enemy_name(): string
+    export function get_next_wave_enemy_names(length: number): string[]
     {
+        const wave = []
         const enemies = sprites.allOfKind(SpriteKind.Enemy)
-        for(let name of spawn_wave) {
+        for (let j=0; j<max_wave_length; j++) {                
+            const name = spawn_wave[current_wave_position]
+            current_wave_position = (current_wave_position + 1) % max_wave_length
             let enemy_exists = false
-            for(let enemy of enemies) {
-                if(!enemy_exists && sprites.readDataString(enemy, "name") == name) {
+            for (let enemy of enemies) {
+                if (!enemy_exists && sprites.readDataString(enemy, "name") == name) {
                     enemies.removeElement(enemy)
                     enemy_exists = true
                 }
             }
-            if(!enemy_exists) {
-                return name
+            if (!enemy_exists) {
+                wave.push(name)
+                if(wave.length >= length) {
+                    return wave
+                }
             }
         }
-        return null
+        return wave
     }
 
 

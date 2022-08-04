@@ -55,7 +55,7 @@ const ENEMY_SPEED_SCALE = 0.05
 const ENEMY_TURN_SCALE = 0.05
 
 const ENEMY_MAX_SPEED = 60
-const ENEMY_MAX_DAMAGE = 100
+const ENEMY_MAX_DAMAGE = 60
 
 const ENEMY_TURN_RATE = 100
 const SPRAY_ANGLE_DELTA = 120 / 5
@@ -86,9 +86,9 @@ GFX CONSTANTS
 const Z_FLAME = 10
 const Z_PICKUP = 11
 const Z_TREASURE_FOOD = 12
-const Z_NPC = 13
-const Z_ENEMY = 14
-const Z_BOSS = 15
+const Z_ENEMY = 13
+const Z_BOSS = 14
+const Z_NPC = 15
 const Z_DODGE_SHADOW = 16
 const Z_PROJECTILE = 17
 const Z_HERO = 18
@@ -197,10 +197,6 @@ let spray_speed = 0
 let spray_inaccuracy = 30
 
 let bonus_magic_spawn = 0
-
-let press_b = 0
-let b_released = true
-let prev_timestamp = 0
 
 type StatTracking = {
     name: string
@@ -632,7 +628,7 @@ function setup_upgrade_menu() {
     exploder_duration = 750
     exploder_spawn_tick.rate = 10
     exploder_projectile_damage = 0
-    exploder_explosion_damage = 20
+    exploder_explosion_damage = 2 // 20
     exploder_explosion_scale = 1.0
     custom.add_upgrade_to_list("FIREBALL 2", assets.image`icon-fireball`, "x2 damage", "FIREBALL") // 40 *.6
     custom.add_upgrade_to_list("FIREBALL 3", assets.image`icon-fireball`, "x1.5 radius", "FIREBALL 2") // 40 *.6
@@ -1172,17 +1168,17 @@ function setup_enemy_phase(mock: boolean = false) {
                             "TROLL"
                         ])
 
-                        // switch(dice_roll_boss) {
-                        //     case "SKELETON MAGE":
-                        //         custom.add_priority_wave_data("MUMMY", 2)
-                        //         break
-                        //     case "SLIME KING":
-                        //         custom.add_priority_wave_data("SLIME", 2)
-                        //         break
-                        //     case "TROLL":
-                        //         custom.add_priority_wave_data("TOUGH SLIME", 2)
-                        //         break
-                        // }
+                        switch(dice_roll_boss) {
+                            case "SKELETON MAGE":
+                                custom.add_priority_wave_data("MUMMY", 2)
+                                break
+                            case "SLIME KING":
+                                custom.add_priority_wave_data("SLIME", 2)
+                                break
+                            case "TROLL":
+                                custom.add_priority_wave_data("TOUGH SLIME", 2)
+                                break
+                        }
 
                         spawn_enemy(dice_roll_boss)
                     }
@@ -1520,8 +1516,11 @@ function setup_game () {
     enemy_phase = 0
 
     if(DEBUG_MODE) {
+        for (let i = 1; i < DEBUG_START_PHASE; i++) {
+            enemy_phase = i
+            setup_enemy_phase(true)
+        }
         enemy_phase = DEBUG_START_PHASE
-        cat_out_of_chest = true
         for(let i=1; i<DEBUG_START_LEVEL; i++) {
             hero_level_up(hero_xp)
         }
@@ -1594,7 +1593,7 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
         enemy.fx = ENEMY_KNOCKBACK_FRICTION
         enemy.fy = ENEMY_KNOCKBACK_FRICTION
 
-        const stun_amount = Math.randomRange(1, 3)
+        const stun_amount = 3 // Math.randomRange(1, 3)
         if(stun_amount > 0) {
             sprites.setDataNumber(enemy, "stun", stun_amount)
             set_enemy_velocity(enemy, SpeedSetupType.Pause)
@@ -1708,7 +1707,7 @@ sprites.onDestroyed(SpriteKind.Explosive, function (sprite) {
     explosion.lifespan = 500
     sprites.setDataNumber(explosion, "damage", exploder_explosion_damage)
     sprites.setDataString(explosion, "name", "FIREBALL")
-    damage_enemies_in_aura(explosion, weapon_knockback * 2)
+    damage_enemies_in_aura(explosion, weapon_knockback)
 })
 
 /*
@@ -1802,6 +1801,7 @@ function spawn_orbit() {
             hero
             )
             sprites.setDataString(new_weapon, "name", "SPELLBOOK")
+            sprites.setDataNumber(new_weapon, "dist", 0)
             sprites.setDataNumber(new_weapon, "damage", orbit_damage)
         }
     }
@@ -1849,9 +1849,9 @@ function next_enemy_phase() {
 
 function spawn_enemy_wave() {
     let existing_enemies = sprites.allOfKind(SpriteKind.Enemy).length
-    for(let i=0; i < MAX_ENEMIES; i++) {
-        const next_enemy = custom.get_next_wave_enemy_name()
-        if (next_enemy != null && existing_enemies < MAX_ENEMIES) {
+    const spawns = custom.get_next_wave_enemy_names(enemy_spawn_per_wave)
+    for (let next_enemy of spawns) {
+        if (existing_enemies < MAX_ENEMIES) {
             spawn_enemy(next_enemy)
             existing_enemies++
         }
@@ -1923,6 +1923,11 @@ game.onUpdateInterval(250, () => {
 GLOBAL ON FRAME EVENTS
 */
 
+
+let press_b = 0
+let b_released = true
+let prev_timestamp = game.runtime()
+
 game.onUpdate(function () {
 
     if(controller.B.isPressed()) {
@@ -1932,6 +1937,33 @@ game.onUpdate(function () {
                 press_b++
                 if (press_b >= 10) {
                     DEBUG_MODE = true
+                    switch(game.askForNumber("START LEVEL?", 1)) {
+                        case 1:
+                            DEBUG_START_PHASE = 3
+                            DEBUG_START_LEVEL = 5
+                            break
+                        case 2:
+                            DEBUG_START_PHASE = 5
+                            DEBUG_START_LEVEL = 6
+                            break
+                        case 3:
+                            DEBUG_START_PHASE = 9
+                            DEBUG_START_LEVEL = 10
+                            break
+                        case 4:
+                            DEBUG_START_PHASE = 12
+                            DEBUG_START_LEVEL = 11
+                            break
+                        case 5:
+                            DEBUG_START_PHASE = 17
+                            DEBUG_START_LEVEL = 15
+                            break
+                        default:
+                            DEBUG_START_PHASE = 18
+                            DEBUG_START_LEVEL = 16
+                            break
+                    }
+
                 }
             } else if (custom.game_state_is(GameState.normal)) {
                 show_stats(DEBUG_MODE, DEBUG_MODE || enemy_extra_difficulty > 0, false, false)
@@ -1941,13 +1973,18 @@ game.onUpdate(function () {
         b_released = true
     }
 
+    const per_second_multiplier = (game.runtime() - prev_timestamp) / 1000
+    prev_timestamp = game.runtime()
+
     for (let moving_orbital of sprites.allOfKind(SpriteKind.Orbital)) {
-        sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed)
+        sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed * per_second_multiplier)
+        let distance = Math.min(orbit_distance, sprites.readDataNumber(moving_orbital, "dist") + orbit_expand_speed * per_second_multiplier)
+        sprites.setDataNumber(moving_orbital, "dist", distance)
         custom.aim_projectile_at_angle(
             moving_orbital,
             sprites.readDataNumber(moving_orbital, "angle"),
             AimType.position,
-            orbit_distance,
+            distance,
             hero
         )
     }
@@ -1982,20 +2019,15 @@ game.onUpdate(function () {
                 pick_up_treasure(pickup)
             }
         }
+    }
+
+    if (custom.game_state_is(GameState.normal)) {
+        const enemies = sprites.allOfKind(SpriteKind.Enemy)
 
         const pl = hero.x - hero.width / 2 * 0.8
         const pr = hero.x + hero.width / 2 * 0.8
         const pt = hero.y - hero.width / 2 * 0.8
         const pb = hero.y + hero.width / 2 * 0.8
-
-        const enemies = sprites.allOfKind(SpriteKind.Enemy)
-        for (let enemy of enemies) {
-            distance = custom.get_distance_between(enemy, hero)
-            if (enemy.isOutOfScreen(game.currentScene().camera)) {
-                custom.move_sprite_off_camera(enemy)
-                set_enemy_velocity(enemy, SpeedSetupType.Init)
-            }
-        }
 
         for (let enemy of enemies) {
 
@@ -2031,6 +2063,20 @@ game.onUpdate(function () {
 
             if ((pr >= el && pl <= er) && (pb >= et && pt <= eb)) {
                 hero_enemy_overlap(hero, enemy)
+            }
+        }
+
+        if (custom.game_state_is(GameState.normal)) {
+            const screen_diagonal = Math.sqrt(scene.screenWidth() / 2 * scene.screenWidth() / 2 + scene.screenHeight() / 2 * scene.screenHeight() / 2) + 10
+            const enemies = sprites.allOfKind(SpriteKind.Enemy)
+            for (let enemy of enemies) {
+                let distance = custom.get_distance_between(enemy, hero)
+                if (distance > screen_diagonal) {
+                    despawn_enemy(enemy)
+                    // custom.move_sprite_off_camera(enemy)
+                    // sprites.setDataBoolean(enemy, "follow", Math.percentChance(sprites.readDataNumber(enemy, "follow_chance")))
+                    // set_enemy_velocity(enemy, SpeedSetupType.Init)
+                }
             }
         }
 
