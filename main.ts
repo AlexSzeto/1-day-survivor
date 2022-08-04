@@ -2045,12 +2045,9 @@ game.onUpdate(function () {
             let distance = custom.get_distance_between(enemy, hero)
             if (distance > screen_diagonal) {
                 despawn_enemy(enemy)
-                // custom.move_sprite_off_camera(enemy)
-                // sprites.setDataBoolean(enemy, "follow", Math.percentChance(sprites.readDataNumber(enemy, "follow_chance")))
-                // set_enemy_velocity(enemy, SpeedSetupType.Init)
             }
         }
-    }    
+    }
 })
 
 
