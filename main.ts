@@ -1945,13 +1945,18 @@ game.onUpdate(function () {
         b_released = true
     }
 
+    const per_second_multiplier = (game.runtime() - prev_timestamp) / 1000
+    prev_timestamp = game.runtime()
+
     for (let moving_orbital of sprites.allOfKind(SpriteKind.Orbital)) {
-        sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed)
+        sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed * per_second_multiplier)
+        let distance = Math.min(orbit_distance, sprites.readDataNumber(moving_orbital, "dist") + orbit_expand_speed * per_second_multiplier)
+        sprites.setDataNumber(moving_orbital, "dist", distance)
         custom.aim_projectile_at_angle(
             moving_orbital,
             sprites.readDataNumber(moving_orbital, "angle"),
             AimType.position,
-            orbit_distance,
+            distance,
             hero
         )
     }
