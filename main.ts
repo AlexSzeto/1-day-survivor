@@ -167,6 +167,7 @@ let orbit_refresh_rate = 0
 let orbit_duration = 0
 let orbit_distance = 0
 let orbit_angular_speed = 0
+let orbit_expand_speed = 0
 
 let explosive_spawn_count = 0
 let exploder_spawn_tick: TickTracking = start_tick_track(spawn_explosive)
@@ -602,7 +603,8 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("SPELLBOOK", assets.image`icon-book`, "circles to protect", "WEAPON")
     orbit_spawn_count = 0
     orbit_spawn_tick.rate = 16
-    orbit_angular_speed = 6
+    orbit_angular_speed = 160
+    orbit_expand_speed = 120
     orbit_distance = 30
     orbit_duration = 2400
     orbit_damage = 12 // 12-24
@@ -1665,6 +1667,7 @@ function spawn_orbit() {
             hero
             )
             sprites.setDataString(new_weapon, "name", "SPELLBOOK")
+            sprites.setDataNumber(new_weapon, "dist", 0)
             sprites.setDataNumber(new_weapon, "damage", orbit_damage)
         }
     }
@@ -1781,6 +1784,7 @@ GLOBAL ON FRAME EVENTS
 
 let press_b = 0
 let b_released = true
+let prev_timestamp = game.runtime()
 
 game.onUpdate(function () {
 
@@ -1804,13 +1808,18 @@ game.onUpdate(function () {
         b_released = true
     }
 
+    const per_second_multiplier = (game.runtime() - prev_timestamp) / 1000
+    prev_timestamp = game.runtime()
+
     for (let moving_orbital of sprites.allOfKind(SpriteKind.Orbital)) {
-        sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed)
+        sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed * per_second_multiplier)
+        let distance = Math.min(orbit_distance, sprites.readDataNumber(moving_orbital, "dist") + orbit_expand_speed * per_second_multiplier)
+        sprites.setDataNumber(moving_orbital, "dist", distance)
         custom.aim_projectile_at_angle(
             moving_orbital,
             sprites.readDataNumber(moving_orbital, "angle"),
             AimType.position,
-            orbit_distance,
+            distance,
             hero
         )
     }
