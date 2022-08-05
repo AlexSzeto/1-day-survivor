@@ -260,7 +260,9 @@ namespace custom {
         const eb = target.y + target.height / 2 * box_scale
 
 
-        return (pr >= el && pl <= er) && (pb >= et && pt <= eb)
+        return (source.flags & sprites.Flag.Destroyed) == 0 &&
+            (target.flags & sprites.Flag.Destroyed) == 0 &&
+            (pr >= el && pl <= er) && (pb >= et && pt <= eb)
     }
 
     /**
@@ -298,19 +300,28 @@ namespace custom {
     //% block="move $target out of camera"
     //% target.shadow=variables_get
     export function move_sprite_off_camera(target: Sprite): void {
-        const spawn_pixel: number = Math.randomRange(0, scene.screenWidth() * 2 + scene.screenHeight() * 2)
-        if(spawn_pixel < scene.screenWidth()) {
-            target.y = scene.cameraProperty(CameraProperty.Y) - scene.screenWidth() / 2 - target.height / 2
+        let spawn_pixel: number = Math.randomRange(0, scene.screenWidth() * 2 + scene.screenHeight() * 2)
+        if (spawn_pixel < scene.screenWidth()) {
+            target.y = scene.cameraTop() - target.height / 2
             target.x = scene.cameraLeft() + spawn_pixel
-        } else if (spawn_pixel < scene.screenWidth() + scene.screenHeight()) {
+            return
+        }
+        spawn_pixel -= scene.screenWidth()
+        if (spawn_pixel < scene.screenHeight()) {
             target.x = scene.cameraLeft() + scene.screenWidth() + target.width / 2
-            target.y = scene.cameraTop() + spawn_pixel - scene.screenWidth()
-        } else if (spawn_pixel < scene.screenWidth() * 2 + scene.screenHeight()) {
-            target.y = scene.cameraTop() + scene.screenHeight() / 2 + scene.screenWidth() / 2 + target.height / 2
-            target.x = scene.cameraLeft() + spawn_pixel - scene.screenWidth() - scene.screenHeight()
-        } else {
+            target.y = scene.cameraTop() + spawn_pixel
+            return
+        }
+        spawn_pixel -= scene.screenHeight()
+        if (spawn_pixel < scene.screenWidth()) {
+            target.y = scene.cameraTop() + scene.screenHeight() + target.height / 2
+            target.x = scene.cameraLeft() + spawn_pixel
+            return
+        }
+        spawn_pixel -= scene.screenWidth()
+        {
             target.x = scene.cameraLeft() - target.width / 2
-            target.y = scene.cameraTop() + spawn_pixel - scene.screenWidth() * 2 - scene.screenHeight()
+            target.y = scene.cameraTop() + spawn_pixel
         }
     }
 

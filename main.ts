@@ -76,6 +76,9 @@ const HYPER_HERO_SPEED = 100
 /*
 GFX CONSTANTS
 */
+
+const screen_diagonal = Math.sqrt(scene.screenWidth() / 2 * scene.screenWidth() / 2 + scene.screenHeight() / 2 * scene.screenHeight() / 2) + 10
+
 const Z_FLAME = 10
 const Z_PICKUP = 11
 const Z_TREASURE_FOOD = 12
@@ -1866,9 +1869,9 @@ game.onUpdate(function () {
         const enemies = sprites.allOfKind(SpriteKind.Enemy)
         if(enemies.length > MAX_ENEMIES / 2) {
             for (let enemy of enemies) {
-                distance = custom.get_distance_between(enemy, hero)
-                if (distance > scene.screenWidth() * 3 / 4) {
-                    custom.move_sprite_off_camera(enemy)
+                let distance = custom.get_distance_between(enemy, hero)
+                if (distance > screen_diagonal) {
+                    despawn_enemy(enemy)
                 }
             }
         }
