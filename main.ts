@@ -39,8 +39,8 @@ const GEM_FLY_SPEED = 100
 BALANCE CONSTANTS
 */
 const TURN_LO = 100
-const TURN_HI = 400
-const TURN_VERY_HI = 1600
+const TURN_MED = 400
+const TURN_HI = 1600
 
 const ENEMY_DAMAGE_HYPER_BASE = 1.50
 const ENEMY_HEALTH_HYPER_BASE = 1.00
@@ -68,6 +68,7 @@ const HERO_LEVEL_UP_SCALING = 8
 
 const ENEMY_KNOCKBACK_FRICTION = 15
 const WEAPON_KNOCKBACK_VELOCITY = 30
+const ENEMY_HIT_BOUNCE = 40
 
 const HYPER_WAVE_TICKS = 4
 const HYPER_PHASE_TICKS = 50
@@ -1253,13 +1254,13 @@ function spawn_enemy(name: string) {
             if (enemy_extra_difficulty <= 0) {
                 new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 360, 35, 20, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1000, 40, 30, TURN_LO, 3, true, true)
+                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1000, 40, 30, TURN_MED, 3, true, true)
             }
             break
 
         // TIER 2 (expected player damage = 45-90)
         case "SLIME":
-            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 36, 20, 36, TURN_LO, 1, false)
+            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 36, 20, 36, TURN_MED, 1, false)
             break
         case "TOUGH SLIME":
             new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 60, 25, 32, TURN_LO, 1)
@@ -1273,7 +1274,7 @@ function spawn_enemy(name: string) {
             if (enemy_extra_difficulty <= 0) {
                 new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 810, 40, 30, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 600, 20, 40, TURN_LO, 3, true, true)
+                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 600, 20, 40, TURN_HI, 3, true, true)
             }
             break
 
@@ -1285,7 +1286,7 @@ function spawn_enemy(name: string) {
             new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 180, 30, 30, TURN_LO, 2)
             break
         case "MEAN SPIRIT":
-            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 54, 5, 50, TURN_LO, 2)
+            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 54, 5, 50, TURN_MED, 2)
             break
 
         // END GAME (expected player damage = 180-270)
@@ -1385,6 +1386,7 @@ function hero_enemy_overlap(hero_sprite: Sprite, enemy: Sprite) {
             wound_hero(enemy)
             if (sprites.readDataBoolean(enemy, "multi_hit")) {
                 sprites.setDataBoolean(enemy, "attack_cooldown", true)
+                knockback_enemy(hero.x, hero.y, enemy, ENEMY_HIT_BOUNCE)
             } else {
                 enemy.destroy()
             }
@@ -1529,7 +1531,28 @@ function drop_gem(enemy:Sprite, image:Image, xp:number): Sprite {
     return new_drop
 }
 
-function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, damage: number, knockback: number) {
+function knockback_enemy(cx: number, cy: number, enemy: Sprite, magnitude: number) {
+    if (magnitude > 0) {
+        let knockback_scale = magnitude / Math.sqrt((enemy.x - cx) * (enemy.x - cx) + (enemy.y - cy) * (enemy.y - cy))
+        enemy.vx = (enemy.x - cx) * knockback_scale
+        enemy.vy = (enemy.y - cy) * knockback_scale
+        if(enemy.vx == 0 && enemy.vy == 0) {
+            custom.aim_projectile_at_angle(
+                enemy,
+                Math.randomRange(0, 360),
+                AimType.velocity,
+                magnitude
+            )
+        }
+        enemy.fx = ENEMY_KNOCKBACK_FRICTION
+        enemy.fy = ENEMY_KNOCKBACK_FRICTION
+
+        sprites.setDataNumber(enemy, "stun", 2)
+        enemy.follow(null)
+    }
+}
+
+function deal_enemy_damage(cx: number, cy: number, enemy: Sprite, name: string, damage: number, knockback: number) {
     const drops: Sprite[] = sprites.allOfKind(SpriteKind.PickUp)
     let new_drop: Sprite = null
     if (drops.length >= MAX_DROPS) {
@@ -1538,19 +1561,7 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
     sprites.changeDataNumberBy(enemy, "health", -damage)
     damage_tracker.find(value => value.name == name).total += damage
 
-    if(knockback > 0) {
-        let knockback_scale = knockback / Math.sqrt((enemy.x - sx) * (enemy.x - sx) + (enemy.y - sy) * (enemy.y - sy))
-        enemy.vx = (enemy.x - sx) * knockback_scale
-        enemy.vy = (enemy.y - sy) * knockback_scale
-        enemy.fx = ENEMY_KNOCKBACK_FRICTION
-        enemy.fy = ENEMY_KNOCKBACK_FRICTION
-
-        const stun_amount = 2
-        if(stun_amount > 0) {
-            sprites.setDataNumber(enemy, "stun", stun_amount)
-            enemy.follow(null)
-        }
-    }
+    knockback_enemy(cx, cy, enemy, knockback)
 
     if (sprites.readDataNumber(enemy, "health") <= 0) {
         kill_tracker.find(tracker => tracker.name == sprites.readDataString(enemy, "name")).total += 1
