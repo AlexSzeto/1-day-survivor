@@ -677,9 +677,9 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("LIFE SHIELD 2", assets.image`icon-shield`, "+100 max HP", "LIFE SHIELD")
     custom.add_upgrade_to_list("LIFE SHIELD 3", assets.image`icon-shield`, "+4 HP per second", "LIFE SHIELD 2")
 
-    custom.add_upgrade_to_list("GEM PRISM", assets.image`icon-prism`, "absorb gems every 10s", "ACCESSORY")
-    custom.add_upgrade_to_list("GEM PRISM 2", assets.image`icon-prism`, "some gems auto pickup", "GEM PRISM")
-    custom.add_upgrade_to_list("GEM PRISM 3", assets.image`icon-prism`, "+1 XP per gem", "GEM PRISM 2")
+    custom.add_upgrade_to_list("GEM PRISM", assets.image`icon-prism`, "+1 XP per gem", "ACCESSORY")
+    custom.add_upgrade_to_list("GEM PRISM 2", assets.image`icon-prism`, "absorb gems every 6s", "GEM PRISM")
+    custom.add_upgrade_to_list("GEM PRISM 3", assets.image`icon-prism`, "auto absorb gem drops", "GEM PRISM 2")
 
     custom.add_upgrade_to_list("FAIRY FEATHER", assets.image`icon-wing`, "x2 potion drops", "ACCESSORY")
     custom.add_upgrade_to_list("FAIRY FEATHER 2", assets.image`icon-wing`, "x1.25 move and dodge", "FAIRY FEATHER")
@@ -809,14 +809,14 @@ function perform_upgrade(name: string) {
             break
 
         case "GEM PRISM":
-            start_auto_collect()
-            hero_auto_collect_tick.rate = 10 * 4
+            gem_bonus_xp += 1
             break
         case "GEM PRISM 2":
-            hero_auto_collect_chance = 33
+            start_auto_collect()
+            hero_auto_collect_tick.rate = 6 * 4
             break
         case "GEM PRISM 3":
-            gem_bonus_xp += 1
+            hero_auto_collect_chance = 50
             break
 
         case "FAIRY FEATHER":
@@ -1245,7 +1245,7 @@ function spawn_enemy(name: string) {
 
         // TIER 2 (expected player damage = 45-90)
         case "SLIME":
-            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 45, 20, 36, 1)
+            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 45, 20, 36, 1, false)
             break
         case "TOUGH SLIME":
             new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 60, 25, 34, 1)
@@ -1265,13 +1265,13 @@ function spawn_enemy(name: string) {
 
         // TIER 3 (expected player damage = 90-180)
         case "LAVA ZOMBIE":
-            new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name, 80, 20, 30, 2)
+            new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name, 80, 20, 24, 2)
             break
         case "CAPTAIN":
-            new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 180, 30, 24, 2)
+            new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 180, 30, 30, 2)
             break
         case "MEAN SPIRIT":
-            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 60, 25, 40, 2, false)
+            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 60, 5, 46, 2)
             break
 
         // END GAME (expected player damage = 180-270)
@@ -1929,6 +1929,8 @@ game.onUpdate(function () {
             if (distance < hero.width / 2 + pickup.width / 2) {
                 hero_health.value += hero_food_heal
                 pickup.destroy()
+            } else if (distance < hero_gem_collect_radius) {
+                pickup.follow(hero, GEM_FLY_SPEED, 1600)
             } else if (distance > scene.screenWidth()) {
                 custom.move_sprite_off_camera(pickup)
             }
