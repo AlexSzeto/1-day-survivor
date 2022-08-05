@@ -38,7 +38,11 @@ const GEM_FLY_SPEED = 100
 /*
 BALANCE CONSTANTS
 */
-const ENEMY_DAMAGE_HYPER_BASE = 2.00
+const TURN_LO = 100
+const TURN_HI = 400
+const TURN_VERY_HI = 1600
+
+const ENEMY_DAMAGE_HYPER_BASE = 1.50
 const ENEMY_HEALTH_HYPER_BASE = 1.00
 const ENEMY_SPEED_HYPER_BASE = 1.20
 const ENEMY_TURN_HYPER_BASE = 1.20
@@ -56,7 +60,6 @@ const ENEMY_TURN_SCALE = 0.15
 const ENEMY_MAX_SPEED = 70
 const ENEMY_MAX_DAMAGE = 75
 
-const ENEMY_TURN_RATE = 100
 const SPRAY_ANGLE_DELTA = 120 / 5
 
 const HERO_UPGRADE_CHOICES = 3
@@ -491,8 +494,8 @@ function start_main_menu() {
                 menu_image.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
                 menu_image.drawTransparentImage(assets.image`title-text`, 0, 0)
                 const reset_menu = miniMenu.createMenu(
-                    miniMenu.createMenuItem("YES"),
-                    miniMenu.createMenuItem("NO")
+                    miniMenu.createMenuItem("NO"),
+                    miniMenu.createMenuItem("YES")
                 )
                 reset_menu.title = miniMenu.createMenuItem("RESET RECORDS?")
                 setup_menu(reset_menu, 2)
@@ -677,13 +680,13 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("LIFE SHIELD 2", assets.image`icon-shield`, "+100 max HP", "LIFE SHIELD")
     custom.add_upgrade_to_list("LIFE SHIELD 3", assets.image`icon-shield`, "+4 HP per second", "LIFE SHIELD 2")
 
-    custom.add_upgrade_to_list("GEM PRISM", assets.image`icon-prism`, "+1 XP per gem", "ACCESSORY")
+    custom.add_upgrade_to_list("GEM PRISM", assets.image`icon-prism`, "+1 XP per gem, x2 absorb radius", "ACCESSORY")
     custom.add_upgrade_to_list("GEM PRISM 2", assets.image`icon-prism`, "absorb gems every 6s", "GEM PRISM")
     custom.add_upgrade_to_list("GEM PRISM 3", assets.image`icon-prism`, "auto absorb gem drops", "GEM PRISM 2")
 
     custom.add_upgrade_to_list("FAIRY FEATHER", assets.image`icon-wing`, "x2 potion drops", "ACCESSORY")
     custom.add_upgrade_to_list("FAIRY FEATHER 2", assets.image`icon-wing`, "x1.25 move and dodge", "FAIRY FEATHER")
-    custom.add_upgrade_to_list("FAIRY FEATHER 3", assets.image`icon-wing`, "x1.5 dodge", "FAIRY FEATHER 2")
+    custom.add_upgrade_to_list("FAIRY FEATHER 3", assets.image`icon-wing`, "x1.25 dodge", "FAIRY FEATHER 2")
 
     custom.add_upgrade_to_list("MAGIC FLASK", assets.image`icon-flask`, "x1.1 all attack speed", "ACCESSORY")
     custom.add_upgrade_to_list("MAGIC FLASK 2", assets.image`icon-flask`, "x1.2 all attack speed", "MAGIC FLASK")
@@ -810,6 +813,7 @@ function perform_upgrade(name: string) {
 
         case "GEM PRISM":
             gem_bonus_xp += 1
+            hero_gem_collect_radius *= 2
             break
         case "GEM PRISM 2":
             start_auto_collect()
@@ -829,7 +833,7 @@ function perform_upgrade(name: string) {
             adjust_hero_speed()
             break
         case "FAIRY FEATHER 3":
-            hero_dodge += 50
+            hero_dodge += 25
             break
 
         case "BLESSED CUP":
@@ -1138,7 +1142,9 @@ function setup_enemy_phase() {
             break
         case 17:
             custom.reset_wave_data()
-            custom.add_wave_data("TOUGH SLIME", 5)
+            custom.add_wave_data("TOUGH SLIME", 2)
+            custom.add_wave_data("GHOST", 2)
+            custom.add_wave_data("MEAN SPIRIT", 1)
             spawn_enemy("TROLL")
             cat_inside_chest = true
             break
@@ -1147,20 +1153,28 @@ function setup_enemy_phase() {
             if(enemy_phase >= 18) {
                 if (!cat_out_of_chest) {
                     custom.reset_wave_data()
-                    custom.add_wave_data("TOUGH SLIME", 6)
+                    custom.add_wave_data("TOUGH SLIME", 2)
+                    custom.add_wave_data("GHOST", 2)
+                    custom.add_wave_data("MEAN SPIRIT", 1)
                 } else if (cat_mercy_phases > 0) {
                     cat_mercy_phases--
                     custom.add_priority_random_enemy_to_wave(["MUMMY", "SLIME"])
+                    custom.add_priority_random_enemy_to_wave(["ZOMBIE", "KNIGHT"])
                 } else {
                     if (enemy_extra_difficulty == 0) {
                         custom.reset_wave_data()
                         for(let i=0; i<MAX_ENEMIES; i++) {
                             custom.add_priority_random_enemy_to_wave(["ZOMBIE", "KNIGHT", "MUMMY", "SLIME", "GHOST"])
                         }
+
+                        game.showLongText(
+                            "A wind chills you to the bone.\n" +
+                            "Time to leave now, or else...\n" +
+                            "things will get VERY dangerous!", DialogLayout.Bottom)
                     }
 
                     enemy_extra_difficulty += 1
-                    effects.blizzard.startScreenEffect(1000)
+                    effects.blizzard.startScreenEffect(1000, 75)
 
                     for (let existing_enemy of sprites.allOfKind(SpriteKind.Enemy)) {
                         tweak_enemy(existing_enemy)
@@ -1225,62 +1239,62 @@ function spawn_enemy(name: string) {
 
         // TIER 1 (expected player damage = 12-45)
         case "ZOMBIE":
-            new_enemy = setup_enemy(assets.image`zombie`, zombie_flash, name, 12, 10, 24, 1)
+            new_enemy = setup_enemy(assets.image`zombie`, zombie_flash, name, 12, 10, 24, TURN_LO, 1)
             break
         case "KNIGHT":
-            new_enemy = setup_enemy(assets.image`knight`, knight_flash, name, 40, 15, 32, 1)
+            new_enemy = setup_enemy(assets.image`knight`, knight_flash, name, 40, 15, 32, TURN_LO, 1)
             break
         case "MUMMY":
-            new_enemy = setup_enemy(assets.image`mummy`, mummy_flash, name, 50, 20, 26, 1, false)
+            new_enemy = setup_enemy(assets.image`mummy`, mummy_flash, name, 50, 20, 26, TURN_LO, 1, false)
             break
 
         // BOSS TAKES ~8 HITS
         case "SKELETON MAGE":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 360, 35, 20, 3, true, true)
+                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 360, 35, 20, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1000, 40, 30, 3, true, true)
+                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1000, 40, 30, TURN_LO, 3, true, true)
             }
             break
 
         // TIER 2 (expected player damage = 45-90)
         case "SLIME":
-            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 45, 20, 36, 1, false)
+            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 36, 20, 36, TURN_LO, 1, false)
             break
         case "TOUGH SLIME":
-            new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 60, 25, 34, 1)
+            new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 60, 25, 32, TURN_LO, 1)
             break
         case "GHOST":
-            new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name, 30, 20, 38, 2, false)
+            new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name, 30, 20, 38, TURN_LO, 2, false)
             break
 
         // BOSS TAKES ~9 HITS
         case "SLIME KING":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 810, 40, 30, 3, true, true)
+                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 810, 40, 30, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 600, 20, 40, 3, true, true)
+                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 600, 20, 40, TURN_LO, 3, true, true)
             }
             break
 
         // TIER 3 (expected player damage = 90-180)
         case "LAVA ZOMBIE":
-            new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name, 80, 20, 24, 2)
+            new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name, 80, 20, 24, TURN_LO, 2)
             break
         case "CAPTAIN":
-            new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 180, 30, 30, 2)
+            new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 180, 30, 30, TURN_LO, 2)
             break
         case "MEAN SPIRIT":
-            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 60, 5, 46, 2)
+            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 54, 5, 50, TURN_LO, 2)
             break
 
         // END GAME (expected player damage = 180-270)
         // BOSS TAKES ~10 HITS
         case "TROLL":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1800, 50, 30, 3, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1700, 50, 30, 3, TURN_LO, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1400, 100, 20, 3, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1400, 100, 20, 3, TURN_LO, true, true)
             }
             break
     }
@@ -1301,7 +1315,7 @@ function tweak_enemy(enemy: Sprite) {
     sprites.setDataNumber(enemy, "speed", adjusted_speed)
 }
 
-function setup_enemy(main_image: Image, flash_image: Image, name: string, health: number, damage: number, speed: number, drop_type: number, multi_hit: boolean = true, boss: boolean = false): Sprite {
+function setup_enemy(main_image: Image, flash_image: Image, name: string, health: number, damage: number, speed: number, turn: number, drop_type: number, multi_hit: boolean = true, boss: boolean = false): Sprite {
     const enemy = sprites.create(main_image, SpriteKind.Enemy)
     sprites.setDataImage(enemy, "main_image", main_image)
     sprites.setDataImage(enemy, "flash_image", flash_image)
@@ -1313,7 +1327,7 @@ function setup_enemy(main_image: Image, flash_image: Image, name: string, health
     sprites.setDataNumber(enemy, "drop_type", drop_type)
     const adjusted_speed = scale_value(speed, ENEMY_SPEED_HYPER_BASE, ENEMY_SPEED_BONUS_BASE, ENEMY_SPEED_SCALE, !boss, ENEMY_MAX_SPEED)
     sprites.setDataNumber(enemy, "speed", adjusted_speed)
-    const adjusted_turn = scale_value(ENEMY_TURN_RATE, ENEMY_TURN_HYPER_BASE, ENEMY_TURN_BONUS_BASE, ENEMY_TURN_SCALE, !boss)
+    const adjusted_turn = scale_value(turn, ENEMY_TURN_HYPER_BASE, ENEMY_TURN_BONUS_BASE, ENEMY_TURN_SCALE, !boss)
     sprites.setDataNumber(enemy, "turn", adjusted_turn)
     enemy.follow(hero, adjusted_speed, adjusted_turn)
     sprites.setDataBoolean(enemy, "boss", boss)
@@ -1354,7 +1368,7 @@ function wound_hero(target:Sprite) {
     wound_tracker.find(value => value.name == sprites.readDataString(target, "name")).total += sprites.readDataNumber(target, "damage")
     hero_health.value -= sprites.readDataNumber(target, "damage")
     scene.cameraShake(Math.constrain(Math.floor(sprites.readDataNumber(target, "damage") / hero_health.max * 16), 2, 8), 250)
-    hero_pain_ticks = 2
+    hero_pain_ticks = 3
     adjust_hero_anim()
 }
 
@@ -1473,8 +1487,8 @@ GAME ACTIONS
 */
 
 function unpause_the_game() {
-    for (let upgrade_icon of sprites.allOfKind(SpriteKind.Enemy)) {
-        upgrade_icon.follow(hero, sprites.readDataNumber(upgrade_icon, "speed"), ENEMY_TURN_RATE)
+    for (let enemy of sprites.allOfKind(SpriteKind.Enemy)) {
+        enemy.follow(hero, sprites.readDataNumber(enemy, "speed"), sprites.readDataNumber(enemy, "turn"))
     }
     if (aura_spawn_count > 0) {
         aura_weapon.setFlag(SpriteFlag.Invisible, false)
@@ -1926,7 +1940,7 @@ game.onUpdate(function () {
 
         for (let pickup of sprites.allOfKind(SpriteKind.Food)) {
             distance = custom.get_distance_between(pickup, hero)
-            if (distance < hero.width / 2 + pickup.width / 2) {
+            if (distance < hero.width * 0.75) {
                 hero_health.value += hero_food_heal
                 pickup.destroy()
             } else if (distance < hero_gem_collect_radius) {
