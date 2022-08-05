@@ -41,10 +41,10 @@ BALANCE CONSTANTS
 const ENEMY_DAMAGE_HYPER_BASE = 2.00
 const ENEMY_HEALTH_HYPER_BASE = 1.00
 const ENEMY_SPEED_HYPER_BASE = 1.20
-const ENEMY_TURN_HYPER_BASE = 1.00
+const ENEMY_TURN_HYPER_BASE = 2.00
 
-const ENEMY_DAMAGE_BONUS_BASE = 2.00
-const ENEMY_HEALTH_BONUS_BASE = 1.50
+const ENEMY_DAMAGE_BONUS_BASE = 1.50
+const ENEMY_HEALTH_BONUS_BASE = 2.00
 const ENEMY_SPEED_BONUS_BASE = 1.00
 const ENEMY_TURN_BONUS_BASE = 1.00
 
@@ -355,6 +355,7 @@ let hero_auto_collect_tick: TickTracking = null
 let hero_level = 1
 let hero_angle = 0
 let hero_dodge = 0
+let hero_pain_ticks = 0
 let hero_dodge_distance = 8
 let hero_dodge_speed = 150
 let hero_dodge_heal = 0
@@ -1020,6 +1021,21 @@ function adjust_hero_speed() {
     }
 }
 
+function adjust_hero_anim() {
+    if(hero_dodge_ticks > 0) {
+        hero.setImage(assets.image`hero-shadow`)
+    } else if (hero_pain_ticks > 0) {
+        hero.setImage(assets.image`hero-pain`)
+    } else {
+        animation.runImageAnimation(
+            hero,
+            assets.animation`hero-anim`,
+            400,
+            true
+        )
+    }
+}
+
 /*
 ENEMY SPAWNING
 */
@@ -1142,9 +1158,6 @@ function setup_enemy_phase() {
                     }
 
                     enemy_extra_difficulty += 1
-                    game.showLongText(
-                        "A wind chills to the bone...\n" +
-                        "The evil grows stronger!", DialogLayout.Bottom)
                     effects.blizzard.startScreenEffect(1000)
 
                     for (let existing_enemy of sprites.allOfKind(SpriteKind.Enemy)) {
@@ -1306,6 +1319,9 @@ function move_hero_to_dodge(target:Sprite) {
     shadow.z = Z_DODGE_SHADOW
     shadow.setFlag(SpriteFlag.Ghost, true)
     shadow.destroy(effects.disintegrate, 600)
+    hero_dodge_ticks = 2
+    adjust_hero_speed()
+    adjust_hero_anim()
     custom.aim_projectile_at_sprite(hero, target, AimType.velocity, hero_dodge_speed)
     hero.vx *= -1
     hero.vy *= -1
@@ -1315,14 +1331,14 @@ function move_hero_to_dodge(target:Sprite) {
     hero.fx = Math.abs(hero.vx) * 4
     hero.fy = Math.abs(hero.vy) * 4
     hero_health.value += hero_dodge_heal
-    hero_dodge_ticks = 2
-    adjust_hero_speed()
 }
 
 function wound_hero(target:Sprite) {
-    hero_health.value -= sprites.readDataNumber(target, "damage")
     wound_tracker.find(value => value.name == sprites.readDataString(target, "name")).total += sprites.readDataNumber(target, "damage")
+    hero_health.value -= sprites.readDataNumber(target, "damage")
     scene.cameraShake(Math.constrain(Math.floor(sprites.readDataNumber(target, "damage") / hero_health.max * 16), 2, 8), 250)
+    hero_pain_ticks = 2
+    adjust_hero_anim()
 }
 
 function hero_enemy_overlap(hero_sprite: Sprite, enemy: Sprite) {
@@ -1392,7 +1408,7 @@ GAME SETUP
 
 function setup_game () {
     tiles.setCurrentTilemap(tilemap`castle`)
-    hero = sprites.create(assets.image`hero`, SpriteKind.Player)
+    hero = sprites.create(assets.image`hero-pain`, SpriteKind.Player)
     animation.runImageAnimation(
     hero,
     assets.animation`hero-anim`,
@@ -1425,6 +1441,7 @@ function setup_game () {
     if(debug_mode) {
         enemy_phase = DEBUG_START_PHASE
         cat_out_of_chest = true
+        cat_mercy_phases = 0
         for(let i=1; i<DEBUG_START_LEVEL; i++) {
             hero_level_up(hero_xp)
         }
@@ -1798,6 +1815,14 @@ game.onUpdateInterval(100, () => {
             hero_dodge_ticks--
             if(hero_dodge_ticks == 0) {
                 adjust_hero_speed()
+                adjust_hero_anim()
+            }
+        }
+
+        if(hero_pain_ticks > 0) {
+            hero_pain_ticks--
+            if(hero_pain_ticks == 0) {
+                adjust_hero_anim()
             }
         }
 
@@ -2065,7 +2090,7 @@ function show_stats(show_hero_stats: boolean, show_enemy_stats: boolean, winning
     if(show_hero_stats) {
         panel.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
     }
-    const button_prompt = sprites.create(assets.image`hero`, SpriteKind.NonInteractive)    
+    const button_prompt = sprites.create(assets.image`hero-pain`, SpriteKind.NonInteractive)    
     animation.runImageAnimation(button_prompt, assets.animation`a-prompt`, 500, true)
     button_prompt.x = scene.screenWidth() - 20
     button_prompt.y = scene.screenHeight() - 18
