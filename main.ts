@@ -20,7 +20,7 @@ namespace StatusBarKind {
 /*
 TESTING
 */
-const DEBUG_MODE = false
+let debug_mode = false
 const DEBUG_START_LEVEL = 16
 const DEBUG_START_PHASE = 18
 
@@ -400,9 +400,24 @@ const menu_image = assets.image`castle-background`.clone()
 let hero_foreground: Sprite = null
 let title_text: Sprite = null
 
-function start_main_menu() {
+function setup_menu(menu: miniMenu.MenuSprite, rows: number) {
+    menu.z = Z_UI
+    menu.setFrame(assets.image`dialog-frame`)
+    const menu_height = 16 + 12 * rows
+    menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, menu_height)
+    menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, menu.width + 12)
+    menu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
+    menu.setStyleProperty(miniMenu.StyleKind.DefaultAndSelected, miniMenu.StyleProperty.Alignment, miniMenu.Alignment.Center)
+    menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
+    menu.left = (scene.screenWidth() - menu.width) / 2
+    menu.bottom = scene.screenHeight() - 10
+}
 
-    if(main_menu) {
+function start_main_menu() {
+    seen_intro = settings.readNumber("seen_intro") == 1
+    completed_game = settings.readNumber("completed_game") == 1
+
+    if (main_menu) {
         main_menu.close()
         title_text.destroy()
         hero_foreground.destroy()
@@ -422,37 +437,29 @@ function start_main_menu() {
     hero_foreground.vy = -16
     hero_foreground.fy = 16
     game.setDialogFrame(assets.image`dialog-frame`)
+    const main_menu_items = [
+        miniMenu.createMenuItem("START   "),
+    ]
+
     if (completed_game) {
-        main_menu = miniMenu.createMenu(
-            miniMenu.createMenuItem("START   "),
-            miniMenu.createMenuItem("HYPER MODE   "),
-            miniMenu.createMenuItem("THE STORY   "),
-            miniMenu.createMenuItem("HOW TO PLAY   ")
-        )
+        main_menu_items.insertAt(1, miniMenu.createMenuItem("HYPER MODE   "))
     } else {
-        main_menu = miniMenu.createMenu(
-            miniMenu.createMenuItem("START   "),
-            miniMenu.createMenuItem("THE STORY   "),
-            miniMenu.createMenuItem("HOW TO PLAY   ")
-        )
+        main_menu_items.insertAt(1, miniMenu.createMenuItem("THE STORY   "))
+        main_menu_items.insertAt(2, miniMenu.createMenuItem("HOW TO PLAY   "))
     }
-    main_menu.z = Z_UI
-    main_menu.setFrame(assets.image`dialog-frame`)
-    const menu_height = 16 + 12 * 3
-    main_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, menu_height)
-    main_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, main_menu.width + 12)
-    main_menu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
-    main_menu.setStyleProperty(miniMenu.StyleKind.DefaultAndSelected, miniMenu.StyleProperty.Alignment, miniMenu.Alignment.Center)
-    main_menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
-    main_menu.left = (scene.screenWidth() - main_menu.width) / 2
-    main_menu.bottom = scene.screenHeight() - 10
+
+    if (info.highScore() > 0) {
+        main_menu_items.push(miniMenu.createMenuItem(`HI SCORE ${info.highScore()}   `))
+    }
+    main_menu = miniMenu.createMenuFromArray(main_menu_items)
+    setup_menu(main_menu, 3)
 
     main_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
         main_menu.close()
         title_text.destroy()
         hero_foreground.destroy()
         main_menu = null
-        switch(selection) {
+        switch (selection) {
             case "HYPER MODE   ":
                 hyper_mode = true
                 enemy_spawn_tick.rate = HYPER_WAVE_TICKS
@@ -466,7 +473,7 @@ function start_main_menu() {
                 }
                 scene.setBackgroundColor(12)
                 setup_game()
-                if(!DEBUG_MODE) {
+                if (!debug_mode) {
                     choose_upgrade("STARTING WEAPON", HERO_STARTING_CHOICES)
                 }
                 break
@@ -479,6 +486,28 @@ function start_main_menu() {
                 show_instructions()
                 start_main_menu()
                 break
+            default:
+                menu_image.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
+                menu_image.drawTransparentImage(assets.image`title-text`, 0, 0)
+                const reset_menu = miniMenu.createMenu(
+                    miniMenu.createMenuItem("YES"),
+                    miniMenu.createMenuItem("NO")
+                )
+                reset_menu.title = miniMenu.createMenuItem("RESET RECORDS?")
+                setup_menu(reset_menu, 2)
+                reset_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, 120)
+                reset_menu.left = (scene.screenWidth() - reset_menu.width) / 2
+                reset_menu.columns = 2
+                reset_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
+                    reset_menu.close()
+                    reset_menu.destroy()
+                    if (selection == "YES") {
+                        settings.remove("high-score")
+                        settings.writeNumber("seen_intro", 0)
+                        settings.writeNumber("completed_game", 0)
+                    }
+                    start_main_menu()
+                })
         }
     })
 }
@@ -548,7 +577,7 @@ function choose_upgrade(title: string, choices: number) {
             unpause_the_game()
         })
     } else {
-        if(!DEBUG_MODE) {
+        if(!debug_mode) {
             game.showLongText(
                 "You reached\n" +
                 "level " + hero_level + "!\n" +
@@ -947,7 +976,7 @@ function hero_level_up(status: StatusBarSprite) {
     status.value = 0
     status.max = Math.floor(status.max + hero_xp_increment)
     hero_level += 1
-    if (custom.game_state_is(GameState.setup) && DEBUG_MODE) {
+    if (custom.game_state_is(GameState.setup) && debug_mode) {
         get_random_upgrade(true, "")
     } else {
         choose_upgrade("YOU REACHED LV. " + hero_level + "!", HERO_UPGRADE_CHOICES)
@@ -1388,7 +1417,7 @@ function setup_game () {
     setup_upgrade_menu()
     enemy_phase = 0
 
-    if(DEBUG_MODE) {
+    if(debug_mode) {
         enemy_phase = DEBUG_START_PHASE
         cat_out_of_chest = true
         for(let i=1; i<DEBUG_START_LEVEL; i++) {
@@ -1806,14 +1835,11 @@ game.onUpdate(function () {
             if (custom.game_state_is(GameState.setup)) {
                 press_b++
                 if (press_b >= 10) {
-                    settings.remove("high-score")
-                    settings.writeNumber("seen_intro", 0)
-                    settings.writeNumber("completed_game", 0)
-                    start_main_menu()
+                    debug_mode = true
                     press_b = 0
                 }
             } else if (custom.game_state_is(GameState.normal)) {
-                show_stats(DEBUG_MODE, DEBUG_MODE || enemy_extra_difficulty > 0, false, false)
+                show_stats(debug_mode, debug_mode || enemy_extra_difficulty > 0, false, false)
             }
         }
     } else {
