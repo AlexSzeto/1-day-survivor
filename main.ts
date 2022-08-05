@@ -550,7 +550,7 @@ function get_random_upgrade (include_basic_items:boolean, message: string) {
         }
     } else {
         game.showLongText("You found gold coins!", DialogLayout.Bottom)
-        info.changeScoreBy(100)
+        info.changeScoreBy(20)
     }
 }
 
@@ -600,7 +600,7 @@ function add_build(name: string, color: number, prerequsites: string[] = null, s
 }
 
 function setup_upgrade_menu() {
-    custom.add_upgrade_to_list("CROSS", assets.image`icon-cross`, "throw 2 crosses", "WEAPON")
+    custom.add_upgrade_to_list("CROSS", assets.image`icon-cross`, "throw crosses", "WEAPON")
     spray_spawn_count = 0
     spray_speed = 100
     spray_spawn_tick.rate = 6
@@ -694,9 +694,9 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("POWER CRYSTAL 3", assets.image`icon-crystal`, "+weapon knockback, -25 max HP", "POWER CRYSTAL 2")
     // cross, spark, spellbook
 
-    custom.add_upgrade_to_list("AURA RING", assets.image`icon-ring`, "x1.2 all radius", "ACCESSORY")
+    custom.add_upgrade_to_list("AURA RING", assets.image`icon-ring`, "x1.1 all radius", "ACCESSORY")
     custom.add_upgrade_to_list("AURA RING 2", assets.image`icon-ring`, "x1.2 all radius", "AURA RING")
-    custom.add_upgrade_to_list("AURA RING 3", assets.image`icon-ring`, "x2 radius damage, -25 max HP", "AURA RING 2")
+    custom.add_upgrade_to_list("AURA RING 3", assets.image`icon-ring`, "x1.3 radius damage, -25 max HP", "AURA RING 2")
     // holy water, fireball, divine aura
 
     custom.add_upgrade_to_list("BLESSED CUP", assets.image`icon-cup`, "+2 HP per second", "ACCESSORY")
@@ -749,6 +749,7 @@ function perform_upgrade(name: string) {
             exploder_spawn_tick.rate *= 0.9
             orbit_spawn_tick.rate *= 0.9
             molotov_spawn_tick.rate *= 0.9
+            molotov_flame_duration *= 0.9
             break
         case "MAGIC FLASK 2":
             spray_spawn_tick.rate *= 0.8
@@ -756,9 +757,13 @@ function perform_upgrade(name: string) {
             exploder_spawn_tick.rate *= 0.8
             orbit_spawn_tick.rate *= 0.8
             molotov_spawn_tick.rate *= 0.8
+            molotov_flame_duration *= 0.8
+            exploder_duration *= 1.2
+            molotov_duration_max *= 1.2
             break
         case "MAGIC FLASK 3":
             bonus_magic_spawn = 1
+            exploder_explosion_damage *= 0.5
             hero_health.max -= 25
             break
 
@@ -786,9 +791,9 @@ function perform_upgrade(name: string) {
             break
 
         case "AURA RING":
-            exploder_explosion_scale *= 1.2
-            aura_scale *= 1.2
-            molotov_flame_scale *= 1.2
+            exploder_explosion_scale *= 1.1
+            aura_scale *= 1.1
+            molotov_flame_scale *= 1.1
             break
         case "AURA RING 2":
             exploder_explosion_scale *= 1.2
@@ -796,9 +801,9 @@ function perform_upgrade(name: string) {
             molotov_flame_scale *= 1.2
             break
         case "AURA RING 3":
-            exploder_explosion_damage *= 2
-            aura_tick_damage *= 2
-            molotov_damage *= 2
+            exploder_explosion_damage *= 1.3
+            aura_tick_damage *= 1.3
+            molotov_damage *= 1.3
             hero_health.max -= 25
             break
 
@@ -1344,7 +1349,7 @@ function hero_enemy_overlap(hero_sprite: Sprite, enemy: Sprite) {
 PICKUP EVENTS
 */
 
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, otherSprite) {
+function pick_up_treasure(treasure: Sprite) {
     if(custom.game_state_is(GameState.normal)) {
         if (cat_inside_chest && !cat_out_of_chest) {
             cat_out_of_chest = true
@@ -1365,13 +1370,13 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, othe
             cat.z = Z_NPC
             cat.setFlag(SpriteFlag.Ghost, true)
             cat.follow(hero, hero_speed - 10)
-            custom.move_sprite_on_top_of_another(cat, otherSprite)
+            custom.move_sprite_on_top_of_another(cat, treasure)
         } else {
             get_random_upgrade(false, "You found treasure!")
         }
     }
-    otherSprite.destroy()
-})
+    treasure.destroy()
+}
 
 scene.onOverlapTile(SpriteKind.Player, assets.tile`door-open-mid`, () => {
     game.splash("VICTORY", "You have lifted the curse!")
@@ -1492,7 +1497,7 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
         enemy.fx = ENEMY_KNOCKBACK_FRICTION
         enemy.fy = ENEMY_KNOCKBACK_FRICTION
 
-        const stun_amount = Math.randomRange(0, 3)
+        const stun_amount = 2
         if(stun_amount > 0) {
             sprites.setDataNumber(enemy, "stun", stun_amount)
             enemy.follow(null)
@@ -1606,7 +1611,7 @@ sprites.onDestroyed(SpriteKind.Explosive, function (sprite) {
     explosion.lifespan = 500
     sprites.setDataNumber(explosion, "damage", exploder_explosion_damage)
     sprites.setDataString(explosion, "name", "FIREBALL")
-    damage_enemies_in_aura(explosion, weapon_knockback * 2)
+    damage_enemies_in_aura(explosion, weapon_knockback)
 })
 
 /*
@@ -1887,6 +1892,11 @@ game.onUpdate(function () {
             }
         }
 
+        for (let pickup of sprites.allOfKind(SpriteKind.Treasure)) {
+            if (custom.box_collision(hero, pickup)) {
+                pick_up_treasure(pickup)
+            }
+        }
         const pl = hero.x - hero.width / 2 * 0.8
         const pr = hero.x + hero.width / 2 * 0.8
         const pt = hero.y - hero.width / 2 * 0.8
