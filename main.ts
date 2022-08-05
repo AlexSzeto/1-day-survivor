@@ -375,6 +375,7 @@ let upgrade_menu: miniMenu.MenuSprite = null
 let upgrade_ui: Image = image.create((assets.image`icon-spark`.width + 2) * MAX_UPGRADES, assets.image`icon-spark`.height)
 let upgrade_ui_sprite: Sprite = null
 
+let cat: Sprite = null
 let cat_inside_chest = false
 let cat_out_of_chest = false
 let cat_mercy_phases = 2
@@ -1328,10 +1329,10 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, othe
             tiles.setTileAt(tiles.getTilesByType(assets.tile`door-closed-mid`)[0], assets.tile`door-open-mid`)
             tiles.setWallAt(tiles.getTilesByType(assets.tile`door-closed-right`)[0], false)
             tiles.setTileAt(tiles.getTilesByType(assets.tile`door-closed-right`)[0], assets.tile`door-open-right`)
-            let cat = sprites.create(assets.image`black-cat`, SpriteKind.NonInteractive)
+            cat = sprites.create(assets.image`black-cat`, SpriteKind.NonInteractive)
             cat.z = Z_NPC
             cat.setFlag(SpriteFlag.Ghost, true)
-            cat.follow(hero, hero_speed - 15)
+            cat.follow(hero, hero_speed - 10)
             custom.move_sprite_on_top_of_another(cat, otherSprite)
         } else {
             get_random_upgrade(false, "You found treasure!")
@@ -1760,6 +1761,14 @@ game.onUpdateInterval(100, () => {
             hero_dodge_ticks--
             if(hero_dodge_ticks == 0) {
                 adjust_hero_speed()
+            }
+        }
+
+        if (cat != null) {
+            if (custom.get_distance_between(cat, hero) < 30) {
+                cat.follow(hero, 0)
+            } else {
+                cat.follow(hero, hero_speed - 20)
             }
         }
     }
