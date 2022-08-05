@@ -41,7 +41,7 @@ BALANCE CONSTANTS
 const ENEMY_DAMAGE_HYPER_BASE = 2.00
 const ENEMY_HEALTH_HYPER_BASE = 1.00
 const ENEMY_SPEED_HYPER_BASE = 1.20
-const ENEMY_TURN_HYPER_BASE = 2.00
+const ENEMY_TURN_HYPER_BASE = 1.20
 
 const ENEMY_DAMAGE_BONUS_BASE = 1.50
 const ENEMY_HEALTH_BONUS_BASE = 2.00
@@ -51,7 +51,7 @@ const ENEMY_TURN_BONUS_BASE = 1.00
 const ENEMY_DAMAGE_SCALE = 0.10
 const ENEMY_HEALTH_SCALE = 0.05
 const ENEMY_SPEED_SCALE = 0.10
-const ENEMY_TURN_SCALE = 0.20
+const ENEMY_TURN_SCALE = 0.15
 
 const ENEMY_MAX_SPEED = 70
 const ENEMY_MAX_DAMAGE = 75
@@ -677,13 +677,13 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("LIFE SHIELD 2", assets.image`icon-shield`, "+100 max HP", "LIFE SHIELD")
     custom.add_upgrade_to_list("LIFE SHIELD 3", assets.image`icon-shield`, "+4 HP per second", "LIFE SHIELD 2")
 
-    custom.add_upgrade_to_list("GEM PRISM", assets.image`icon-prism`, "x1.5 pickup range", "ACCESSORY")
-    custom.add_upgrade_to_list("GEM PRISM 2", assets.image`icon-prism`, "absorb gems every 10s", "GEM PRISM")
+    custom.add_upgrade_to_list("GEM PRISM", assets.image`icon-prism`, "absorb gems every 10s", "ACCESSORY")
+    custom.add_upgrade_to_list("GEM PRISM 2", assets.image`icon-prism`, "some gems auto pickup", "GEM PRISM")
     custom.add_upgrade_to_list("GEM PRISM 3", assets.image`icon-prism`, "+1 XP per gem", "GEM PRISM 2")
 
     custom.add_upgrade_to_list("FAIRY FEATHER", assets.image`icon-wing`, "x2 potion drops", "ACCESSORY")
     custom.add_upgrade_to_list("FAIRY FEATHER 2", assets.image`icon-wing`, "x1.25 move and dodge", "FAIRY FEATHER")
-    custom.add_upgrade_to_list("FAIRY FEATHER 3", assets.image`icon-wing`, "+30 HP on dodge", "FAIRY FEATHER 2")
+    custom.add_upgrade_to_list("FAIRY FEATHER 3", assets.image`icon-wing`, "x1.5 dodge", "FAIRY FEATHER 2")
 
     custom.add_upgrade_to_list("MAGIC FLASK", assets.image`icon-flask`, "x1.1 all attack speed", "ACCESSORY")
     custom.add_upgrade_to_list("MAGIC FLASK 2", assets.image`icon-flask`, "x1.2 all attack speed", "MAGIC FLASK")
@@ -701,7 +701,7 @@ function setup_upgrade_menu() {
     // holy water, fireball, divine aura
 
     custom.add_upgrade_to_list("BLESSED CUP", assets.image`icon-cup`, "+2 HP per second", "ACCESSORY")
-    custom.add_upgrade_to_list("BLESSED CUP 2", assets.image`icon-cup`, "x1.1 holy damage", "BLESSED CUP")
+    custom.add_upgrade_to_list("BLESSED CUP 2", assets.image`icon-cup`, "x1.1 holy damage, +50 max HP ", "BLESSED CUP")
     custom.add_upgrade_to_list("BLESSED CUP 3", assets.image`icon-cup`, "+holy powers ups", "BLESSED CUP 2")
     // holy water, cross, divine aura
 
@@ -809,11 +809,11 @@ function perform_upgrade(name: string) {
             break
 
         case "GEM PRISM":
-            hero_gem_collect_radius *= 1.5
-            break
-        case "GEM PRISM 2":
             start_auto_collect()
             hero_auto_collect_tick.rate = 10 * 4
+            break
+        case "GEM PRISM 2":
+            hero_auto_collect_chance = 33
             break
         case "GEM PRISM 3":
             gem_bonus_xp += 1
@@ -829,7 +829,7 @@ function perform_upgrade(name: string) {
             adjust_hero_speed()
             break
         case "FAIRY FEATHER 3":
-            hero_dodge_heal = 30
+            hero_dodge += 50
             break
 
         case "BLESSED CUP":
@@ -839,6 +839,7 @@ function perform_upgrade(name: string) {
             molotov_tick_damage *= 1.1
             aura_tick_damage *= 1.1
             spray_damage *= 1.1
+            hero_health.max += 50
             break
         case "BLESSED CUP 3":
             molotov_duration_max *= 0.5
@@ -1039,6 +1040,7 @@ function adjust_hero_anim() {
 /*
 ENEMY SPAWNING
 */
+const bonus_enemy_pool: string[] = []
 // CONTAINS GAME DESIGN
 function setup_enemy_phase() {
     switch(enemy_phase) {
@@ -1148,7 +1150,7 @@ function setup_enemy_phase() {
                     custom.add_wave_data("TOUGH SLIME", 6)
                 } else if (cat_mercy_phases > 0) {
                     cat_mercy_phases--
-                    custom.add_priority_random_enemy_to_wave(["KNIGHT", "MUMMY", "SLIME", "TOUGH SLIME", "GHOST"])
+                    custom.add_priority_random_enemy_to_wave(["MUMMY", "SLIME"])
                 } else {
                     if (enemy_extra_difficulty == 0) {
                         custom.reset_wave_data()
@@ -1164,11 +1166,26 @@ function setup_enemy_phase() {
                         tweak_enemy(existing_enemy)
                     }
 
-                    if (enemy_extra_difficulty <= 4) {
-                        custom.add_priority_random_enemy_to_wave(["MUMMY", "GHOST", "SLIME", "TOUGH SLIME"])
-                    } else {
-                        custom.add_priority_random_enemy_to_wave(["TOUGH SLIME", "LAVA ZOMBIE", "MEAN SPIRIT", "CAPTAIN"])
+                    switch(enemy_extra_difficulty) {
+                        case 1:
+                            bonus_enemy_pool.push("KNIGHT")
+                            bonus_enemy_pool.push("GHOST")
+                            break
+                        case 2:
+                            bonus_enemy_pool.push("MUMMY")
+                            bonus_enemy_pool.push("SLIME")
+                            break
+                        case 3:
+                            bonus_enemy_pool.push("TOUGH SLIME")
+                            bonus_enemy_pool.push("LAVA ZOMBIE")
+                            break
+                        case 4:
+                            bonus_enemy_pool.push("MEAN SPIRIT")
+                            bonus_enemy_pool.push("CAPTAIN")
+                            break
                     }
+                    custom.add_priority_random_enemy_to_wave(bonus_enemy_pool)
+                    custom.add_priority_random_enemy_to_wave(bonus_enemy_pool)
 
                     if(enemy_phase % 2 == 0) {                        
                         const dice_roll_boss = Math.pickRandom([
@@ -1248,13 +1265,13 @@ function spawn_enemy(name: string) {
 
         // TIER 3 (expected player damage = 90-180)
         case "LAVA ZOMBIE":
-            new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name, 90, 20, 30, 2)
+            new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name, 80, 20, 30, 2)
             break
         case "CAPTAIN":
-            new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 240, 30, 24, 2)
+            new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 180, 30, 24, 2)
             break
         case "MEAN SPIRIT":
-            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 70, 25, 40, 2, false)
+            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 60, 25, 40, 2, false)
             break
 
         // END GAME (expected player damage = 180-270)
