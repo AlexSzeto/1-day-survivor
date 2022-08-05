@@ -17,18 +17,12 @@ namespace StatusBarKind {
     export const Experience = StatusBarKind.create()
 }
 
-enum SpeedSetupType {
-    Pause,
-    Unpause,
-    Init
-}
-
 /*
 TESTING
 */
-let DEBUG_MODE = false
-let DEBUG_START_LEVEL = 16
-let DEBUG_START_PHASE = 18
+const DEBUG_MODE = false
+const DEBUG_START_LEVEL = 16
+const DEBUG_START_PHASE = 18
 
 const CHEAT_MODE = false
 
@@ -44,40 +38,39 @@ const GEM_FLY_SPEED = 100
 /*
 BALANCE CONSTANTS
 */
-const ENEMY_DAMAGE_BONUS_BASE = 1.50
+const ENEMY_DAMAGE_HYPER_BASE = 2.00
+const ENEMY_HEALTH_HYPER_BASE = 1.00
+const ENEMY_SPEED_HYPER_BASE = 1.20
+const ENEMY_TURN_HYPER_BASE = 1.00
+
+const ENEMY_DAMAGE_BONUS_BASE = 2.00
 const ENEMY_HEALTH_BONUS_BASE = 1.50
 const ENEMY_SPEED_BONUS_BASE = 1.00
 const ENEMY_TURN_BONUS_BASE = 1.00
 
 const ENEMY_DAMAGE_SCALE = 0.10
-const ENEMY_HEALTH_SCALE = 0.06
-const ENEMY_SPEED_SCALE = 0.05
-const ENEMY_TURN_SCALE = 0.05
+const ENEMY_HEALTH_SCALE = 0.05
+const ENEMY_SPEED_SCALE = 0.10
+const ENEMY_TURN_SCALE = 0.20
 
-const ENEMY_MAX_SPEED = 60
-const ENEMY_MAX_DAMAGE = 60
+const ENEMY_MAX_SPEED = 70
+const ENEMY_MAX_DAMAGE = 75
 
 const ENEMY_TURN_RATE = 100
 const SPRAY_ANGLE_DELTA = 120 / 5
 
 const HERO_UPGRADE_CHOICES = 3
 const HERO_STARTING_CHOICES = 3
-const HERO_FIRST_LEVEL_UP_XP = 10
-const HERO_LEVEL_UP_SCALING = 6
+const HERO_LEVEL_UP_SCALING = 8
 
 const ENEMY_KNOCKBACK_FRICTION = 15
 const WEAPON_KNOCKBACK_VELOCITY = 30
 
-
-const ENEMY_DAMAGE_HYPER_BASE = 1.50
-const ENEMY_HEALTH_HYPER_BASE = 0.90
-const ENEMY_SPEED_HYPER_BASE = 1.20
-const ENEMY_TURN_HYPER_BASE = 2.00
-
 const HYPER_WAVE_TICKS = 4
 const HYPER_PHASE_TICKS = 50
 const HYPER_XP_MULTIPLIER = 1.5
-const HYPER_BOSS_HP_SCALE = 1.0
+const HYPER_BOSS_HP_SCALE = 0.5
+const HYPER_ENEMY_SPEED_SCALE = 1.2
 const HYPER_HERO_SPEED = 100
 
 /*
@@ -86,15 +79,14 @@ GFX CONSTANTS
 const Z_FLAME = 10
 const Z_PICKUP = 11
 const Z_TREASURE_FOOD = 12
-const Z_ENEMY = 13
-const Z_BOSS = 14
-const Z_NPC = 15
-const Z_DODGE_SHADOW = 16
-const Z_PROJECTILE = 17
-const Z_HERO = 18
-const Z_AURA = 19
-const Z_EXPLOSION = 20
-const Z_UI = 21
+const Z_NPC = 13
+const Z_ENEMY = 14
+const Z_DODGE_SHADOW = 15
+const Z_PROJECTILE = 16
+const Z_HERO = 17
+const Z_AURA = 18
+const Z_EXPLOSION = 19
+const Z_UI = 20
 
 const MAX_UPGRADES = 6
 
@@ -175,7 +167,6 @@ let orbit_refresh_rate = 0
 let orbit_duration = 0
 let orbit_distance = 0
 let orbit_angular_speed = 0
-let orbit_expand_speed = 0
 
 let explosive_spawn_count = 0
 let exploder_spawn_tick: TickTracking = start_tick_track(spawn_explosive)
@@ -343,9 +334,8 @@ let wound_tracker: StatTracking[] = make_enemy_stat()
 
 let enemy_attack_cooldown_tick: TickTracking = start_tick_track(reset_enemy_attack_cooldown)
 enemy_attack_cooldown_tick.rate = 3
-let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 8)
+let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 12)
 let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100)
-let enemy_spawn_per_wave = 4
 let enemy_phase = 0
 let enemy_extra_difficulty = 0
 let heal_drop_chance = 5
@@ -354,7 +344,7 @@ let hero: Sprite = null
 let hero_health: StatusBarSprite = null
 let hero_xp: StatusBarSprite = null
 let hero_xp_increment: number = 0
-let hero_speed = 70
+let hero_speed = 80
 let hero_regen = 0
 let hero_regen_tick: TickTracking = start_tick_track(regenerate_hero, 4)
 let hero_auto_collect_tick: TickTracking = null
@@ -384,7 +374,6 @@ let upgrade_menu: miniMenu.MenuSprite = null
 let upgrade_ui: Image = image.create((assets.image`icon-spark`.width + 2) * MAX_UPGRADES, assets.image`icon-spark`.height)
 let upgrade_ui_sprite: Sprite = null
 
-let cat: Sprite = null
 let cat_inside_chest = false
 let cat_out_of_chest = false
 let cat_mercy_phases = 2
@@ -405,19 +394,6 @@ let completed_game: boolean = settings.readNumber("completed_game") == 1
 const menu_image = assets.image`castle-background`.clone()
 let hero_foreground: Sprite = null
 let title_text: Sprite = null
-
-function setup_menu(menu: miniMenu.MenuSprite, rows: number) {
-    menu.z = Z_UI
-    menu.setFrame(assets.image`dialog-frame`)
-    const menu_height = 16 + 12 * rows
-    menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, menu_height)
-    menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, menu.width + 12)
-    menu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
-    menu.setStyleProperty(miniMenu.StyleKind.DefaultAndSelected, miniMenu.StyleProperty.Alignment, miniMenu.Alignment.Center)
-    menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
-    menu.left = (scene.screenWidth() - menu.width) / 2
-    menu.bottom = scene.screenHeight() - 10
-}
 
 function start_main_menu() {
 
@@ -441,20 +417,30 @@ function start_main_menu() {
     hero_foreground.vy = -16
     hero_foreground.fy = 16
     game.setDialogFrame(assets.image`dialog-frame`)
-    const main_menu_items = [
-        miniMenu.createMenuItem("START   "),
-        miniMenu.createMenuItem("THE STORY   "),
-        miniMenu.createMenuItem("HOW TO PLAY   "),
-    ]
-
     if (completed_game) {
-        main_menu_items.insertAt(1, miniMenu.createMenuItem("HYPER MODE   "))
+        main_menu = miniMenu.createMenu(
+            miniMenu.createMenuItem("START   "),
+            miniMenu.createMenuItem("HYPER MODE   "),
+            miniMenu.createMenuItem("THE STORY   "),
+            miniMenu.createMenuItem("HOW TO PLAY   ")
+        )
+    } else {
+        main_menu = miniMenu.createMenu(
+            miniMenu.createMenuItem("START   "),
+            miniMenu.createMenuItem("THE STORY   "),
+            miniMenu.createMenuItem("HOW TO PLAY   ")
+        )
     }
-    if (info.highScore() > 0) {
-        main_menu_items.push(miniMenu.createMenuItem(`HI SCORE ${info.highScore()}   `))
-    }
-    main_menu = miniMenu.createMenuFromArray(main_menu_items)
-    setup_menu(main_menu, 3)
+    main_menu.z = Z_UI
+    main_menu.setFrame(assets.image`dialog-frame`)
+    const menu_height = 16 + 12 * 3
+    main_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Height, menu_height)
+    main_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, main_menu.width + 12)
+    main_menu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Padding, 2)
+    main_menu.setStyleProperty(miniMenu.StyleKind.DefaultAndSelected, miniMenu.StyleProperty.Alignment, miniMenu.Alignment.Center)
+    main_menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
+    main_menu.left = (scene.screenWidth() - main_menu.width) / 2
+    main_menu.bottom = scene.screenHeight() - 10
 
     main_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
         main_menu.close()
@@ -488,28 +474,6 @@ function start_main_menu() {
                 show_instructions()
                 start_main_menu()
                 break
-            default:
-                menu_image.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
-                menu_image.drawTransparentImage(assets.image`title-text`, 0, 0)
-                const reset_menu = miniMenu.createMenu(
-                    miniMenu.createMenuItem("YES"),
-                    miniMenu.createMenuItem("NO")
-                )
-                reset_menu.title = miniMenu.createMenuItem("RESET RECORDS?")
-                setup_menu(reset_menu, 2)
-                reset_menu.setMenuStyleProperty(miniMenu.MenuStyleProperty.Width, 120)
-                reset_menu.left = (scene.screenWidth() - reset_menu.width) / 2
-                reset_menu.columns = 2
-                reset_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
-                    reset_menu.close()
-                    reset_menu.destroy()
-                    if(selection == "YES") {
-                        settings.remove("high-score")
-                        settings.writeNumber("seen_intro", 0)
-                        settings.writeNumber("completed_game", 0)
-                    }
-                    start_main_menu()
-                })
         }
     })
 }
@@ -552,7 +516,7 @@ function get_random_upgrade (include_basic_items:boolean, message: string) {
         }
     } else {
         game.showLongText("You found gold coins!", DialogLayout.Bottom)
-        info.changeScoreBy(20)
+        info.changeScoreBy(100)
     }
 }
 
@@ -602,7 +566,7 @@ function add_build(name: string, color: number, prerequsites: string[] = null, s
 }
 
 function setup_upgrade_menu() {
-    custom.add_upgrade_to_list("CROSS", assets.image`icon-cross`, "throw crosses", "WEAPON", 2)
+    custom.add_upgrade_to_list("CROSS", assets.image`icon-cross`, "throw 2 crosses", "WEAPON")
     spray_spawn_count = 0
     spray_speed = 100
     spray_spawn_tick.rate = 6
@@ -612,7 +576,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("CROSS 4", assets.image`icon-cross`, "+1 cross", "CROSS 3") // 18-72
     custom.add_upgrade_to_list("CROSS 5", assets.image`icon-cross`, "x1.5 damage", "CROSS 4") // 27-108
 
-    custom.add_upgrade_to_list("SPARK", assets.image`icon-spark`, "auto aim missile", "WEAPON", 2)
+    custom.add_upgrade_to_list("SPARK", assets.image`icon-spark`, "auto aim missile", "WEAPON")
     tracer_spawn_count = 0
     tracer_speed = 90
     tracer_spawn_tick.rate = 8
@@ -622,24 +586,23 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("SPARK 4", assets.image`icon-spark`, "x2 damage", "SPARK 3") // 36
     custom.add_upgrade_to_list("SPARK 5", assets.image`icon-spark`, "+1 spark", "SPARK 4") // 36-72
 
-    custom.add_upgrade_to_list("FIREBALL", assets.image`icon-fireball`, "explode on impact", "WEAPON", 2)
+    custom.add_upgrade_to_list("FIREBALL", assets.image`icon-fireball`, "explode on impact", "WEAPON")
     explosive_spawn_count = 0
     exploder_speed = 80
     exploder_duration = 750
     exploder_spawn_tick.rate = 10
     exploder_projectile_damage = 0
-    exploder_explosion_damage = 2 // 20
+    exploder_explosion_damage = 20
     exploder_explosion_scale = 1.0
     custom.add_upgrade_to_list("FIREBALL 2", assets.image`icon-fireball`, "x2 damage", "FIREBALL") // 40 *.6
     custom.add_upgrade_to_list("FIREBALL 3", assets.image`icon-fireball`, "x1.5 radius", "FIREBALL 2") // 40 *.6
     custom.add_upgrade_to_list("FIREBALL 4", assets.image`icon-fireball`, "x1.5 speed", "FIREBALL 3") // 40 *.6
     custom.add_upgrade_to_list("FIREBALL 5", assets.image`icon-fireball`, "x2 damage", "FIREBALL 4") // 80 *.6
 
-    custom.add_upgrade_to_list("SPELLBOOK", assets.image`icon-book`, "circles to protect", "WEAPON", 2)
+    custom.add_upgrade_to_list("SPELLBOOK", assets.image`icon-book`, "circles to protect", "WEAPON")
     orbit_spawn_count = 0
-    orbit_spawn_tick.rate = 18
-    orbit_angular_speed = 160
-    orbit_expand_speed = 120
+    orbit_spawn_tick.rate = 16
+    orbit_angular_speed = 6
     orbit_distance = 30
     orbit_duration = 2400
     orbit_damage = 12 // 12-24
@@ -648,7 +611,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("SPELLBOOK 4", assets.image`icon-book`, "+1 book", "SPELLBOOK 3") // 18-54 *.75
     custom.add_upgrade_to_list("SPELLBOOK 5", assets.image`icon-book`, "x1.5 damage", "SPELLBOOK 4") // 27-81 *.75
 
-    custom.add_upgrade_to_list("DIVINE AURA", assets.image`icon-aura`, "damage ring", "WEAPON", 2)
+    custom.add_upgrade_to_list("DIVINE AURA", assets.image`icon-aura`, "damage ring", "WEAPON")
     aura_spawn_count = 0
     aura_aoe_tick.rate = 2
     aura_tick_damage = 8
@@ -658,7 +621,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("DIVINE AURA 4", assets.image`icon-aura`, "x1.2 radius", "DIVINE AURA 3") // 12 * 3
     custom.add_upgrade_to_list("DIVINE AURA 5", assets.image`icon-aura`, "x2 damage", "DIVINE AURA 4") // 24 * 3
 
-    custom.add_upgrade_to_list("HOLY WATER", assets.image`icon-water`, "toss and burn", "WEAPON", 2)
+    custom.add_upgrade_to_list("HOLY WATER", assets.image`icon-water`, "toss and burn", "WEAPON")
     molotov_spawn_count = 0
     molotov_speed = 85
     molotov_damage = 12
@@ -696,9 +659,9 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("POWER CRYSTAL 3", assets.image`icon-crystal`, "+weapon knockback, -25 max HP", "POWER CRYSTAL 2")
     // cross, spark, spellbook
 
-    custom.add_upgrade_to_list("AURA RING", assets.image`icon-ring`, "x1.1 all radius", "ACCESSORY")
+    custom.add_upgrade_to_list("AURA RING", assets.image`icon-ring`, "x1.2 all radius", "ACCESSORY")
     custom.add_upgrade_to_list("AURA RING 2", assets.image`icon-ring`, "x1.2 all radius", "AURA RING")
-    custom.add_upgrade_to_list("AURA RING 3", assets.image`icon-ring`, "x1.3 radius damage, -25 max HP", "AURA RING 2")
+    custom.add_upgrade_to_list("AURA RING 3", assets.image`icon-ring`, "x2 radius damage, -25 max HP", "AURA RING 2")
     // holy water, fireball, divine aura
 
     custom.add_upgrade_to_list("BLESSED CUP", assets.image`icon-cup`, "+2 HP per second", "ACCESSORY")
@@ -751,7 +714,6 @@ function perform_upgrade(name: string) {
             exploder_spawn_tick.rate *= 0.9
             orbit_spawn_tick.rate *= 0.9
             molotov_spawn_tick.rate *= 0.9
-            molotov_flame_duration *= 0.9
             break
         case "MAGIC FLASK 2":
             spray_spawn_tick.rate *= 0.8
@@ -759,13 +721,9 @@ function perform_upgrade(name: string) {
             exploder_spawn_tick.rate *= 0.8
             orbit_spawn_tick.rate *= 0.8
             molotov_spawn_tick.rate *= 0.8
-            molotov_flame_duration *= 0.8
-            exploder_duration *= 1.2
-            molotov_duration_max *= 1.2
             break
         case "MAGIC FLASK 3":
             bonus_magic_spawn = 1
-            exploder_explosion_damage *= 0.5
             hero_health.max -= 25
             break
 
@@ -793,9 +751,9 @@ function perform_upgrade(name: string) {
             break
 
         case "AURA RING":
-            exploder_explosion_scale *= 1.1
-            aura_scale *= 1.1
-            molotov_flame_scale *= 1.1
+            exploder_explosion_scale *= 1.2
+            aura_scale *= 1.2
+            molotov_flame_scale *= 1.2
             break
         case "AURA RING 2":
             exploder_explosion_scale *= 1.2
@@ -803,9 +761,9 @@ function perform_upgrade(name: string) {
             molotov_flame_scale *= 1.2
             break
         case "AURA RING 3":
-            exploder_explosion_damage *= 1.3
-            aura_tick_damage *= 1.3
-            molotov_damage *= 1.3
+            exploder_explosion_damage *= 2
+            aura_tick_damage *= 2
+            molotov_damage *= 2
             hero_health.max -= 25
             break
 
@@ -1026,139 +984,137 @@ function adjust_hero_speed() {
 ENEMY SPAWNING
 */
 // CONTAINS GAME DESIGN
-function setup_enemy_phase(mock: boolean = false) {
+function setup_enemy_phase() {
     switch(enemy_phase) {
         // TIER 1
         case 0:
             custom.reset_wave_data()
-            custom.add_wave_data("ZOMBIE", 3)
+            custom.add_wave_data("ZOMBIE", 2)
             break
         case 1:
             custom.reset_wave_data()
             custom.add_wave_data("KNIGHT", 1)
-            custom.add_wave_data("ZOMBIE", 3)
+            custom.add_wave_data("ZOMBIE", 2)
             break
         case 2:
-            custom.reset_wave_data()
-            custom.add_wave_data("KNIGHT", 2)
-            custom.add_wave_data("ZOMBIE", 4)
+            custom.add_wave_data("KNIGHT", 1)
+            custom.add_wave_data("ZOMBIE", 2)
             break
         case 3:
             custom.reset_wave_data()
-            custom.add_wave_data("MUMMY", 4)
-            if(!mock) {
-                spawn_enemy("SKELETON MAGE")
-            }
+            custom.add_wave_data("MUMMY", 3)
+            spawn_enemy("SKELETON MAGE")
             break
 
 
         // TIER 2 
         case 5:
             custom.reset_wave_data()
-            custom.add_wave_data("MUMMY", 4)
-            custom.add_wave_data("LAVA ZOMBIE", 2)
+            custom.add_wave_data("KNIGHT", 3)
+            custom.add_wave_data("MUMMY", 2)
+            custom.add_wave_data("GHOST", 1)
             break
         case 6:
             custom.reset_wave_data()
-            custom.add_wave_data("LAVA ZOMBIE", 4)
+            custom.add_wave_data("SLIME", 1)
+            custom.add_wave_data("MUMMY", 3)
             custom.add_wave_data("GHOST", 2)
             break
         case 7:
             custom.reset_wave_data()
-            custom.add_wave_data("SLIME", 2)
-            custom.add_wave_data("LAVA ZOMBIE", 2)
+            custom.add_wave_data("SLIME", 1)
+            custom.add_wave_data("TOUGH SLIME", 1)
+            custom.add_wave_data("MUMMY", 2)
             custom.add_wave_data("GHOST", 2)
             break
         case 8:
             custom.reset_wave_data()
-            custom.add_wave_data("SLIME", 3)
-            custom.add_wave_data("GHOST", 3)
+            custom.add_wave_data("SLIME", 2)
+            custom.add_wave_data("TOUGH SLIME", 1)
+            custom.add_wave_data("SLIME", 2)
+            custom.add_wave_data("GHOST", 1)
             break
         case 9:
             custom.reset_wave_data()
             custom.add_wave_data("SLIME", 4)
-            custom.add_wave_data("GHOST", 1)
-            if(!mock) {
-                spawn_enemy("SLIME KING")
-            }
+            spawn_enemy("SLIME KING")
             break
         
 
         // TIER 3
         case 12:
             custom.reset_wave_data()
-            custom.add_wave_data("SLIME", 4)
-            custom.add_wave_data("TOUGH SLIME", 2)
+            custom.add_wave_data("LAVA ZOMBIE", 2)
+            custom.add_wave_data("ZOMBIE", 2)
+            custom.add_wave_data("GHOST", 1)
+            custom.add_wave_data("LAVA ZOMBIE", 1)
             break
         case 13:
             custom.reset_wave_data()
-            custom.add_wave_data("TOUGH SLIME", 4)
-            custom.add_wave_data("MEAN SPIRIT", 2)
+            custom.add_wave_data("LAVA ZOMBIE", 2)
+            custom.add_wave_data("GHOST", 1)
+            custom.add_wave_data("LAVA ZOMBIE", 2)
+            custom.add_wave_data("MEAN SPIRIT", 1)
             break
         case 14:
             custom.reset_wave_data()
-            custom.add_wave_data("TOUGH SLIME", 4)
-            custom.add_wave_data("MEAN SPIRIT", 1)
+            custom.add_wave_data("LAVA ZOMBIE", 3)
+            custom.add_wave_data("KNIGHT", 1)
             custom.add_wave_data("CAPTAIN", 1)
+            custom.add_wave_data("MEAN SPIRIT", 1)
             break
         case 15:
             custom.reset_wave_data()
-            custom.add_wave_data("TOUGH SLIME", 3)
-            custom.add_wave_data("MEAN SPIRIT", 2)
-            custom.add_wave_data("CAPTAIN", 1)
-            break
-        case 16:
-            custom.reset_wave_data()
-            custom.add_wave_data("MEAN SPIRIT", 3)
             custom.add_wave_data("TOUGH SLIME", 2)
-            custom.add_wave_data("CAPTAIN", 1)
+            custom.add_wave_data("MEAN SPIRIT", 1)
+            custom.add_wave_data("CAPTAIN", 2)
+            custom.add_wave_data("MEAN SPIRIT", 1)
             break
 
+
         // END GAME
+        case 16:
+            custom.reset_wave_data()
+            custom.add_wave_data("TOUGH SLIME", 4)
+            custom.add_wave_data("MEAN SPIRIT", 2)
+            break
         case 17:
             custom.reset_wave_data()
-            custom.add_wave_data("CAPTAIN", 1)
-            custom.add_wave_data("TOUGH SLIME", 2)
-            custom.add_wave_data("MEAN SPIRIT", 2)
-            if(!mock) {
-                spawn_enemy("TROLL")
-                cat_inside_chest = true
-            } else {
-                cat_inside_chest = false
-                cat_out_of_chest = true                
-            }
+            custom.add_wave_data("TOUGH SLIME", 5)
+            spawn_enemy("TROLL")
+            cat_inside_chest = true
             break
 
         default:
             if(enemy_phase >= 18) {
                 if (!cat_out_of_chest) {
-
+                    custom.reset_wave_data()
+                    custom.add_wave_data("TOUGH SLIME", 6)
                 } else if (cat_mercy_phases > 0) {
                     cat_mercy_phases--
-                    custom.add_priority_random_enemy_to_wave(["ZOMBIE", "KNIGHT", "MUMMY", "LAVA ZOMBIE", "SLIME", "GHOST"])
+                    custom.add_priority_random_enemy_to_wave(["KNIGHT", "MUMMY", "SLIME", "TOUGH SLIME", "GHOST"])
                 } else {
                     if (enemy_extra_difficulty == 0) {
                         custom.reset_wave_data()
                         for(let i=0; i<MAX_ENEMIES; i++) {
-                            custom.add_priority_random_enemy_to_wave(["ZOMBIE", "KNIGHT", "MUMMY", "LAVA ZOMBIE", "SLIME"])
+                            custom.add_priority_random_enemy_to_wave(["ZOMBIE", "KNIGHT", "MUMMY", "SLIME", "GHOST"])
                         }
                     }
 
                     enemy_extra_difficulty += 1
+                    game.showLongText(
+                        "A wind chills to the bone...\n" +
+                        "The evil grows stronger!", DialogLayout.Bottom)
                     effects.blizzard.startScreenEffect(1000)
 
                     for (let existing_enemy of sprites.allOfKind(SpriteKind.Enemy)) {
                         tweak_enemy(existing_enemy)
                     }
 
-                    if (enemy_extra_difficulty <= 2) {
-                        custom.add_priority_random_enemy_to_wave(["LAVA ZOMBIE", "SLIME"])
-                    } else if (enemy_extra_difficulty <= 4) {
-                        custom.add_priority_random_enemy_to_wave(["GHOST", "MEAN SPIRIT"])
-                    } else if (enemy_extra_difficulty <= 6) {
-                        custom.add_priority_random_enemy_to_wave(["TOUGH SLIME", "CAPTAIN"])
+                    if (enemy_extra_difficulty <= 4) {
+                        custom.add_priority_random_enemy_to_wave(["MUMMY", "GHOST", "SLIME", "TOUGH SLIME"])
                     } else {
-                        custom.add_priority_random_enemy_to_wave(["TOUGH SLIME", "CAPTAIN", "GHOST", "MEAN SPIRIT"])
+                        custom.add_priority_random_enemy_to_wave(["TOUGH SLIME", "LAVA ZOMBIE", "MEAN SPIRIT", "CAPTAIN"])
                     }
 
                     if(enemy_phase % 2 == 0) {                        
@@ -1167,18 +1123,6 @@ function setup_enemy_phase(mock: boolean = false) {
                             "SLIME KING",
                             "TROLL"
                         ])
-
-                        switch(dice_roll_boss) {
-                            case "SKELETON MAGE":
-                                custom.add_priority_wave_data("MUMMY", 2)
-                                break
-                            case "SLIME KING":
-                                custom.add_priority_wave_data("SLIME", 2)
-                                break
-                            case "TROLL":
-                                custom.add_priority_wave_data("TOUGH SLIME", 2)
-                                break
-                        }
 
                         spawn_enemy(dice_roll_boss)
                     }
@@ -1199,6 +1143,7 @@ function despawn_enemy(destroy_candidate: Sprite) {
 function spawn_enemy(name: string) {
     const enemies: Sprite[] = sprites.allOfKind(SpriteKind.Enemy)
     if (enemies.length >= MAX_ENEMIES) {
+
         if(!(["SKELETON MAGE", "SLIME KING", "TROLL"].indexOf(name) >= 0)) {
             return
         }
@@ -1210,110 +1155,67 @@ function spawn_enemy(name: string) {
 
         // TIER 1 (expected player damage = 12-45)
         case "ZOMBIE":
-            new_enemy = setup_enemy(assets.image`zombie`, zombie_flash, name, 
-            12, 10,
-            25, 100,
-            100, 1)
+            new_enemy = setup_enemy(assets.image`zombie`, zombie_flash, name, 12, 10, 24, 1)
             break
         case "KNIGHT":
-            new_enemy = setup_enemy(assets.image`knight`, knight_flash, name,
-            45, 20,
-            25, 800,
-            100, 1)
+            new_enemy = setup_enemy(assets.image`knight`, knight_flash, name, 40, 15, 32, 1)
             break
         case "MUMMY":
-            new_enemy = setup_enemy(assets.image`mummy`, mummy_flash, name,
-            20, 25,
-            40, 0,
-            0, 1, false)
+            new_enemy = setup_enemy(assets.image`mummy`, mummy_flash, name, 50, 20, 26, 1, false)
             break
 
         // BOSS TAKES ~8 HITS
         case "SKELETON MAGE":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 
-                360, 40,
-                20, 400,
-                100, 3, true, true)
+                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 360, 35, 20, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 
-                900 / ENEMY_HEALTH_BONUS_BASE, 60,
-                50, 0,
-                0, 3, true, true)
+                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1000, 40, 30, 3, true, true)
             }
             break
 
         // TIER 2 (expected player damage = 45-90)
-        case "LAVA ZOMBIE":
-            new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name,
-            60, 35,
-            25, 400,
-            100, 1)
-            break
         case "SLIME":
-            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name,
-            40, 25,
-            35, 100,
-            50, 1, false)
+            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 45, 20, 36, 1)
+            break
+        case "TOUGH SLIME":
+            new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 60, 25, 34, 1)
             break
         case "GHOST":
-            new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name,
-            25, 25,
-            45, 100,
-            90, 1, false)
+            new_enemy = setup_enemy(assets.image`ghost`, ghost_flash, name, 30, 20, 38, 2, false)
             break
 
         // BOSS TAKES ~9 HITS
         case "SLIME KING":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 
-                810, 40,
-                30, 400,
-                100, 3, true, true)
+                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 810, 40, 30, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name,
-                600 / ENEMY_HEALTH_BONUS_BASE, 20,
-                45, 100,
-                100, 3, true, true)
+                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 600, 20, 40, 3, true, true)
             }
             break
 
         // TIER 3 (expected player damage = 90-180)
-        case "TOUGH SLIME":
-            new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name,
-            120, 35,
-            40, 100,
-            25, 1)
+        case "LAVA ZOMBIE":
+            new_enemy = setup_enemy(assets.image`lava-zombie`, lava_zombie_flash, name, 90, 20, 30, 2)
             break
         case "CAPTAIN":
-            new_enemy = setup_enemy(assets.image`captain`, captain_flash, name,
-            360, 40,
-            30, 800,
-            100, 2)
+            new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 240, 30, 24, 2)
             break
         case "MEAN SPIRIT":
-            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name,
-            60, 30,
-            45, 100,
-            90, 2, false)
+            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 70, 25, 40, 2, false)
             break
 
         // END GAME (expected player damage = 180-270)
         // BOSS TAKES ~10 HITS
         case "TROLL":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 
-                1800, 60,
-                25, 1600,
-                100, 3, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1800, 50, 30, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name,
-                1200 / ENEMY_HEALTH_BONUS_BASE, 90,
-                40, 1600,
-                100, 3, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1400, 100, 20, 3, true, true)
             }
             break
     }
+
+    custom.move_sprite_off_camera(new_enemy)
 }
 
 function scale_value(base: number, hyper_base: number, bonus_base: number, bonus_scale: number, use_bonus: Boolean = true, cap: number = 0): number {
@@ -1329,39 +1231,7 @@ function tweak_enemy(enemy: Sprite) {
     sprites.setDataNumber(enemy, "speed", adjusted_speed)
 }
 
-function set_enemy_velocity(enemy: Sprite, setupType: SpeedSetupType) {
-    const speed = sprites.readDataNumber(enemy, "speed")
-    const turn = sprites.readDataNumber(enemy, "turn")
-    
-    if (setupType == SpeedSetupType.Pause || sprites.readDataNumber(enemy, "stun") > 0) {
-        if(enemy.vx != 0 || enemy.vy != 0) {
-            sprites.setDataNumber(enemy, "fvx", enemy.vx)
-            sprites.setDataNumber(enemy, "fvy", enemy.vy)
-        }
-        enemy.follow(null)
-        enemy.vx = 0
-        enemy.vy = 0
-    }
-    else {
-        const follow = sprites.readDataBoolean(enemy, "follow")
-        if (follow) {
-            enemy.follow(hero, speed, turn)
-        }
-
-        if (setupType == SpeedSetupType.Init) {
-            custom.aim_projectile_at_sprite(enemy, hero, AimType.velocity, speed)
-        } else if (setupType == SpeedSetupType.Unpause) {
-            enemy.vx = sprites.readDataNumber(enemy, "fvx")
-            enemy.vy = sprites.readDataNumber(enemy, "fvy")
-        }
-    }
-}
-
-function setup_enemy(main_image: Image, flash_image: Image, name: string, 
-    health: number, damage: number, speed: number, turn: number,
-    follow_chance: number, drop_type: number,
-    multi_hit: boolean = true, boss: boolean = false): Sprite {
-
+function setup_enemy(main_image: Image, flash_image: Image, name: string, health: number, damage: number, speed: number, drop_type: number, multi_hit: boolean = true, boss: boolean = false): Sprite {
     const enemy = sprites.create(main_image, SpriteKind.Enemy)
     sprites.setDataImage(enemy, "main_image", main_image)
     sprites.setDataImage(enemy, "flash_image", flash_image)
@@ -1373,18 +1243,15 @@ function setup_enemy(main_image: Image, flash_image: Image, name: string,
     sprites.setDataNumber(enemy, "drop_type", drop_type)
     const adjusted_speed = scale_value(speed, ENEMY_SPEED_HYPER_BASE, ENEMY_SPEED_BONUS_BASE, ENEMY_SPEED_SCALE, !boss, ENEMY_MAX_SPEED)
     sprites.setDataNumber(enemy, "speed", adjusted_speed)
-    const adjusted_turn = scale_value(turn, ENEMY_TURN_HYPER_BASE, ENEMY_TURN_BONUS_BASE, ENEMY_TURN_SCALE, !boss)
+    const adjusted_turn = scale_value(ENEMY_TURN_RATE, ENEMY_TURN_HYPER_BASE, ENEMY_TURN_BONUS_BASE, ENEMY_TURN_SCALE, !boss)
     sprites.setDataNumber(enemy, "turn", adjusted_turn)
-    sprites.setDataNumber(enemy, "follow_chance", follow_chance)
-    sprites.setDataBoolean(enemy, "follow", Math.percentChance(follow_chance))
-    custom.move_sprite_off_camera(enemy)
-    set_enemy_velocity(enemy, SpeedSetupType.Init)
+    enemy.follow(hero, adjusted_speed, adjusted_turn)
     sprites.setDataBoolean(enemy, "boss", boss)
     sprites.setDataBoolean(enemy, "multi_hit", multi_hit)
     sprites.setDataBoolean(enemy, "attack_cooldown", false)
     sprites.setDataNumber(enemy, "flash", 0)
     sprites.setDataNumber(enemy, "stun", 0)
-    enemy.z = boss ? Z_BOSS : Z_ENEMY
+    enemy.z = Z_ENEMY
     enemy.setFlag(SpriteFlag.GhostThroughWalls, true)
     return enemy
 }
@@ -1442,7 +1309,7 @@ function hero_enemy_overlap(hero_sprite: Sprite, enemy: Sprite) {
 PICKUP EVENTS
 */
 
-function pick_up_treasure(treasure: Sprite) {
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Treasure, function (sprite, otherSprite) {
     if(custom.game_state_is(GameState.normal)) {
         if (cat_inside_chest && !cat_out_of_chest) {
             cat_out_of_chest = true
@@ -1459,17 +1326,17 @@ function pick_up_treasure(treasure: Sprite) {
             tiles.setTileAt(tiles.getTilesByType(assets.tile`door-closed-mid`)[0], assets.tile`door-open-mid`)
             tiles.setWallAt(tiles.getTilesByType(assets.tile`door-closed-right`)[0], false)
             tiles.setTileAt(tiles.getTilesByType(assets.tile`door-closed-right`)[0], assets.tile`door-open-right`)
-            cat = sprites.create(assets.image`black-cat`, SpriteKind.NonInteractive)
+            let cat = sprites.create(assets.image`black-cat`, SpriteKind.NonInteractive)
             cat.z = Z_NPC
             cat.setFlag(SpriteFlag.Ghost, true)
-            cat.follow(hero, hero_speed - 20)
-            custom.move_sprite_on_top_of_another(cat, treasure)
+            cat.follow(hero, hero_speed - 15)
+            custom.move_sprite_on_top_of_another(cat, otherSprite)
         } else {
             get_random_upgrade(false, "You found treasure!")
         }
     }
-    treasure.destroy()
-}
+    otherSprite.destroy()
+})
 
 scene.onOverlapTile(SpriteKind.Player, assets.tile`door-open-mid`, () => {
     game.splash("VICTORY", "You have lifted the curse!")
@@ -1505,7 +1372,7 @@ function setup_game () {
     hero_xp.setLabel("EXP", 12)
     hero_xp.positionDirection(CollisionDirection.Bottom)
     hero_xp.setOffsetPadding(0, 4)
-    hero_xp.max = HERO_FIRST_LEVEL_UP_XP
+    hero_xp.max = 10
     hero_xp_increment = HERO_LEVEL_UP_SCALING
     hero_xp.value = 0
     hero_xp.setColor(9, 15, 15)
@@ -1516,11 +1383,8 @@ function setup_game () {
     enemy_phase = 0
 
     if(DEBUG_MODE) {
-        for (let i = 1; i < DEBUG_START_PHASE; i++) {
-            enemy_phase = i
-            setup_enemy_phase(true)
-        }
         enemy_phase = DEBUG_START_PHASE
+        cat_out_of_chest = true
         for(let i=1; i<DEBUG_START_LEVEL; i++) {
             hero_level_up(hero_xp)
         }
@@ -1535,8 +1399,8 @@ GAME ACTIONS
 */
 
 function unpause_the_game() {
-    for (let enemy of sprites.allOfKind(SpriteKind.Enemy)) {
-        set_enemy_velocity(enemy, SpeedSetupType.Unpause)
+    for (let upgrade_icon of sprites.allOfKind(SpriteKind.Enemy)) {
+        upgrade_icon.follow(hero, sprites.readDataNumber(upgrade_icon, "speed"), ENEMY_TURN_RATE)
     }
     if (aura_spawn_count > 0) {
         aura_weapon.setFlag(SpriteFlag.Invisible, false)
@@ -1547,8 +1411,8 @@ function unpause_the_game() {
 
 function pause_the_game() {
     custom.set_game_state(GameState.menu)
-    for (let enemy of sprites.allOfKind(SpriteKind.Enemy)) {
-        set_enemy_velocity(enemy, SpeedSetupType.Pause)
+    for (let value2 of sprites.allOfKind(SpriteKind.Enemy)) {
+        value2.follow(hero, 0)
     }
     sprites.destroyAllSpritesOfKind(SpriteKind.Orbital)
     sprites.destroyAllSpritesOfKind(SpriteKind.Flame)
@@ -1593,10 +1457,10 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
         enemy.fx = ENEMY_KNOCKBACK_FRICTION
         enemy.fy = ENEMY_KNOCKBACK_FRICTION
 
-        const stun_amount = 3 // Math.randomRange(1, 3)
+        const stun_amount = Math.randomRange(0, 3)
         if(stun_amount > 0) {
             sprites.setDataNumber(enemy, "stun", stun_amount)
-            set_enemy_velocity(enemy, SpeedSetupType.Pause)
+            enemy.follow(null)
         }
     }
 
@@ -1707,7 +1571,7 @@ sprites.onDestroyed(SpriteKind.Explosive, function (sprite) {
     explosion.lifespan = 500
     sprites.setDataNumber(explosion, "damage", exploder_explosion_damage)
     sprites.setDataString(explosion, "name", "FIREBALL")
-    damage_enemies_in_aura(explosion, weapon_knockback)
+    damage_enemies_in_aura(explosion, weapon_knockback * 2)
 })
 
 /*
@@ -1740,7 +1604,7 @@ function aura_aoe() {
     }
 }
 
-function spawn_molotov() {    
+function spawn_molotov() {
     for (let index = 0; index < molotov_spawn_count; index++) {
         let new_weapon = sprites.create(assets.image`weapon-water`, SpriteKind.Molotov)
         new_weapon.z = Z_PROJECTILE
@@ -1801,7 +1665,6 @@ function spawn_orbit() {
             hero
             )
             sprites.setDataString(new_weapon, "name", "SPELLBOOK")
-            sprites.setDataNumber(new_weapon, "dist", 0)
             sprites.setDataNumber(new_weapon, "damage", orbit_damage)
         }
     }
@@ -1849,9 +1712,9 @@ function next_enemy_phase() {
 
 function spawn_enemy_wave() {
     let existing_enemies = sprites.allOfKind(SpriteKind.Enemy).length
-    const spawns = custom.get_next_wave_enemy_names(enemy_spawn_per_wave)
-    for (let next_enemy of spawns) {
-        if (existing_enemies < MAX_ENEMIES) {
+    for(let i=0; i < MAX_ENEMIES; i++) {
+        const next_enemy = custom.get_next_wave_enemy_name()
+        if (next_enemy != null && existing_enemies < MAX_ENEMIES) {
             spawn_enemy(next_enemy)
             existing_enemies++
         }
@@ -1884,7 +1747,7 @@ game.onUpdateInterval(100, () => {
                 if (status == 0) {
                     enemy.fx = 0
                     enemy.fy = 0
-                    set_enemy_velocity(enemy, SpeedSetupType.Unpause)
+                    enemy.follow(hero, sprites.readDataNumber(enemy, "speed"))
                 }
             }
 
@@ -1894,14 +1757,6 @@ game.onUpdateInterval(100, () => {
             hero_dodge_ticks--
             if(hero_dodge_ticks == 0) {
                 adjust_hero_speed()
-            }
-        }
-
-        if(cat != null) {
-            if(custom.get_distance_between(cat, hero) < 30) {
-                cat.follow(hero, 0)
-            } else {
-                cat.follow(hero, hero_speed - 20)
             }
         }
     }
@@ -1926,7 +1781,6 @@ GLOBAL ON FRAME EVENTS
 
 let press_b = 0
 let b_released = true
-let prev_timestamp = game.runtime()
 
 game.onUpdate(function () {
 
@@ -1936,34 +1790,11 @@ game.onUpdate(function () {
             if (custom.game_state_is(GameState.setup)) {
                 press_b++
                 if (press_b >= 10) {
-                    DEBUG_MODE = true
-                    switch(game.askForNumber("START LEVEL?", 1)) {
-                        case 1:
-                            DEBUG_START_PHASE = 3
-                            DEBUG_START_LEVEL = 5
-                            break
-                        case 2:
-                            DEBUG_START_PHASE = 5
-                            DEBUG_START_LEVEL = 6
-                            break
-                        case 3:
-                            DEBUG_START_PHASE = 9
-                            DEBUG_START_LEVEL = 10
-                            break
-                        case 4:
-                            DEBUG_START_PHASE = 12
-                            DEBUG_START_LEVEL = 11
-                            break
-                        case 5:
-                            DEBUG_START_PHASE = 17
-                            DEBUG_START_LEVEL = 15
-                            break
-                        default:
-                            DEBUG_START_PHASE = 18
-                            DEBUG_START_LEVEL = 16
-                            break
-                    }
-
+                    settings.remove("high-score")
+                    settings.writeNumber("seen_intro", 0)
+                    settings.writeNumber("completed_game", 0)
+                    start_main_menu()
+                    press_b = 0
                 }
             } else if (custom.game_state_is(GameState.normal)) {
                 show_stats(DEBUG_MODE, DEBUG_MODE || enemy_extra_difficulty > 0, false, false)
@@ -1973,18 +1804,13 @@ game.onUpdate(function () {
         b_released = true
     }
 
-    const per_second_multiplier = (game.runtime() - prev_timestamp) / 1000
-    prev_timestamp = game.runtime()
-
     for (let moving_orbital of sprites.allOfKind(SpriteKind.Orbital)) {
-        sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed * per_second_multiplier)
-        let distance = Math.min(orbit_distance, sprites.readDataNumber(moving_orbital, "dist") + orbit_expand_speed * per_second_multiplier)
-        sprites.setDataNumber(moving_orbital, "dist", distance)
+        sprites.changeDataNumberBy(moving_orbital, "angle", orbit_angular_speed)
         custom.aim_projectile_at_angle(
             moving_orbital,
             sprites.readDataNumber(moving_orbital, "angle"),
             AimType.position,
-            distance,
+            orbit_distance,
             hero
         )
     }
@@ -2014,20 +1840,20 @@ game.onUpdate(function () {
             }
         }
 
-        for (let pickup of sprites.allOfKind(SpriteKind.Treasure)) {
-            if(custom.box_collision(hero, pickup)) {
-                pick_up_treasure(pickup)
-            }
-        }
-    }
-
-    if (custom.game_state_is(GameState.normal)) {
-        const enemies = sprites.allOfKind(SpriteKind.Enemy)
-
         const pl = hero.x - hero.width / 2 * 0.8
         const pr = hero.x + hero.width / 2 * 0.8
         const pt = hero.y - hero.width / 2 * 0.8
         const pb = hero.y + hero.width / 2 * 0.8
+
+        const enemies = sprites.allOfKind(SpriteKind.Enemy)
+        if(enemies.length > MAX_ENEMIES / 2) {
+            for (let enemy of enemies) {
+                distance = custom.get_distance_between(enemy, hero)
+                if (distance > scene.screenWidth() * 3 / 4) {
+                    custom.move_sprite_off_camera(enemy)
+                }
+            }
+        }
 
         for (let enemy of enemies) {
 
@@ -2063,20 +1889,6 @@ game.onUpdate(function () {
 
             if ((pr >= el && pl <= er) && (pb >= et && pt <= eb)) {
                 hero_enemy_overlap(hero, enemy)
-            }
-        }
-
-        if (custom.game_state_is(GameState.normal)) {
-            const screen_diagonal = Math.sqrt(scene.screenWidth() / 2 * scene.screenWidth() / 2 + scene.screenHeight() / 2 * scene.screenHeight() / 2) + 10
-            const enemies = sprites.allOfKind(SpriteKind.Enemy)
-            for (let enemy of enemies) {
-                let distance = custom.get_distance_between(enemy, hero)
-                if (distance > screen_diagonal) {
-                    despawn_enemy(enemy)
-                    // custom.move_sprite_off_camera(enemy)
-                    // sprites.setDataBoolean(enemy, "follow", Math.percentChance(sprites.readDataNumber(enemy, "follow_chance")))
-                    // set_enemy_velocity(enemy, SpeedSetupType.Init)
-                }
             }
         }
 
