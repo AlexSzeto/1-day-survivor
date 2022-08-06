@@ -46,6 +46,7 @@ const ENEMY_DAMAGE_HYPER_BASE = 1.50
 const ENEMY_HEALTH_HYPER_BASE = 1.00
 const ENEMY_SPEED_HYPER_BASE = 1.20
 const ENEMY_TURN_HYPER_BASE = 1.20
+const HERO_ATTACK_HYPER_BASE = 1.50
 
 const ENEMY_DAMAGE_BONUS_BASE = 1.50
 const ENEMY_HEALTH_BONUS_BASE = 2.00
@@ -68,7 +69,7 @@ const HERO_LEVEL_UP_SCALING = 8
 
 const ENEMY_KNOCKBACK_FRICTION = 15
 const WEAPON_KNOCKBACK_VELOCITY = 30
-const ENEMY_HIT_BOUNCE = 40
+const ENEMY_HIT_BOUNCE = 24
 
 const HYPER_WAVE_TICKS = 4
 const HYPER_PHASE_TICKS = 50
@@ -709,6 +710,16 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("BLESSED CUP 3", assets.image`icon-cup`, "+holy powers ups", "BLESSED CUP 2")
     // holy water, cross, divine aura
 
+    if(hyper_mode) {
+        spray_spawn_tick.rate /= HERO_ATTACK_HYPER_BASE
+        orbit_spawn_tick.rate /= HERO_ATTACK_HYPER_BASE
+        exploder_spawn_tick.rate /= HERO_ATTACK_HYPER_BASE
+        tracer_spawn_tick.rate /= HERO_ATTACK_HYPER_BASE
+        molotov_spawn_tick.rate *= HERO_ATTACK_HYPER_BASE
+        molotov_flame_duration *= HERO_ATTACK_HYPER_BASE
+        aura_tick_damage *= HERO_ATTACK_HYPER_BASE
+    }
+
     add_build("GRAND SORCERESS", 10, ["SPELLBOOK", "SPARK", "FIREBALL", "MAGIC FLASK 3"])
     add_build("SORCERESS", 8, ["SPELLBOOK", "SPARK", "FIREBALL"])
     add_build("CRYSTAL TRICKSTER", 10, ["CROSS", "SPARK", "SPELLBOOK", "POWER CRYSTAL 3"])
@@ -1293,9 +1304,9 @@ function spawn_enemy(name: string) {
         // BOSS TAKES ~10 HITS
         case "TROLL":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1700, 50, 30, 3, TURN_LO, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1700, 50, 30, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1400, 100, 20, 3, TURN_LO, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1400, 100, 20, TURN_LO, 3, true, true)
             }
             break
     }
