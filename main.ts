@@ -46,6 +46,7 @@ const ENEMY_DAMAGE_HYPER_BASE = 1.50
 const ENEMY_HEALTH_HYPER_BASE = 1.00
 const ENEMY_SPEED_HYPER_BASE = 1.20
 const ENEMY_TURN_HYPER_BASE = 1.20
+const HERO_ATTACK_HYPER_BASE = 1.50
 
 const ENEMY_DAMAGE_BONUS_BASE = 1.50
 const ENEMY_HEALTH_BONUS_BASE = 2.00
@@ -708,6 +709,16 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("BLESSED CUP 2", assets.image`icon-cup`, "x1.1 holy damage, +50 max HP ", "BLESSED CUP")
     custom.add_upgrade_to_list("BLESSED CUP 3", assets.image`icon-cup`, "+holy powers ups", "BLESSED CUP 2")
     // holy water, cross, divine aura
+
+    if(hyper_mode) {
+        spray_spawn_tick.rate /= HERO_ATTACK_HYPER_BASE
+        orbit_spawn_tick.rate /= HERO_ATTACK_HYPER_BASE
+        exploder_spawn_tick.rate /= HERO_ATTACK_HYPER_BASE
+        tracer_spawn_tick.rate /= HERO_ATTACK_HYPER_BASE
+        molotov_spawn_tick.rate *= HERO_ATTACK_HYPER_BASE
+        molotov_flame_duration *= HERO_ATTACK_HYPER_BASE
+        aura_tick_damage *= HERO_ATTACK_HYPER_BASE
+    }
 
     add_build("GRAND SORCERESS", 10, ["SPELLBOOK", "SPARK", "FIREBALL", "MAGIC FLASK 3"])
     add_build("SORCERESS", 8, ["SPELLBOOK", "SPARK", "FIREBALL"])
@@ -1548,6 +1559,7 @@ function knockback_enemy(cx: number, cy: number, enemy: Sprite, magnitude: numbe
 
     }
 }
+
 function deal_enemy_damage(cx: number, cy: number, enemy: Sprite, name: string, damage: number, knockback: number) {
     const drops: Sprite[] = sprites.allOfKind(SpriteKind.PickUp)
     let new_drop: Sprite = null
