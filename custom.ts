@@ -473,15 +473,4 @@ namespace custom {
         }
         return null
     }
-
-
-    /**
-     * get a count of spawns from a spawn wave
-     */
-    //% group="Spawn Waves"
-    //% block="count of current enemy wave list"
-    export function get_wave_enemy_count(): number {
-        return spawn_wave.length
-    }
-
 }

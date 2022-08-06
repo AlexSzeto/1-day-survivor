@@ -816,8 +816,7 @@ function perform_upgrade(name: string) {
             hero_gem_collect_radius *= 2
             break
         case "GEM PRISM 2":
-            start_auto_collect()
-            hero_auto_collect_tick.rate = 6 * 4
+            hero_auto_collect_tick = start_tick_track(auto_collect_all_gems, 6 * 4)
             break
         case "GEM PRISM 3":
             hero_auto_collect_chance += 50
@@ -1003,10 +1002,6 @@ statusbars.onZero(StatusBarKind.Health, function (status) {
         game.over(false)
     }
 })
-
-function start_auto_collect() {
-    hero_auto_collect_tick = start_tick_track(auto_collect_all_gems)
-}
 
 function auto_collect_all_gems() {
     for(let gem of sprites.allOfKind(SpriteKind.PickUp)) {
