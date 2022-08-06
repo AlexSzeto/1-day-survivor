@@ -68,6 +68,7 @@ const HERO_LEVEL_UP_SCALING = 8
 
 const ENEMY_KNOCKBACK_FRICTION = 15
 const WEAPON_KNOCKBACK_VELOCITY = 30
+const ENEMY_HIT_BOUNCE = 24
 
 const HYPER_WAVE_TICKS = 4
 const HYPER_PHASE_TICKS = 50
@@ -1380,6 +1381,7 @@ function hero_enemy_overlap(hero_sprite: Sprite, enemy: Sprite) {
             wound_hero(enemy)
             if (sprites.readDataBoolean(enemy, "multi_hit")) {
                 sprites.setDataBoolean(enemy, "attack_cooldown", true)
+                knockback_enemy(hero.x, hero.y, enemy, ENEMY_HIT_BOUNCE)
             } else {
                 enemy.destroy()
             }
@@ -1524,7 +1526,29 @@ function drop_gem(enemy:Sprite, image:Image, xp:number): Sprite {
     return new_drop
 }
 
-function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, damage: number, knockback: number) {
+function knockback_enemy(cx: number, cy: number, enemy: Sprite, magnitude: number) {
+    if (magnitude > 0) {
+        enemy.follow(null)
+        let knockback_scale = magnitude / Math.sqrt((enemy.x - cx) * (enemy.x - cx) + (enemy.y - cy) * (enemy.y - cy))
+        enemy.vx = (enemy.x - cx) * knockback_scale
+        enemy.vy = (enemy.y - cy) * knockback_scale
+        if(enemy.vx == 0 && enemy.vy == 0) {
+            custom.aim_projectile_at_angle(
+                enemy,
+                Math.randomRange(0, 360),
+                AimType.velocity,
+                magnitude
+            )
+        }
+        console.log(enemy.vx + "," + enemy.vy)
+        enemy.fx = ENEMY_KNOCKBACK_FRICTION
+        enemy.fy = ENEMY_KNOCKBACK_FRICTION
+
+        sprites.setDataNumber(enemy, "stun", 250)
+
+    }
+}
+function deal_enemy_damage(cx: number, cy: number, enemy: Sprite, name: string, damage: number, knockback: number) {
     const drops: Sprite[] = sprites.allOfKind(SpriteKind.PickUp)
     let new_drop: Sprite = null
     if (drops.length >= MAX_DROPS) {
@@ -1533,16 +1557,7 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
     sprites.changeDataNumberBy(enemy, "health", -damage)
     damage_tracker.find(value => value.name == name).total += damage
 
-    if(knockback > 0) {
-        sprites.setDataNumber(enemy, "stun", 250)
-        enemy.follow(null)
-
-        let knockback_scale = knockback / Math.sqrt((enemy.x - sx) * (enemy.x - sx) + (enemy.y - sy) * (enemy.y - sy))
-        enemy.vx = (enemy.x - sx) * knockback_scale
-        enemy.vy = (enemy.y - sy) * knockback_scale
-        enemy.fx = ENEMY_KNOCKBACK_FRICTION
-        enemy.fy = ENEMY_KNOCKBACK_FRICTION
-    }
+    knockback_enemy(cx, cy, enemy, knockback)
 
     if (sprites.readDataNumber(enemy, "health") <= 0) {
         kill_tracker.find(tracker => tracker.name == sprites.readDataString(enemy, "name")).total += 1
