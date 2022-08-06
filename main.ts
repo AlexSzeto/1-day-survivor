@@ -24,8 +24,6 @@ let debug_mode = false
 const DEBUG_START_LEVEL = 16
 const DEBUG_START_PHASE = 18
 
-const CHEAT_MODE = false
-
 /*
 PERFORMANCE CONSTANTS
 */
@@ -44,9 +42,9 @@ const TURN_HI = 1600
 
 const ENEMY_DAMAGE_HYPER_BASE = 1.50
 const ENEMY_HEALTH_HYPER_BASE = 1.00
-const ENEMY_SPEED_HYPER_BASE = 1.20
+const ENEMY_SPEED_HYPER_BASE = 1.15
 const ENEMY_TURN_HYPER_BASE = 1.20
-const HERO_ATTACK_HYPER_BASE = 1.50
+const HERO_ATTACK_HYPER_BASE = 1.25
 
 const ENEMY_DAMAGE_BONUS_BASE = 1.50
 const ENEMY_HEALTH_BONUS_BASE = 2.00
@@ -389,11 +387,6 @@ let cat_inside_chest = false
 let cat_out_of_chest = false
 let cat_mercy_phases = 2
 
-if(CHEAT_MODE) {
-    hero_dodge = 100
-    hero_auto_collect_chance = 100
-}
-
 /*
 MAIN MENU
 */
@@ -594,8 +587,6 @@ function choose_upgrade(title: string, choices: number) {
     }
 }
 
-// CONTAINS GAME DESIGN
-
 function add_build(name: string, color: number, prerequsites: string[] = null, strongest_weapon: string = null) {
     hero_builds.push({
         name,
@@ -693,24 +684,20 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("MAGIC FLASK", assets.image`icon-flask`, "x1.1 all attack speed", "ACCESSORY")
     custom.add_upgrade_to_list("MAGIC FLASK 2", assets.image`icon-flask`, "x1.2 all attack speed", "MAGIC FLASK")
     custom.add_upgrade_to_list("MAGIC FLASK 3", assets.image`icon-flask`, "+1 spell weapons, -25 max HP", "MAGIC FLASK 2")
-    // spellbook, spark, fireball
 
     custom.add_upgrade_to_list("POWER CRYSTAL", assets.image`icon-crystal`, "x1.1 all damage", "ACCESSORY")
     custom.add_upgrade_to_list("POWER CRYSTAL 2", assets.image`icon-crystal`, "x1.2 all damage", "POWER CRYSTAL")
     custom.add_upgrade_to_list("POWER CRYSTAL 3", assets.image`icon-crystal`, "+weapon knockback, -25 max HP", "POWER CRYSTAL 2")
-    // cross, spark, spellbook
 
     custom.add_upgrade_to_list("AURA RING", assets.image`icon-ring`, "x1.1 all radius", "ACCESSORY")
     custom.add_upgrade_to_list("AURA RING 2", assets.image`icon-ring`, "x1.2 all radius", "AURA RING")
     custom.add_upgrade_to_list("AURA RING 3", assets.image`icon-ring`, "x1.3 radius damage, -25 max HP", "AURA RING 2")
-    // holy water, fireball, divine aura
 
     custom.add_upgrade_to_list("BLESSED CUP", assets.image`icon-cup`, "+2 HP per second", "ACCESSORY")
     custom.add_upgrade_to_list("BLESSED CUP 2", assets.image`icon-cup`, "x1.1 holy damage, +50 max HP ", "BLESSED CUP")
     custom.add_upgrade_to_list("BLESSED CUP 3", assets.image`icon-cup`, "+holy powers ups", "BLESSED CUP 2")
-    // holy water, cross, divine aura
 
-    if(hyper_mode) {
+    if (hyper_mode) {
         spray_spawn_tick.rate /= HERO_ATTACK_HYPER_BASE
         orbit_spawn_tick.rate /= HERO_ATTACK_HYPER_BASE
         exploder_spawn_tick.rate /= HERO_ATTACK_HYPER_BASE
@@ -746,7 +733,6 @@ function setup_upgrade_menu() {
     add_build("SCHOLAR", 15, [], "SPELLBOOK")
 }
 
-// CONTAINS GAME DESIGN
 function perform_upgrade(name: string) {
     switch(name) {
         case "LIFE SHIELD":
@@ -1052,7 +1038,6 @@ function adjust_hero_anim() {
 ENEMY SPAWNING
 */
 const bonus_enemy_pool: string[] = []
-// CONTAINS GAME DESIGN
 function setup_enemy_phase() {
     switch(enemy_phase) {
         // TIER 1
@@ -1240,7 +1225,6 @@ function spawn_enemy(name: string) {
         }
     }
 
-    // CONTAINS GAME DESIGN
     let new_enemy: Sprite = null
     switch(name) {
 
@@ -1551,12 +1535,10 @@ function knockback_enemy(cx: number, cy: number, enemy: Sprite, magnitude: numbe
                 magnitude
             )
         }
-        console.log(enemy.vx + "," + enemy.vy)
         enemy.fx = ENEMY_KNOCKBACK_FRICTION
         enemy.fy = ENEMY_KNOCKBACK_FRICTION
 
         sprites.setDataNumber(enemy, "stun", 250)
-
     }
 }
 
