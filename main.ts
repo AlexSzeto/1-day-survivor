@@ -358,11 +358,11 @@ let hero_auto_collect_tick: TickTracking = null
 let hero_level = 1
 let hero_angle = 0
 let hero_dodge = 0
-let hero_pain_ticks = 0
+let hero_pain_timer = 0
 let hero_dodge_distance = 8
 let hero_dodge_speed = 150
 let hero_dodge_heal = 0
-let hero_dodge_ticks = 0
+let hero_dodge_timer = 0
 let hero_auto_collect_chance: number = 0
 let hero_gem_collect_radius: number = 26
 let hero_food_heal = 30
@@ -1019,7 +1019,7 @@ function regenerate_hero() {
 }
 
 function adjust_hero_speed() {
-    if(custom.game_state_is(GameState.normal) && hero_dodge_ticks == 0) {
+    if(custom.game_state_is(GameState.normal) && hero_dodge_timer == 0) {
         controller.moveSprite(hero, hero_speed, hero_speed)
     } else {
         controller.moveSprite(hero, 0, 0)
@@ -1027,9 +1027,9 @@ function adjust_hero_speed() {
 }
 
 function adjust_hero_anim() {
-    if(hero_dodge_ticks > 0) {
+    if(hero_dodge_timer > 0) {
         hero.setImage(assets.image`hero-shadow`)
-    } else if (hero_pain_ticks > 0) {
+    } else if (hero_pain_timer > 0) {
         hero.setImage(assets.image`hero-pain`)
     } else {
         animation.runImageAnimation(
@@ -1350,7 +1350,7 @@ function move_hero_to_dodge(target:Sprite) {
     shadow.z = Z_DODGE_SHADOW
     shadow.setFlag(SpriteFlag.Ghost, true)
     shadow.destroy(effects.disintegrate, 600)
-    hero_dodge_ticks = 2
+    hero_dodge_timer = 200
     adjust_hero_speed()
     adjust_hero_anim()
     custom.aim_projectile_at_sprite(hero, target, AimType.velocity, hero_dodge_speed)
@@ -1368,12 +1368,12 @@ function wound_hero(target:Sprite) {
     wound_tracker.find(value => value.name == sprites.readDataString(target, "name")).total += sprites.readDataNumber(target, "damage")
     hero_health.value -= sprites.readDataNumber(target, "damage")
     scene.cameraShake(Math.constrain(Math.floor(sprites.readDataNumber(target, "damage") / hero_health.max * 16), 2, 8), 250)
-    hero_pain_ticks = 3
+    hero_pain_timer = 300
     adjust_hero_anim()
 }
 
 function hero_enemy_overlap(hero_sprite: Sprite, enemy: Sprite) {
-    if (hero_dodge_ticks > 0) {
+    if (hero_dodge_timer > 0) {
         return
     }
 
@@ -1539,17 +1539,14 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
     damage_tracker.find(value => value.name == name).total += damage
 
     if(knockback > 0) {
+        sprites.setDataNumber(enemy, "stun", 250)
+        enemy.follow(null)
+
         let knockback_scale = knockback / Math.sqrt((enemy.x - sx) * (enemy.x - sx) + (enemy.y - sy) * (enemy.y - sy))
         enemy.vx = (enemy.x - sx) * knockback_scale
         enemy.vy = (enemy.y - sy) * knockback_scale
         enemy.fx = ENEMY_KNOCKBACK_FRICTION
         enemy.fy = ENEMY_KNOCKBACK_FRICTION
-
-        const stun_amount = 2
-        if(stun_amount > 0) {
-            sprites.setDataNumber(enemy, "stun", stun_amount)
-            enemy.follow(null)
-        }
     }
 
     if (sprites.readDataNumber(enemy, "health") <= 0) {
@@ -1587,7 +1584,7 @@ function deal_enemy_damage(sx: number, sy: number, enemy: Sprite, name: string, 
         enemy.destroy(effects.disintegrate)
     } else {
         enemy.setImage(sprites.readDataImage(enemy, "flash_image"))
-        sprites.setDataNumber(enemy, "flash", 2)
+        sprites.setDataNumber(enemy, "flash", 200)
     }
 }
 
@@ -1816,44 +1813,13 @@ function reset_enemy_attack_cooldown() {
     }
 }
 
-game.onUpdateInterval(100, () => {
+game.onUpdateInterval(250, () => {
     if(custom.game_state_is(GameState.normal)) {
-        let status = 0
-        for(let enemy of sprites.allOfKind(SpriteKind.Enemy)) {            
-            status = sprites.readDataNumber(enemy, "flash")
-            if(status > 0) {
-                status--
-                sprites.setDataNumber(enemy, "flash", status)
-                if(status == 0) {
-                    enemy.setImage(sprites.readDataImage(enemy, "main_image"))
-                }
-            }
-
-            status = sprites.readDataNumber(enemy, "stun")
-            if (status > 0) {
-                status--
-                sprites.setDataNumber(enemy, "stun", status)
-                if (status == 0) {
-                    enemy.fx = 0
-                    enemy.fy = 0
-                    enemy.follow(hero, sprites.readDataNumber(enemy, "speed"))
-                }
-            }
-
-        }
-
-        if(hero_dodge_ticks > 0) {
-            hero_dodge_ticks--
-            if(hero_dodge_ticks == 0) {
-                adjust_hero_speed()
-                adjust_hero_anim()
-            }
-        }
-
-        if(hero_pain_ticks > 0) {
-            hero_pain_ticks--
-            if(hero_pain_ticks == 0) {
-                adjust_hero_anim()
+        for (let ticker of tick_trackers) {
+            ticker.count++
+            if(ticker.count >= ticker.rate) {
+                ticker.count = 0
+                ticker.event()
             }
         }
 
@@ -1864,18 +1830,7 @@ game.onUpdateInterval(100, () => {
                 cat.follow(hero, hero_speed - 20)
             }
         }
-    }
-})
 
-game.onUpdateInterval(250, () => {
-    if(custom.game_state_is(GameState.normal)) {
-        for (let ticker of tick_trackers) {
-            ticker.count++
-            if(ticker.count >= ticker.rate) {
-                ticker.count = 0
-                ticker.event()
-            }
-        }
     }
 })
 
@@ -1907,7 +1862,8 @@ game.onUpdate(function () {
         b_released = true
     }
 
-    const per_second_multiplier = (game.runtime() - prev_timestamp) / 1000
+    const game_time_elapsed = game.runtime() - prev_timestamp
+    const per_second_multiplier = game_time_elapsed / 1000
     prev_timestamp = game.runtime()
 
     for (let moving_orbital of sprites.allOfKind(SpriteKind.Orbital)) {
@@ -1924,6 +1880,24 @@ game.onUpdate(function () {
     }
 
     if( custom.game_state_is(GameState.normal) ) {
+        
+        if (hero_dodge_timer > 0) {
+            hero_dodge_timer -= game_time_elapsed
+            if (hero_dodge_timer <= 0) {
+                hero_dodge_timer = 0
+                adjust_hero_speed()
+                adjust_hero_anim()
+            }
+        }
+
+        if (hero_pain_timer > 0) {
+            hero_pain_timer -= game_time_elapsed
+            if (hero_pain_timer <= 0) {
+                hero_pain_timer = 0
+                adjust_hero_anim()
+            }
+        }
+
         let distance = 0
         for (let pickup of sprites.allOfKind(SpriteKind.PickUp)) {
             distance = custom.get_distance_between(pickup, hero)
@@ -1970,7 +1944,27 @@ game.onUpdate(function () {
             }
         }
 
+        let status = 0
         for (let enemy of enemies) {
+            status = sprites.readDataNumber(enemy, "flash")
+            if (status > 0) {
+                status = Math.max(status - game_time_elapsed, 0)
+                sprites.setDataNumber(enemy, "flash", status)
+                if (status == 0) {
+                    enemy.setImage(sprites.readDataImage(enemy, "main_image"))
+                }
+            }
+
+            status = sprites.readDataNumber(enemy, "stun")
+            if (status > 0) {
+                status = Math.max(status - game_time_elapsed, 0)
+                sprites.setDataNumber(enemy, "stun", status)
+                if (status == 0) {
+                    enemy.fx = 0
+                    enemy.fy = 0
+                    enemy.follow(hero, sprites.readDataNumber(enemy, "speed"))
+                }
+            }            
 
             let projectiles = sprites.allOfKind(SpriteKind.Projectile)
             for (let projectile of projectiles) {
