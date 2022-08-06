@@ -39,8 +39,8 @@ const GEM_FLY_SPEED = 100
 BALANCE CONSTANTS
 */
 const TURN_LO = 100
-const TURN_HI = 400
-const TURN_VERY_HI = 1600
+const TURN_MED = 400
+const TURN_HI = 1600
 
 const ENEMY_DAMAGE_HYPER_BASE = 1.50
 const ENEMY_HEALTH_HYPER_BASE = 1.00
@@ -820,7 +820,7 @@ function perform_upgrade(name: string) {
             hero_auto_collect_tick.rate = 6 * 4
             break
         case "GEM PRISM 3":
-            hero_auto_collect_chance = 50
+            hero_auto_collect_chance += 50
             break
 
         case "FAIRY FEATHER":
@@ -1253,13 +1253,13 @@ function spawn_enemy(name: string) {
             if (enemy_extra_difficulty <= 0) {
                 new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 360, 35, 20, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1000, 40, 30, TURN_LO, 3, true, true)
+                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1000, 40, 30, TURN_MED, 3, true, true)
             }
             break
 
         // TIER 2 (expected player damage = 45-90)
         case "SLIME":
-            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 36, 20, 36, TURN_LO, 1, false)
+            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 36, 20, 36, TURN_MED, 1, false)
             break
         case "TOUGH SLIME":
             new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 60, 25, 32, TURN_LO, 1)
@@ -1273,7 +1273,7 @@ function spawn_enemy(name: string) {
             if (enemy_extra_difficulty <= 0) {
                 new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 810, 40, 30, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 600, 20, 40, TURN_LO, 3, true, true)
+                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 600, 20, 40, TURN_HI, 3, true, true)
             }
             break
 
@@ -1285,16 +1285,16 @@ function spawn_enemy(name: string) {
             new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 180, 30, 30, TURN_LO, 2)
             break
         case "MEAN SPIRIT":
-            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 54, 5, 50, TURN_LO, 2)
+            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 54, 10, 50, TURN_MED, 2)
             break
 
         // END GAME (expected player damage = 180-270)
         // BOSS TAKES ~10 HITS
         case "TROLL":
             if (enemy_extra_difficulty <= 0) {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1700, 50, 30, 3, TURN_LO, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1700, 50, 30, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1400, 100, 20, 3, TURN_LO, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1400, 100, 20, TURN_LO, 3, true, true)
             }
             break
     }
