@@ -40,24 +40,30 @@ const TURN_LO = 100
 const TURN_MED = 400
 const TURN_HI = 1600
 
-const ENEMY_DAMAGE_HYPER_BASE = 1.50
+const HYPER_WAVE_TICKS = 4
+const HYPER_PHASE_TICKS = 50
+const HYPER_XP_MULTIPLIER = 2
+const HYPER_BOSS_HP_SCALE = 0.5
+const HYPER_HERO_SPEED = 100
+
+const ENEMY_DAMAGE_HYPER_BASE = 1.25
 const ENEMY_HEALTH_HYPER_BASE = 1.00
 const ENEMY_SPEED_HYPER_BASE = 1.15
 const ENEMY_TURN_HYPER_BASE = 1.20
 const HERO_ATTACK_HYPER_BASE = 1.25
 
-const ENEMY_DAMAGE_BONUS_BASE = 1.50
+const ENEMY_DAMAGE_BONUS_BASE = 1.25
 const ENEMY_HEALTH_BONUS_BASE = 2.00
-const ENEMY_SPEED_BONUS_BASE = 1.00
+const ENEMY_SPEED_BONUS_BASE = 1.10
 const ENEMY_TURN_BONUS_BASE = 1.00
 
 const ENEMY_DAMAGE_SCALE = 0.10
 const ENEMY_HEALTH_SCALE = 0.05
 const ENEMY_SPEED_SCALE = 0.10
-const ENEMY_TURN_SCALE = 0.15
+const ENEMY_TURN_SCALE = 0.05
 
 const ENEMY_MAX_SPEED = 70
-const ENEMY_MAX_DAMAGE = 75
+const ENEMY_MAX_DAMAGE = 50
 
 const SPRAY_ANGLE_DELTA = 120 / 5
 
@@ -68,13 +74,6 @@ const HERO_LEVEL_UP_SCALING = 8
 const ENEMY_KNOCKBACK_FRICTION = 15
 const WEAPON_KNOCKBACK_VELOCITY = 30
 const ENEMY_HIT_BOUNCE = 24
-
-const HYPER_WAVE_TICKS = 4
-const HYPER_PHASE_TICKS = 50
-const HYPER_XP_MULTIPLIER = 1.5
-const HYPER_BOSS_HP_SCALE = 0.5
-const HYPER_ENEMY_SPEED_SCALE = 1.2
-const HYPER_HERO_SPEED = 100
 
 /*
 GFX CONSTANTS
@@ -415,7 +414,6 @@ function setup_menu(menu: miniMenu.MenuSprite, rows: number) {
 function start_main_menu() {
     seen_intro = settings.readNumber("seen_intro") == 1
     completed_game = settings.readNumber("completed_game") == 1
-
     if (main_menu) {
         main_menu.close()
         title_text.destroy()
@@ -436,15 +434,19 @@ function start_main_menu() {
     hero_foreground.vy = -16
     hero_foreground.fy = 16
     game.setDialogFrame(assets.image`dialog-frame`)
-    const main_menu_items = [
-        miniMenu.createMenuItem("START   "),
-    ]
+    let main_menu_items = []
 
     if (completed_game) {
-        main_menu_items.insertAt(1, miniMenu.createMenuItem("HYPER MODE   "))
+        main_menu_items = [
+            miniMenu.createMenuItem("NORMAL MODE   "),
+            miniMenu.createMenuItem("HYPER MODE   ")
+        ]
     } else {
-        main_menu_items.insertAt(1, miniMenu.createMenuItem("THE STORY   "))
-        main_menu_items.insertAt(2, miniMenu.createMenuItem("HOW TO PLAY   "))
+        main_menu_items = [
+            miniMenu.createMenuItem("START   "),
+            miniMenu.createMenuItem("THE STORY   "),
+            miniMenu.createMenuItem("HOW TO PLAY   ")
+        ]
     }
 
     if (info.highScore() > 0) {
@@ -464,6 +466,7 @@ function start_main_menu() {
                 enemy_spawn_tick.rate = HYPER_WAVE_TICKS
                 enemy_phase_tick.rate = HYPER_PHASE_TICKS
                 hero_speed = HYPER_HERO_SPEED
+            case "NORMAL MODE   ":
             case "START   ":
                 if (!seen_intro) {
                     menu_image.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
@@ -673,7 +676,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("LIFE SHIELD 2", assets.image`icon-shield`, "+100 max HP", "LIFE SHIELD")
     custom.add_upgrade_to_list("LIFE SHIELD 3", assets.image`icon-shield`, "+4 HP per second", "LIFE SHIELD 2")
 
-    custom.add_upgrade_to_list("GEM PRISM", assets.image`icon-prism`, "+1 XP per gem, x2 absorb radius", "ACCESSORY")
+    custom.add_upgrade_to_list("GEM PRISM", assets.image`icon-prism`, "+1 XP per gem", "ACCESSORY")
     custom.add_upgrade_to_list("GEM PRISM 2", assets.image`icon-prism`, "absorb gems every 6s", "GEM PRISM")
     custom.add_upgrade_to_list("GEM PRISM 3", assets.image`icon-prism`, "auto absorb gem drops", "GEM PRISM 2")
 
@@ -811,7 +814,6 @@ function perform_upgrade(name: string) {
 
         case "GEM PRISM":
             gem_bonus_xp += 1
-            hero_gem_collect_radius *= 2
             break
         case "GEM PRISM 2":
             hero_auto_collect_tick = start_tick_track(auto_collect_all_gems, 6 * 4)
