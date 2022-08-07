@@ -986,6 +986,7 @@ function hero_level_up(status: StatusBarSprite) {
     status.value = 0
     status.max = Math.floor(status.max + hero_xp_increment)
     hero_level += 1
+    hero_xp.setLabel(`LV${hero_level}`, 12)
     if (custom.game_state_is(GameState.setup) && debug_mode) {
         get_random_upgrade(true, "")
     } else {
@@ -1450,7 +1451,7 @@ function setup_game () {
     hero_health.setColor(7, 2)
     hero_health.z = Z_UI
     hero_xp = statusbars.create(scene.screenWidth() - 40, 5, StatusBarKind.Experience)
-    hero_xp.setLabel("EXP", 12)
+    hero_xp.setLabel("LV1", 12)
     hero_xp.positionDirection(CollisionDirection.Bottom)
     hero_xp.setOffsetPadding(0, 4)
     hero_xp.max = 10
