@@ -46,13 +46,13 @@ const HYPER_XP_MULTIPLIER = 2
 const HYPER_BOSS_HP_SCALE = 0.5
 const HYPER_HERO_SPEED = 100
 
-const ENEMY_DAMAGE_HYPER_BASE = 1.25
+const ENEMY_DAMAGE_HYPER_BASE = 1.10
 const ENEMY_HEALTH_HYPER_BASE = 1.00
 const ENEMY_SPEED_HYPER_BASE = 1.15
 const ENEMY_TURN_HYPER_BASE = 1.20
 const HERO_ATTACK_HYPER_BASE = 1.25
 
-const ENEMY_DAMAGE_BONUS_BASE = 1.25
+const ENEMY_DAMAGE_BONUS_BASE = 1.15
 const ENEMY_HEALTH_BONUS_BASE = 2.00
 const ENEMY_SPEED_BONUS_BASE = 1.10
 const ENEMY_TURN_BONUS_BASE = 1.00
@@ -466,6 +466,7 @@ function start_main_menu() {
                 enemy_spawn_tick.rate = HYPER_WAVE_TICKS
                 enemy_phase_tick.rate = HYPER_PHASE_TICKS
                 hero_speed = HYPER_HERO_SPEED
+                hero_gem_collect_radius = 35
             case "NORMAL MODE   ":
             case "START   ":
                 if (!seen_intro) {
@@ -604,7 +605,7 @@ function setup_upgrade_menu() {
     spray_spawn_count = 0
     spray_speed = 100
     spray_spawn_tick.rate = 6
-    spray_damage = 12 // 12-24
+    spray_damage = 14 // 12-24
     custom.add_upgrade_to_list("CROSS 2", assets.image`icon-cross`, "+1 cross", "CROSS") // 12-36
     custom.add_upgrade_to_list("CROSS 3", assets.image`icon-cross`, "x1.5 damage", "CROSS 2") // 18-54
     custom.add_upgrade_to_list("CROSS 4", assets.image`icon-cross`, "+1 cross", "CROSS 3") // 18-72
@@ -635,7 +636,7 @@ function setup_upgrade_menu() {
 
     custom.add_upgrade_to_list("SPELLBOOK", assets.image`icon-book`, "circles to protect", "WEAPON")
     orbit_spawn_count = 0
-    orbit_spawn_tick.rate = 16
+    orbit_spawn_tick.rate = 14
     orbit_angular_speed = 160
     orbit_expand_speed = 120
     orbit_distance = 30
@@ -1992,7 +1993,7 @@ game.onUpdate(function () {
             projectiles = sprites.allOfKind(SpriteKind.Orbital)
             for (let projectile of projectiles) {
                 if (custom.box_collision(enemy, projectile)) {
-                    deal_enemy_damage(hero.x, hero.y, enemy, sprites.readDataString(projectile, "name"), sprites.readDataNumber(projectile, "damage"), weapon_knockback / 2)
+                    deal_enemy_damage(hero.x, hero.y, enemy, sprites.readDataString(projectile, "name"), sprites.readDataNumber(projectile, "damage"), weapon_knockback)
                     projectile.destroy()
                 }
             }
