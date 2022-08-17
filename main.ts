@@ -46,7 +46,7 @@ const HYPER_XP_MULTIPLIER = 2
 const HYPER_BOSS_HP_SCALE = 0.5
 const HYPER_HERO_SPEED = 100
 
-const ENEMY_DAMAGE_HYPER_BASE = 1.10
+const ENEMY_DAMAGE_HYPER_BASE = 1.15
 const ENEMY_HEALTH_HYPER_BASE = 1.00
 const ENEMY_SPEED_HYPER_BASE = 1.15
 const ENEMY_TURN_HYPER_BASE = 1.20
@@ -57,7 +57,7 @@ const ENEMY_HEALTH_BONUS_BASE = 2.00
 const ENEMY_SPEED_BONUS_BASE = 1.10
 const ENEMY_TURN_BONUS_BASE = 1.00
 
-const ENEMY_DAMAGE_SCALE = 0.10
+const ENEMY_DAMAGE_SCALE = 0.05
 const ENEMY_HEALTH_SCALE = 0.05
 const ENEMY_SPEED_SCALE = 0.10
 const ENEMY_TURN_SCALE = 0.05
@@ -466,7 +466,7 @@ function start_main_menu() {
                 enemy_spawn_tick.rate = HYPER_WAVE_TICKS
                 enemy_phase_tick.rate = HYPER_PHASE_TICKS
                 hero_speed = HYPER_HERO_SPEED
-                hero_gem_collect_radius = 35
+                hero_gem_collect_radius = 32
             case "NORMAL MODE   ":
             case "START   ":
                 if (!seen_intro) {
@@ -694,11 +694,11 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("POWER CRYSTAL 3", assets.image`icon-crystal`, "+weapon knockback, -25 max HP", "POWER CRYSTAL 2")
 
     custom.add_upgrade_to_list("AURA RING", assets.image`icon-ring`, "x1.1 all radius", "ACCESSORY")
-    custom.add_upgrade_to_list("AURA RING 2", assets.image`icon-ring`, "x1.2 all radius", "AURA RING")
-    custom.add_upgrade_to_list("AURA RING 3", assets.image`icon-ring`, "x1.3 radius damage, -25 max HP", "AURA RING 2")
+    custom.add_upgrade_to_list("AURA RING 2", assets.image`icon-ring`, "x1.1 all radius", "AURA RING")
+    custom.add_upgrade_to_list("AURA RING 3", assets.image`icon-ring`, "x1.1 all radius", "AURA RING 2")
 
     custom.add_upgrade_to_list("BLESSED CUP", assets.image`icon-cup`, "+2 HP per second", "ACCESSORY")
-    custom.add_upgrade_to_list("BLESSED CUP 2", assets.image`icon-cup`, "x1.1 holy damage, +50 max HP ", "BLESSED CUP")
+    custom.add_upgrade_to_list("BLESSED CUP 2", assets.image`icon-cup`, "x1.1 holy damage", "BLESSED CUP")
     custom.add_upgrade_to_list("BLESSED CUP 3", assets.image`icon-cup`, "+holy powers ups", "BLESSED CUP 2")
 
     if (hyper_mode) {
@@ -802,15 +802,14 @@ function perform_upgrade(name: string) {
             molotov_flame_scale *= 1.1
             break
         case "AURA RING 2":
-            exploder_explosion_scale *= 1.2
-            aura_scale *= 1.2
-            molotov_flame_scale *= 1.2
+            exploder_explosion_scale *= 1.1
+            aura_scale *= 1.1
+            molotov_flame_scale *= 1.1
             break
         case "AURA RING 3":
-            exploder_explosion_damage *= 1.3
-            aura_tick_damage *= 1.3
-            molotov_damage *= 1.3
-            hero_health.max -= 25
+            exploder_explosion_scale *= 1.1
+            aura_scale *= 1.1
+            molotov_flame_scale *= 1.1
             break
 
         case "GEM PRISM":
@@ -843,7 +842,6 @@ function perform_upgrade(name: string) {
             molotov_tick_damage *= 1.1
             aura_tick_damage *= 1.1
             spray_damage *= 1.1
-            hero_health.max += 50
             break
         case "BLESSED CUP 3":
             molotov_duration_max *= 0.5
@@ -1860,7 +1858,9 @@ game.onUpdate(function () {
                 press_b++
                 if (press_b >= 10) {
                     debug_mode = true
+                    settings.writeNumber("completed_game", 1)
                     press_b = 0
+
                 }
             } else if (custom.game_state_is(GameState.normal)) {
                 show_stats(debug_mode, debug_mode || enemy_extra_difficulty > 0, false, false)
@@ -1911,7 +1911,7 @@ game.onUpdate(function () {
             distance = custom.get_distance_between(pickup, hero)
             if (distance < hero.width * 0.75) {
                 hero_xp.value += sprites.readDataNumber(pickup, "xp") + gem_bonus_xp
-                info.changeScoreBy(sprites.readDataNumber(pickup, "xp") + gem_bonus_xp)
+                info.changeScoreBy(sprites.readDataNumber(pickup, "xp"))
                 pickup.destroy()
             } else if (distance < hero_gem_collect_radius) {
                 pickup.follow(hero, GEM_FLY_SPEED, 1600)
