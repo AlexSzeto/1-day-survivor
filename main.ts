@@ -18,13 +18,6 @@ namespace StatusBarKind {
 }
 
 /*
-TESTING
-*/
-let debug_mode = false
-const DEBUG_START_LEVEL = 16
-const DEBUG_START_PHASE = 18
-
-/*
 PERFORMANCE CONSTANTS
 */
 const MAX_DROPS = 8
@@ -40,6 +33,7 @@ const TURN_LO = 100
 const TURN_MED = 400
 const TURN_HI = 1600
 
+const HYPER_STARTING_CHOICES = 6
 const HYPER_WAVE_TICKS = 4
 const HYPER_PHASE_TICKS = 50
 const HYPER_XP_MULTIPLIER = 2
@@ -476,9 +470,7 @@ function start_main_menu() {
                 }
                 scene.setBackgroundColor(12)
                 setup_game()
-                if (!debug_mode) {
-                    choose_upgrade("STARTING WEAPON", HERO_STARTING_CHOICES)
-                }
+                choose_upgrade("STARTING WEAPON", hyper_mode ? HYPER_STARTING_CHOICES : HERO_STARTING_CHOICES)
                 break
             case "THE STORY   ":
                 menu_image.drawTransparentImage(assets.image`hero-foreground`, menu_image.width - assets.image`hero-foreground`.width, 0)
@@ -529,11 +521,6 @@ function show_intro() {
     settings.writeNumber("seen_intro", 1)
 }
 
-controller.left.onEvent(ControllerButtonEvent.Pressed, () => { hero_angle = 180 })
-controller.right.onEvent(ControllerButtonEvent.Pressed, () => { hero_angle = 0 })
-controller.up.onEvent(ControllerButtonEvent.Pressed, () => { hero_angle = 270 })
-controller.down.onEvent(ControllerButtonEvent.Pressed, () => { hero_angle = 90 })
-
 /*
 UPGRADES
 */
@@ -580,14 +567,12 @@ function choose_upgrade(title: string, choices: number) {
             unpause_the_game()
         })
     } else {
-        if(!debug_mode) {
-            game.showLongText(
-                "You reached\n" +
-                "level " + hero_level + "!\n" +
-                "You feel slightly tougher.", DialogLayout.Bottom)
-            hero_health.max += 5
-            hero_health.value += 5
-        }
+        game.showLongText(
+            "You reached\n" +
+            "level " + hero_level + "!\n" +
+            "You feel slightly tougher.", DialogLayout.Bottom)
+        hero_health.max += 5
+        hero_health.value += 5
     }
 }
 
@@ -694,7 +679,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("POWER CRYSTAL 3", assets.image`icon-crystal`, "weapons knockback, weakens body", "POWER CRYSTAL 2")
 
     custom.add_upgrade_to_list("AURA RING", assets.image`icon-ring`, "bigger attacks", "ACCESSORY") // x1.1
-    custom.add_upgrade_to_list("AURA RING 2", assets.image`icon-ring`, "bigger attacks", "AURA RING") // x1.1
+    custom.add_upgrade_to_list("AURA RING 2", assets.image`icon-ring`, "more area damage", "AURA RING") // x1.1
     custom.add_upgrade_to_list("AURA RING 3", assets.image`icon-ring`, "bigger attacks", "AURA RING 2") // x1.2
 
     custom.add_upgrade_to_list("BLESSED CUP", assets.image`icon-cup`, "regenerations", "ACCESSORY")
@@ -798,19 +783,19 @@ function perform_upgrade(name: string) {
             break
 
         case "AURA RING":
-            exploder_explosion_scale *= 1.1
-            aura_scale *= 1.1
-            molotov_flame_scale *= 1.1
+            exploder_explosion_scale += 0.10
+            aura_scale += 0.10
+            molotov_flame_scale += 0.10
             break
         case "AURA RING 2":
-            exploder_explosion_scale *= 1.1
-            aura_scale *= 1.1
-            molotov_flame_scale *= 1.1
+            exploder_explosion_damage *= 1.10
+            aura_tick_damage *= 1.10
+            molotov_damage *= 1.10
             break
         case "AURA RING 3":
-            exploder_explosion_scale *= 1.2
-            aura_scale *= 1.2
-            molotov_flame_scale *= 1.2
+            exploder_explosion_scale += 0.20
+            aura_scale += 0.20
+            molotov_flame_scale += 0.20
             break
 
         case "GEM PRISM":
@@ -896,7 +881,7 @@ function perform_upgrade(name: string) {
             break
         case "FIREBALL 4":
             exploder_speed *= 1.5
-            exploder_duration = exploder_duration * 2 / 3
+            exploder_duration = exploder_duration * 0.33
             break
         case "FIREBALL 5":
             exploder_projectile_damage *= 2
@@ -926,14 +911,14 @@ function perform_upgrade(name: string) {
             create_new_aura()
             break
         case "DIVINE AURA 2":
-            aura_scale += 0.2
+            aura_scale += 0.15
             adjust_aura_scale()
             break
         case "DIVINE AURA 3":
             aura_tick_damage *= 1.5
             break
         case "DIVINE AURA 4":
-            aura_scale += 0.2
+            aura_scale += 0.15
             adjust_aura_scale()
             break
         case "DIVINE AURA 5":
@@ -986,11 +971,7 @@ function hero_level_up(status: StatusBarSprite) {
     status.max = Math.floor(status.max + hero_xp_increment)
     hero_level += 1
     hero_xp.setLabel(`LV${hero_level}`, 12)
-    if (custom.game_state_is(GameState.setup) && debug_mode) {
-        get_random_upgrade(true, "")
-    } else {
-        choose_upgrade("YOU REACHED LV. " + hero_level + "!", HERO_UPGRADE_CHOICES)
-    }
+    choose_upgrade("YOU REACHED LV. " + hero_level + "!", HERO_UPGRADE_CHOICES)
 }
 statusbars.onStatusReached(StatusBarKind.Experience, statusbars.StatusComparison.GTE, statusbars.ComparisonType.Percentage, 100, hero_level_up)
 
@@ -1463,14 +1444,6 @@ function setup_game () {
     setup_upgrade_menu()
     enemy_phase = 0
 
-    if(debug_mode) {
-        enemy_phase = DEBUG_START_PHASE
-        cat_out_of_chest = true
-        cat_mercy_phases = 0
-        for(let i=1; i<DEBUG_START_LEVEL; i++) {
-            hero_level_up(hero_xp)
-        }
-    }
     setup_enemy_phase()
     custom.set_game_state(GameState.normal)
     adjust_hero_speed()
@@ -1497,7 +1470,6 @@ function pause_the_game() {
         value2.follow(hero, 0)
     }
     sprites.destroyAllSpritesOfKind(SpriteKind.Orbital)
-    sprites.destroyAllSpritesOfKind(SpriteKind.Flame)
     sprites.destroyAllSpritesOfKind(SpriteKind.Molotov)
     sprites.destroyAllSpritesOfKind(SpriteKind.Explosive)
     sprites.destroyAllSpritesOfKind(SpriteKind.Projectile)
@@ -1713,14 +1685,21 @@ function spawn_molotov() {
 }
 
 function spawn_spray() {
-    let spray_angle = hero_angle
-    spray_angle -= spray_spawn_count * SPRAY_ANGLE_DELTA / 2
-    spray_angle += Math.randomRange(-spray_inaccuracy, spray_inaccuracy)
+    let spray_angle = 90 * Math.randomRange(0, 3)
     let weapon_image:Image = null
-
     for (let index = 0; index < spray_spawn_count; index++) {
         let new_weapon = sprites.create(assets.image`weapon-cross`, SpriteKind.Projectile)
         new_weapon.z = Z_PROJECTILE
+        if(index == 0) {
+            const target = sprites.allOfKind(SpriteKind.Enemy)._pickRandom()
+            if(target) {
+                spray_angle = Math.abs(hero.x - target.x) > Math.abs(hero.y - target.y)
+                    ? (hero.x > target.x ? 180 : 0)
+                    : (hero.y > target.y ? 270 : 90)
+            }
+            spray_angle -= spray_spawn_count * SPRAY_ANGLE_DELTA / 2
+            spray_angle += Math.randomRange(-spray_inaccuracy, spray_inaccuracy)
+        }
         custom.aim_projectile_at_angle(
         new_weapon,
         spray_angle,
@@ -1857,13 +1836,12 @@ game.onUpdate(function () {
             if (custom.game_state_is(GameState.setup)) {
                 press_b++
                 if (press_b >= 10) {
-                    debug_mode = true
                     settings.writeNumber("completed_game", 1)
                     start_main_menu()
                     press_b = 0
                 }
             } else if (custom.game_state_is(GameState.normal)) {
-                show_stats(debug_mode, debug_mode || enemy_extra_difficulty > 0, false, false)
+                show_stats(false, enemy_extra_difficulty > 0, false, false)
             }
         }
     } else {
@@ -2110,7 +2088,7 @@ function show_stats(show_hero_stats: boolean, show_enemy_stats: boolean, winning
     const class_name = hero_class ? hero_class.name : "COLLECTOR"
     const class_color = hero_class ? hero_class.color : 15
     const upgrades = custom.get_obtained_upgrade_names()
-    const hero_summary = new SummaryDialog(class_name, `LV ${hero_level}`, class_color, `TOTAL DAMAGE: ${tracked_total_sum(damage_tracker)}`, 3,
+    const hero_summary = new SummaryDialog(class_name, `LV ${hero_level}`, class_color, `TOTAL SCORE: ${info.score()}`, 3,
         damage_tracker
             .filter(tracked => upgrades.indexOf(tracked.name) >= 0)
             .map(tracker => ({
