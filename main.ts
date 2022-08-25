@@ -338,7 +338,7 @@ let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 12)
 let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100)
 let enemy_phase = 0
 let enemy_extra_difficulty = 0
-let heal_drop_chance = 5
+let heal_drop_chance = 7
 
 let hero: Sprite = null
 let hero_health: StatusBarSprite = null
@@ -586,24 +586,24 @@ function add_build(name: string, color: number, prerequsites: string[] = null, s
 }
 
 function setup_upgrade_menu() {
-    custom.add_upgrade_to_list("CROSS", assets.image`icon-cross`, "throw crosses", "WEAPON")
+    custom.add_upgrade_to_list("CROSS", assets.image`icon-cross`, "multiples thrown", "WEAPON")
     spray_spawn_count = 0
     spray_speed = 100
     spray_spawn_tick.rate = 6
     spray_damage = 14 // 12-24
     custom.add_upgrade_to_list("CROSS 2", assets.image`icon-cross`, "extra cross", "CROSS")
-    custom.add_upgrade_to_list("CROSS 3", assets.image`icon-cross`, "more damage", "CROSS 2") // x1.5
+    custom.add_upgrade_to_list("CROSS 3", assets.image`icon-cross`, "damage up", "CROSS 2") // x1.5
     custom.add_upgrade_to_list("CROSS 4", assets.image`icon-cross`, "extra cross", "CROSS 3")
-    custom.add_upgrade_to_list("CROSS 5", assets.image`icon-cross`, "more damage", "CROSS 4") // x1.5
+    custom.add_upgrade_to_list("CROSS 5", assets.image`icon-cross`, "damage up", "CROSS 4") // x1.5
 
-    custom.add_upgrade_to_list("SPARK", assets.image`icon-spark`, "auto aim missile", "WEAPON")
+    custom.add_upgrade_to_list("SPARK", assets.image`icon-spark`, "auto aim", "WEAPON")
     tracer_spawn_count = 0
     tracer_speed = 90
     tracer_spawn_tick.rate = 8
     tracer_damage = 12
-    custom.add_upgrade_to_list("SPARK 2", assets.image`icon-spark`, "more damage", "SPARK") // x1.5
-    custom.add_upgrade_to_list("SPARK 3", assets.image`icon-spark`, "casts faster", "SPARK 2") // x1.25
-    custom.add_upgrade_to_list("SPARK 4", assets.image`icon-spark`, "double damage", "SPARK 3") // x2
+    custom.add_upgrade_to_list("SPARK 2", assets.image`icon-spark`, "damage up", "SPARK") // x1.5
+    custom.add_upgrade_to_list("SPARK 3", assets.image`icon-spark`, "faster cast", "SPARK 2") // x1.25
+    custom.add_upgrade_to_list("SPARK 4", assets.image`icon-spark`, "damage doubled", "SPARK 3") // x2
     custom.add_upgrade_to_list("SPARK 5", assets.image`icon-spark`, "extra spark", "SPARK 4")
 
     custom.add_upgrade_to_list("FIREBALL", assets.image`icon-fireball`, "explode on impact", "WEAPON")
@@ -614,23 +614,23 @@ function setup_upgrade_menu() {
     exploder_projectile_damage = 0
     exploder_explosion_damage = 20
     exploder_explosion_scale = 1.0
-    custom.add_upgrade_to_list("FIREBALL 2", assets.image`icon-fireball`, "double damage", "FIREBALL") // x2
+    custom.add_upgrade_to_list("FIREBALL 2", assets.image`icon-fireball`, "damage doubled", "FIREBALL") // x2
     custom.add_upgrade_to_list("FIREBALL 3", assets.image`icon-fireball`, "bigger explosion", "FIREBALL 2") // x1.5
-    custom.add_upgrade_to_list("FIREBALL 4", assets.image`icon-fireball`, "more accurate", "FIREBALL 3")
-    custom.add_upgrade_to_list("FIREBALL 5", assets.image`icon-fireball`, "double damage", "FIREBALL 4") // x2
+    custom.add_upgrade_to_list("FIREBALL 4", assets.image`icon-fireball`, "accuracy up", "FIREBALL 3")
+    custom.add_upgrade_to_list("FIREBALL 5", assets.image`icon-fireball`, "damage doubled", "FIREBALL 4") // x2
 
     custom.add_upgrade_to_list("SPELLBOOK", assets.image`icon-book`, "circles to protect", "WEAPON")
     orbit_spawn_count = 0
-    orbit_spawn_tick.rate = 14
-    orbit_angular_speed = 160
-    orbit_expand_speed = 120
+    orbit_spawn_tick.rate = 12
+    orbit_angular_speed = 180
+    orbit_expand_speed = 140
     orbit_distance = 30
     orbit_duration = 2400
     orbit_damage = 12 // 12-24
-    custom.add_upgrade_to_list("SPELLBOOK 2", assets.image`icon-book`, "more damage", "SPELLBOOK") // x1.5
-    custom.add_upgrade_to_list("SPELLBOOK 3", assets.image`icon-book`, "casts faster", "SPELLBOOK 2") // x1.25
+    custom.add_upgrade_to_list("SPELLBOOK 2", assets.image`icon-book`, "damage up", "SPELLBOOK") // x1.5
+    custom.add_upgrade_to_list("SPELLBOOK 3", assets.image`icon-book`, "faster cast", "SPELLBOOK 2") // x1.25
     custom.add_upgrade_to_list("SPELLBOOK 4", assets.image`icon-book`, "extra book", "SPELLBOOK 3") // 18-54 *.75
-    custom.add_upgrade_to_list("SPELLBOOK 5", assets.image`icon-book`, "more damage", "SPELLBOOK 4") // x1.5
+    custom.add_upgrade_to_list("SPELLBOOK 5", assets.image`icon-book`, "damage up", "SPELLBOOK 4") // x1.5
 
     custom.add_upgrade_to_list("DIVINE AURA", assets.image`icon-aura`, "damage ring", "WEAPON")
     aura_spawn_count = 0
@@ -638,9 +638,9 @@ function setup_upgrade_menu() {
     aura_tick_damage = 8
     aura_scale = 1.0
     custom.add_upgrade_to_list("DIVINE AURA 2", assets.image`icon-aura`, "bigger ring", "DIVINE AURA") // x1.2
-    custom.add_upgrade_to_list("DIVINE AURA 3", assets.image`icon-aura`, "more damage", "DIVINE AURA 2") // x1.5
+    custom.add_upgrade_to_list("DIVINE AURA 3", assets.image`icon-aura`, "damage up", "DIVINE AURA 2") // x1.5
     custom.add_upgrade_to_list("DIVINE AURA 4", assets.image`icon-aura`, "bigger ring", "DIVINE AURA 3") // x1.1
-    custom.add_upgrade_to_list("DIVINE AURA 5", assets.image`icon-aura`, "double damage", "DIVINE AURA 4") // x2
+    custom.add_upgrade_to_list("DIVINE AURA 5", assets.image`icon-aura`, "damage doubled", "DIVINE AURA 4") // x2
 
     custom.add_upgrade_to_list("HOLY WATER", assets.image`icon-water`, "toss and burn", "WEAPON")
     molotov_spawn_count = 0
@@ -653,37 +653,37 @@ function setup_upgrade_menu() {
     molotov_aoe_tick.rate = 2 // 2 attacks
     molotov_tick_damage = 8 // 16
     molotov_flame_scale = 1.0 
-    custom.add_upgrade_to_list("HOLY WATER 2", assets.image`icon-water`, "burns longer", "HOLY WATER") // x1.5
+    custom.add_upgrade_to_list("HOLY WATER 2", assets.image`icon-water`, "longer burn", "HOLY WATER") // x1.5
     custom.add_upgrade_to_list("HOLY WATER 3", assets.image`icon-water`, "bigger fire", "HOLY WATER 2") // x1.5
-    custom.add_upgrade_to_list("HOLY WATER 4", assets.image`icon-water`, "double damage", "HOLY WATER 3") // x2
-    custom.add_upgrade_to_list("HOLY WATER 5", assets.image`icon-water`, "double intensity", "HOLY WATER 4") // x2
+    custom.add_upgrade_to_list("HOLY WATER 4", assets.image`icon-water`, "damage doubled", "HOLY WATER 3") // x2
+    custom.add_upgrade_to_list("HOLY WATER 5", assets.image`icon-water`, "intensity doubled", "HOLY WATER 4") // x2
 
-    custom.add_upgrade_to_list("LIFE SHIELD", assets.image`icon-shield`, "double healing", "ACCESSORY")
-    custom.add_upgrade_to_list("LIFE SHIELD 2", assets.image`icon-shield`, "more max HP", "LIFE SHIELD") // +100
+    custom.add_upgrade_to_list("LIFE SHIELD", assets.image`icon-shield`, "healing doubled", "ACCESSORY")
+    custom.add_upgrade_to_list("LIFE SHIELD 2", assets.image`icon-shield`, "max HP up", "LIFE SHIELD") // +100
     custom.add_upgrade_to_list("LIFE SHIELD 3", assets.image`icon-shield`, "regeneration", "LIFE SHIELD 2")
 
-    custom.add_upgrade_to_list("GEM PRISM", assets.image`icon-prism`, "absorb farther", "ACCESSORY") // x1.5
+    custom.add_upgrade_to_list("GEM PRISM", assets.image`icon-prism`, "absorb power up", "ACCESSORY") // x1.25
     custom.add_upgrade_to_list("GEM PRISM 2", assets.image`icon-prism`, "bonus gem XP", "GEM PRISM")
-    custom.add_upgrade_to_list("GEM PRISM 3", assets.image`icon-prism`, "auto absorb gems", "GEM PRISM 2") // 6s
+    custom.add_upgrade_to_list("GEM PRISM 3", assets.image`icon-prism`, "timed auto absorb", "GEM PRISM 2") // 6s
 
     custom.add_upgrade_to_list("FAIRY FEATHER", assets.image`icon-wing`, "more potions", "ACCESSORY") // x2
     custom.add_upgrade_to_list("FAIRY FEATHER 2", assets.image`icon-wing`, "moves faster", "FAIRY FEATHER") // 0.25
-    custom.add_upgrade_to_list("FAIRY FEATHER 3", assets.image`icon-wing`, "chance to dodge", "FAIRY FEATHER 2") // 0.25
+    custom.add_upgrade_to_list("FAIRY FEATHER 3", assets.image`icon-wing`, "dodge some attacks", "FAIRY FEATHER 2") // 0.25
 
-    custom.add_upgrade_to_list("MAGIC FLASK", assets.image`icon-flask`, "attacks faster", "ACCESSORY") // x1.1
-    custom.add_upgrade_to_list("MAGIC FLASK 2", assets.image`icon-flask`, "attacks faster", "MAGIC FLASK") // x1.2
-    custom.add_upgrade_to_list("MAGIC FLASK 3", assets.image`icon-flask`, "extra spells, weakens body", "MAGIC FLASK 2")
+    custom.add_upgrade_to_list("MAGIC FLASK", assets.image`icon-flask`, "faster attacks", "ACCESSORY") // x1.1
+    custom.add_upgrade_to_list("MAGIC FLASK 2", assets.image`icon-flask`, "faster attack", "MAGIC FLASK") // x1.2
+    custom.add_upgrade_to_list("MAGIC FLASK 3", assets.image`icon-flask`, "extra spells", "MAGIC FLASK 2")
 
-    custom.add_upgrade_to_list("POWER CRYSTAL", assets.image`icon-crystal`, "more damage", "ACCESSORY") // x1.1
-    custom.add_upgrade_to_list("POWER CRYSTAL 2", assets.image`icon-crystal`, "more damage", "POWER CRYSTAL") // x1.2
-    custom.add_upgrade_to_list("POWER CRYSTAL 3", assets.image`icon-crystal`, "weapons knockback, weakens body", "POWER CRYSTAL 2")
+    custom.add_upgrade_to_list("POWER CRYSTAL", assets.image`icon-crystal`, "all damage up", "ACCESSORY") // x1.1
+    custom.add_upgrade_to_list("POWER CRYSTAL 2", assets.image`icon-crystal`, "all damage up", "POWER CRYSTAL") // x1.2
+    custom.add_upgrade_to_list("POWER CRYSTAL 3", assets.image`icon-crystal`, "weapons knockback", "POWER CRYSTAL 2")
 
     custom.add_upgrade_to_list("AURA RING", assets.image`icon-ring`, "bigger attacks", "ACCESSORY") // x1.1
-    custom.add_upgrade_to_list("AURA RING 2", assets.image`icon-ring`, "more area damage", "AURA RING") // x1.1
+    custom.add_upgrade_to_list("AURA RING 2", assets.image`icon-ring`, "area damage up", "AURA RING") // x1.1
     custom.add_upgrade_to_list("AURA RING 3", assets.image`icon-ring`, "bigger attacks", "AURA RING 2") // x1.2
 
     custom.add_upgrade_to_list("BLESSED CUP", assets.image`icon-cup`, "regenerations", "ACCESSORY")
-    custom.add_upgrade_to_list("BLESSED CUP 2", assets.image`icon-cup`, "more holy damage", "BLESSED CUP") // x1.1
+    custom.add_upgrade_to_list("BLESSED CUP 2", assets.image`icon-cup`, "holy damage up", "BLESSED CUP") // x1.1
     custom.add_upgrade_to_list("BLESSED CUP 3", assets.image`icon-cup`, "gain holy powers", "BLESSED CUP 2")
 
     if (hyper_mode) {
@@ -756,7 +756,6 @@ function perform_upgrade(name: string) {
         case "MAGIC FLASK 3":
             bonus_magic_spawn = 1
             exploder_explosion_damage *= 0.5
-            hero_health.max -= 25
             break
 
         case "POWER CRYSTAL":
@@ -779,7 +778,6 @@ function perform_upgrade(name: string) {
             break
         case "POWER CRYSTAL 3":
             weapon_knockback = WEAPON_KNOCKBACK_VELOCITY
-            hero_health.max -= 25
             break
 
         case "AURA RING":
@@ -799,13 +797,13 @@ function perform_upgrade(name: string) {
             break
 
         case "GEM PRISM":
-            hero_gem_collect_radius *= 1.5
+            hero_gem_collect_radius *= 1.25
             break
         case "GEM PRISM 2":
             gem_bonus_xp += 1
             break
         case "GEM PRISM 3":
-            hero_auto_collect_tick = start_tick_track(auto_collect_all_gems, 6 * 4)
+            hero_auto_collect_tick = start_tick_track(auto_collect_all_gems, 8 * 4)
             break
 
         case "FAIRY FEATHER":
@@ -2078,6 +2076,7 @@ function tracked_total_sum(tracker_set:StatTracking[]): number {
 
 function show_stats(show_hero_stats: boolean, show_enemy_stats: boolean, winning: boolean, end_game: boolean) {
     pause_the_game()
+    const score = info.score()
     game.pushScene()
 
     const strongest_weapon_name = custom.get_strongest_upgrade()
@@ -2088,7 +2087,7 @@ function show_stats(show_hero_stats: boolean, show_enemy_stats: boolean, winning
     const class_name = hero_class ? hero_class.name : "COLLECTOR"
     const class_color = hero_class ? hero_class.color : 15
     const upgrades = custom.get_obtained_upgrade_names()
-    const hero_summary = new SummaryDialog(class_name, `LV ${hero_level}`, class_color, `TOTAL SCORE: ${info.score()}`, 3,
+    const hero_summary = new SummaryDialog(class_name, `LV ${hero_level}`, class_color, `TOTAL SCORE: ${score}`, 3,
         damage_tracker
             .filter(tracked => upgrades.indexOf(tracked.name) >= 0)
             .map(tracker => ({
