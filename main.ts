@@ -56,7 +56,7 @@ const ENEMY_HEALTH_SCALE = 0.05
 const ENEMY_SPEED_SCALE = 0.10
 const ENEMY_TURN_SCALE = 0.05
 
-const ENEMY_MAX_SPEED = 70
+const ENEMY_MAX_SPEED = 90
 const ENEMY_MAX_DAMAGE = 50
 
 const SPRAY_ANGLE_DELTA = 120 / 5
@@ -376,7 +376,8 @@ let upgrade_ui: Image = image.create((assets.image`icon-spark`.width + 2) * MAX_
 let upgrade_ui_sprite: Sprite = null
 
 let cat: Sprite = null
-let cat_inside_chest = false
+let cat_in_next_chest = false
+let cat_chest_spawned = false
 let cat_out_of_chest = false
 let cat_mercy_phases = 2
 
@@ -590,7 +591,7 @@ function setup_upgrade_menu() {
     spray_spawn_count = 0
     spray_speed = 100
     spray_spawn_tick.rate = 6
-    spray_damage = 14 // 12-24
+    spray_damage = 12 // 12-24
     custom.add_upgrade_to_list("CROSS 2", assets.image`icon-cross`, "extra cross", "CROSS")
     custom.add_upgrade_to_list("CROSS 3", assets.image`icon-cross`, "damage up", "CROSS 2") // x1.5
     custom.add_upgrade_to_list("CROSS 4", assets.image`icon-cross`, "extra cross", "CROSS 3")
@@ -612,7 +613,7 @@ function setup_upgrade_menu() {
     exploder_duration = 750
     exploder_spawn_tick.rate = 10
     exploder_projectile_damage = 0
-    exploder_explosion_damage = 20
+    exploder_explosion_damage = 25
     exploder_explosion_scale = 1.0
     custom.add_upgrade_to_list("FIREBALL 2", assets.image`icon-fireball`, "damage doubled", "FIREBALL") // x2
     custom.add_upgrade_to_list("FIREBALL 3", assets.image`icon-fireball`, "bigger explosion", "FIREBALL 2") // x1.5
@@ -622,11 +623,11 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("SPELLBOOK", assets.image`icon-book`, "circles to protect", "WEAPON")
     orbit_spawn_count = 0
     orbit_spawn_tick.rate = 12
-    orbit_angular_speed = 180
+    orbit_angular_speed = 225
     orbit_expand_speed = 140
     orbit_distance = 30
     orbit_duration = 2400
-    orbit_damage = 12 // 12-24
+    orbit_damage = 16 // 12-24
     custom.add_upgrade_to_list("SPELLBOOK 2", assets.image`icon-book`, "damage up", "SPELLBOOK") // x1.5
     custom.add_upgrade_to_list("SPELLBOOK 3", assets.image`icon-book`, "faster cast", "SPELLBOOK 2") // x1.25
     custom.add_upgrade_to_list("SPELLBOOK 4", assets.image`icon-book`, "extra book", "SPELLBOOK 3") // 18-54 *.75
@@ -652,7 +653,7 @@ function setup_upgrade_menu() {
     molotov_spawn_tick.rate = 24 // 6 sec
     molotov_aoe_tick.rate = 2 // 2 attacks
     molotov_tick_damage = 8 // 16
-    molotov_flame_scale = 1.0 
+    molotov_flame_scale = 1.1
     custom.add_upgrade_to_list("HOLY WATER 2", assets.image`icon-water`, "longer burn", "HOLY WATER") // x1.5
     custom.add_upgrade_to_list("HOLY WATER 3", assets.image`icon-water`, "bigger fire", "HOLY WATER 2") // x1.5
     custom.add_upgrade_to_list("HOLY WATER 4", assets.image`icon-water`, "damage doubled", "HOLY WATER 3") // x2
@@ -811,7 +812,7 @@ function perform_upgrade(name: string) {
             adjust_hero_speed()
             break
         case "FAIRY FEATHER 2":
-            hero_speed += 25
+            hero_speed += 20
             adjust_hero_speed()
             break
         case "FAIRY FEATHER 3":
@@ -1119,12 +1120,12 @@ function setup_enemy_phase() {
             custom.add_wave_data("GHOST", 2)
             custom.add_wave_data("MEAN SPIRIT", 1)
             spawn_enemy("TROLL")
-            cat_inside_chest = true
+            cat_in_next_chest = true
             break
 
         default:
             if(enemy_phase >= 18) {
-                if (!cat_out_of_chest) {
+                if (!cat_chest_spawned) {
                     custom.reset_wave_data()
                     custom.add_wave_data("TOUGH SLIME", 2)
                     custom.add_wave_data("GHOST", 2)
@@ -1225,7 +1226,7 @@ function spawn_enemy(name: string) {
             if (enemy_extra_difficulty <= 0) {
                 new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 360, 35, 20, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1000, 40, 30, TURN_MED, 3, true, true)
+                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1000, 40, 32, TURN_MED, 3, true, true)
             }
             break
 
@@ -1245,7 +1246,7 @@ function spawn_enemy(name: string) {
             if (enemy_extra_difficulty <= 0) {
                 new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 810, 40, 30, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 600, 20, 40, TURN_HI, 3, true, true)
+                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 700, 20, 40, TURN_HI, 3, true, true)
             }
             break
 
@@ -1266,7 +1267,7 @@ function spawn_enemy(name: string) {
             if (enemy_extra_difficulty <= 0) {
                 new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1700, 50, 30, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1400, 100, 20, TURN_LO, 3, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1400, 100, 30, TURN_LO, 3, true, true)
             }
             break
     }
@@ -1371,7 +1372,7 @@ PICKUP EVENTS
 
 function pick_up_treasure(treasure: Sprite) {
     if(custom.game_state_is(GameState.normal)) {
-        if (cat_inside_chest && !cat_out_of_chest) {
+        if (cat_in_next_chest && !cat_out_of_chest) {
             cat_out_of_chest = true
             game.showLongText(
                 "You found Jiji the black cat!\n" +
@@ -1454,6 +1455,7 @@ GAME ACTIONS
 function unpause_the_game() {
     for (let enemy of sprites.allOfKind(SpriteKind.Enemy)) {
         enemy.follow(hero, sprites.readDataNumber(enemy, "speed"), sprites.readDataNumber(enemy, "turn"))
+        enemy.setVelocity(sprites.readDataNumber(enemy, 'vx'), sprites.readDataNumber(enemy, 'vy'))
     }
     if (aura_spawn_count > 0) {
         aura_weapon.setFlag(SpriteFlag.Invisible, false)
@@ -1465,10 +1467,13 @@ function unpause_the_game() {
 function pause_the_game() {
     custom.set_game_state(GameState.menu)
     for (let value2 of sprites.allOfKind(SpriteKind.Enemy)) {
+        sprites.setDataNumber(value2, 'vx', value2.vx)
+        sprites.setDataNumber(value2, 'vy', value2.vy)
         value2.follow(hero, 0)
     }
     sprites.destroyAllSpritesOfKind(SpriteKind.Orbital)
     sprites.destroyAllSpritesOfKind(SpriteKind.Molotov)
+    sprites.destroyAllSpritesOfKind(SpriteKind.Flame)
     sprites.destroyAllSpritesOfKind(SpriteKind.Explosive)
     sprites.destroyAllSpritesOfKind(SpriteKind.Projectile)
     sprites.destroyAllSpritesOfKind(SpriteKind.VisualEffects)
@@ -1554,6 +1559,9 @@ function deal_enemy_damage(cx: number, cy: number, enemy: Sprite, name: string, 
                 enemy
             )
             let new_treasure = sprites.create(assets.image`treasure`, SpriteKind.Treasure)
+            if(cat_in_next_chest) {
+                cat_chest_spawned = true
+            }
             new_treasure.z = Z_TREASURE_FOOD
             custom.move_sprite_on_top_of_another(new_treasure, enemy)
         }
