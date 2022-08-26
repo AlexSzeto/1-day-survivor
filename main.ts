@@ -37,7 +37,7 @@ const HYPER_STARTING_CHOICES = 6
 const HYPER_WAVE_TICKS = 4
 const HYPER_PHASE_TICKS = 50
 const HYPER_XP_MULTIPLIER = 2
-const HYPER_BOSS_HP_SCALE = 0.5
+const HYPER_BOSS_HP_SCALE = 0.75
 const HYPER_HERO_SPEED = 100
 
 const ENEMY_DAMAGE_HYPER_BASE = 1.15
@@ -697,30 +697,32 @@ function setup_upgrade_menu() {
         aura_tick_damage *= HERO_ATTACK_HYPER_BASE
     }
 
-    add_build("GRAND SORCERESS", 10, ["SPELLBOOK", "SPARK", "FIREBALL", "MAGIC FLASK 3"])
-    add_build("SORCERESS", 8, ["SPELLBOOK", "SPARK", "FIREBALL"])
-    add_build("CRYSTAL TRICKSTER", 10, ["CROSS", "SPARK", "SPELLBOOK", "POWER CRYSTAL 3"])
-    add_build("TRICKSTER", 8, ["CROSS", "SPARK", "SPELLBOOK"])
-    add_build("AURA MASTER", 10, ["HOLY WATER", "FIREBALL", "DIVINE AURA", "AURA RING 3"])
-    add_build("AURAMANCER", 8, ["HOLY WATER", "FIREBALL", "DIVINE AURA"])
-    add_build("BLESSED PALADIN", 10, ["HOLY WATER", "CROSS", "DIVINE AURA", "BLESSED CUP 3"])
-    add_build("PALADIN", 8, ["HOLY WATER", "CROSS", "DIVINE AURA"])
+    add_build("GRAND SORCERESS", 4, ["SPELLBOOK 5", "SPARK 5", "FIREBALL 5", "MAGIC FLASK 3"])
+    add_build("SORCERESS", 10, ["SPELLBOOK", "SPARK", "FIREBALL"])
+    add_build("CRYSTAL GUARDIAN", 4, ["CROSS 5", "SPARK 5", "SPELLBOOK 5", "POWER CRYSTAL 3"])
+    add_build("GUARDIAN", 10, ["CROSS", "SPARK", "SPELLBOOK"])
+    add_build("AURA MASTER", 4, ["HOLY WATER 5", "FIREBALL 5", "DIVINE AURA 5", "AURA RING 3"])
+    add_build("AURAMANCER", 10, ["HOLY WATER", "FIREBALL", "DIVINE AURA"])
+    add_build("HOLY CRUSADER", 4, ["HOLY WATER 5", "CROSS 5", "DIVINE AURA 5", "BLESSED CUP 3"])
+    add_build("CRUSADER", 10, ["HOLY WATER", "CROSS", "DIVINE AURA"])
 
-    add_build("ULTIMATE SURVIVOR", 10, ["LIFE SHIELD 3", "FAIRY FEATHER 3", "GEM PRISM 3"])
-    add_build("SURVIVOR", 8, ["LIFE SHIELD", "FAIRY FEATHER", "GEM PRISM"])
+    add_build("LIGHT CHAMPION", 10, ["LIFE SHIELD 3", "FAIRY FEATHER 3"])
 
-    add_build("MAGICIAN", 7, [], "SPARK 5")
-    add_build("APPRENTICE", 15, [], "SPARK")
-    add_build("VETERAN", 7, [], "CROSS 5")
-    add_build("SOLDIER", 15, [], "CROSS")
-    add_build("PYROMANCER", 7, [], "FIREBALL 5")
-    add_build("FIRESTARTER", 15, [], "FIREBALL")
-    add_build("ORACLE", 7, [], "DIVINE AURA 5")
-    add_build("PRIESTESS", 15, [], "DIVINE AURA")
-    add_build("CHEMIST", 7, [], "HOLY WATER 5")
-    add_build("ALCHEMIST", 15, [], "HOLY WATER")
-    add_build("SAGE", 7, [], "SPELLBOOK 5")
+    add_build("WITCH", 10, ["SPARK 5"])
+    add_build("PYROMANCER", 10, ["FIREBALL 5"])
+    add_build("SAGE", 10, ["SPELLBOOK 5"])
+    add_build("ORACLE", 10, ["DIVINE AURA 5"])
+    add_build("ALCHEMIST", 10, ["HOLY WATER 5"])
+    add_build("CHAMPION", 10, ["CROSS 5"])
+
+    add_build("LIFEBINDER", 8, ["LIFE SHIELD", "FAIRY FEATHER"])
+
+    add_build("SCHOLAR", 15, [], "SPARK")
+    add_build("SCHOLAR", 15, [], "FIREBALL")
     add_build("SCHOLAR", 15, [], "SPELLBOOK")
+    add_build("ADVENTURER", 15, [], "DIVINE AURA")
+    add_build("ADVENTURER", 15, [], "HOLY WATER")
+    add_build("ADVENTURER", 15, [], "CROSS")
 }
 
 function perform_upgrade(name: string) {
@@ -1226,13 +1228,13 @@ function spawn_enemy(name: string) {
             if (enemy_extra_difficulty <= 0) {
                 new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 360, 35, 20, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1000, 40, 32, TURN_MED, 3, true, true)
+                new_enemy = setup_enemy(assets.image`skeleton-mage`, skeleton_mage_flash, name, 1400, 40, 15, TURN_MED, 3, true, true)
             }
             break
 
         // TIER 2 (expected player damage = 45-90)
         case "SLIME":
-            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 36, 20, 36, TURN_MED, 1, false)
+            new_enemy = setup_enemy(assets.image`slime`, slime_flash, name, 36, 18, 36, TURN_MED, 1, false)
             break
         case "TOUGH SLIME":
             new_enemy = setup_enemy(assets.image`tough-slime`, tough_slime_flash, name, 60, 25, 32, TURN_LO, 1)
@@ -1246,7 +1248,7 @@ function spawn_enemy(name: string) {
             if (enemy_extra_difficulty <= 0) {
                 new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 810, 40, 30, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 700, 20, 40, TURN_HI, 3, true, true)
+                new_enemy = setup_enemy(assets.image`slime-king`, slime_king_flash, name, 600, 20, 45, TURN_HI, 3, true, true)
             }
             break
 
@@ -1258,7 +1260,7 @@ function spawn_enemy(name: string) {
             new_enemy = setup_enemy(assets.image`captain`, captain_flash, name, 180, 30, 30, TURN_LO, 2)
             break
         case "MEAN SPIRIT":
-            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 54, 10, 50, TURN_MED, 2)
+            new_enemy = setup_enemy(assets.image`mourner`, mean_spirit_flash, name, 54, 14, 50, TURN_MED, 2)
             break
 
         // END GAME (expected player damage = 180-270)
@@ -1267,7 +1269,7 @@ function spawn_enemy(name: string) {
             if (enemy_extra_difficulty <= 0) {
                 new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1700, 50, 30, TURN_LO, 3, true, true)
             } else {
-                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 1400, 100, 30, TURN_LO, 3, true, true)
+                new_enemy = setup_enemy(assets.image`troll`, troll_flash, name, 2000, 100, 30, TURN_LO, 3, true, true)
             }
             break
     }
@@ -1400,6 +1402,7 @@ function pick_up_treasure(treasure: Sprite) {
 }
 
 scene.onOverlapTile(SpriteKind.Player, assets.tile`door-open-mid`, () => {
+    info.changeScoreBy(200)
     game.splash("VICTORY", "You have saved the kingdom!")
     settings.writeNumber("completed_game", 1)
     show_stats(true, false, true, true)

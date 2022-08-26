@@ -76,7 +76,7 @@ namespace custom {
     export function get_upgrade_choices(max: number, include_basic_items: boolean): string[] {
         const basic_weapons_count = upgrades_obtained.reduce((count, upgrade) => (upgrade.prerequisite == "WEAPON") ? count + 1 : count, 0)
         const basic_armors_count = upgrades_obtained.reduce((count, upgrade) => (upgrade.prerequisite == "ACCESSORY") ? count + 1 : count, 0)
-        const eligible_list = upgrades_available_list
+        let eligible_list = upgrades_available_list
            .filter(upgrade => 
                (
                    include_basic_items && (
@@ -86,6 +86,8 @@ namespace custom {
                )
                || upgrades_obtained.some(existing_upgrade => existing_upgrade.name == upgrade.prerequisite)
             )
+        eligible_list = eligible_list.concat(eligible_list.filter(upgrade => upgrade.prerequisite == "WEAPON"))
+        
         
         let choices: UpgradeData[] = []
 
@@ -94,7 +96,7 @@ namespace custom {
         } else {
             for (let count = 0; count < max; count++) {
                 let choice = Math.pickRandom(eligible_list)
-                while (choices.indexOf(choice) >= 0) {
+                while (choices.some(existing => existing.name == choice.name)) {
                     choice = Math.pickRandom(eligible_list)
                 }
                 choices.push(choice)
