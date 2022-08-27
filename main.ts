@@ -1403,7 +1403,7 @@ function pick_up_treasure(treasure: Sprite) {
 
 scene.onOverlapTile(SpriteKind.Player, assets.tile`door-open-mid`, () => {
     info.changeScoreBy(200)
-    game.splash("VICTORY", "You have saved the kingdom!")
+    game.splash("VICTORY", "You've saved the kingdom!")
     settings.writeNumber("completed_game", 1)
     show_stats(true, false, true, true)
     game.setGameOverSound(true, new music.Melody(""))
