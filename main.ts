@@ -706,8 +706,6 @@ function setup_upgrade_menu() {
     add_build("HOLY CRUSADER", 4, ["HOLY WATER 5", "CROSS 5", "DIVINE AURA 5", "BLESSED CUP 3"])
     add_build("CRUSADER", 10, ["HOLY WATER", "CROSS", "DIVINE AURA"])
 
-    add_build("LIGHT CHAMPION", 10, ["LIFE SHIELD 3", "FAIRY FEATHER 3"])
-
     add_build("WITCH", 10, ["SPARK 5"])
     add_build("PYROMANCER", 10, ["FIREBALL 5"])
     add_build("SAGE", 10, ["SPELLBOOK 5"])
@@ -716,13 +714,14 @@ function setup_upgrade_menu() {
     add_build("CHAMPION", 10, ["CROSS 5"])
 
     add_build("LIFEBINDER", 8, ["LIFE SHIELD", "FAIRY FEATHER"])
+    add_build("CRYSTALMANCER", 8, ["MAGIC FLASK", "POWER CRYSTAL"])
+    add_build("BATTLEMAGE", 8, ["MAGIC FLASK", "AURA RING"])
+    add_build("PRIESTESS", 8, ["MAGIC FLASK", "BLESSED CUP"])
+    add_build("CLERIC", 8, ["BLESSED CUP", "POWER CRYSTAL"])
+    add_build("MYSTIC", 8, ["BLESSED CUP", "AURA RING"])
+    add_build("ARTIFICER", 8, ["POWER CRYSTAL", "AURA RING"])
 
-    add_build("SCHOLAR", 15, [], "SPARK")
-    add_build("SCHOLAR", 15, [], "FIREBALL")
-    add_build("SCHOLAR", 15, [], "SPELLBOOK")
-    add_build("ADVENTURER", 15, [], "DIVINE AURA")
-    add_build("ADVENTURER", 15, [], "HOLY WATER")
-    add_build("ADVENTURER", 15, [], "CROSS")
+    add_build("ADVENTURER", 15, [])
 }
 
 function perform_upgrade(name: string) {
