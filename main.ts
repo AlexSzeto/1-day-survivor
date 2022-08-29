@@ -338,7 +338,7 @@ let enemy_spawn_tick: TickTracking = start_tick_track(spawn_enemy_wave, 12)
 let enemy_phase_tick: TickTracking = start_tick_track(next_enemy_phase, 100)
 let enemy_phase = 0
 let enemy_extra_difficulty = 0
-let heal_drop_chance = 7
+let heal_drop_chance = 10
 
 let hero: Sprite = null
 let hero_health: StatusBarSprite = null
@@ -659,7 +659,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("HOLY WATER 4", assets.image`icon-water`, "damage doubled", "HOLY WATER 3") // x2
     custom.add_upgrade_to_list("HOLY WATER 5", assets.image`icon-water`, "intensity doubled", "HOLY WATER 4") // x2
 
-    custom.add_upgrade_to_list("LIFE SHIELD", assets.image`icon-shield`, "healing doubled", "ACCESSORY")
+    custom.add_upgrade_to_list("LIFE SHIELD", assets.image`icon-shield`, "healing up", "ACCESSORY")
     custom.add_upgrade_to_list("LIFE SHIELD 2", assets.image`icon-shield`, "max HP up", "LIFE SHIELD") // +100
     custom.add_upgrade_to_list("LIFE SHIELD 3", assets.image`icon-shield`, "regeneration", "LIFE SHIELD 2")
 
@@ -727,7 +727,7 @@ function setup_upgrade_menu() {
 function perform_upgrade(name: string) {
     switch(name) {
         case "LIFE SHIELD":
-            hero_food_heal *= 2
+            hero_food_heal *= 1.4
             break
         case "LIFE SHIELD 2":
             hero_health.max += 75
@@ -809,7 +809,7 @@ function perform_upgrade(name: string) {
             break
 
         case "FAIRY FEATHER":
-            heal_drop_chance *= 2
+            heal_drop_chance *= 1.4
             adjust_hero_speed()
             break
         case "FAIRY FEATHER 2":
