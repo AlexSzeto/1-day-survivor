@@ -613,8 +613,8 @@ function setup_upgrade_menu() {
     exploder_duration = 750
     exploder_spawn_tick.rate = 10
     exploder_projectile_damage = 0
-    exploder_explosion_damage = 25
-    exploder_explosion_scale = 1.0
+    exploder_explosion_damage = 30
+    exploder_explosion_scale = 1.1
     custom.add_upgrade_to_list("FIREBALL 2", assets.image`icon-fireball`, "damage doubled", "FIREBALL") // x2
     custom.add_upgrade_to_list("FIREBALL 3", assets.image`icon-fireball`, "bigger explosion", "FIREBALL 2") // x1.5
     custom.add_upgrade_to_list("FIREBALL 4", assets.image`icon-fireball`, "accuracy up", "FIREBALL 3")
@@ -637,7 +637,7 @@ function setup_upgrade_menu() {
     aura_spawn_count = 0
     aura_aoe_tick.rate = 2
     aura_tick_damage = 8
-    aura_scale = 1.0
+    aura_scale = 1.1
     custom.add_upgrade_to_list("DIVINE AURA 2", assets.image`icon-aura`, "bigger ring", "DIVINE AURA") // x1.2
     custom.add_upgrade_to_list("DIVINE AURA 3", assets.image`icon-aura`, "damage up", "DIVINE AURA 2") // x1.5
     custom.add_upgrade_to_list("DIVINE AURA 4", assets.image`icon-aura`, "bigger ring", "DIVINE AURA 3") // x1.1
@@ -700,26 +700,26 @@ function setup_upgrade_menu() {
     add_build("GRAND SORCERESS", 4, ["SPELLBOOK 5", "SPARK 5", "FIREBALL 5", "MAGIC FLASK 3"])
     add_build("SORCERESS", 10, ["SPELLBOOK", "SPARK", "FIREBALL"])
     add_build("CRYSTAL GUARDIAN", 4, ["CROSS 5", "SPARK 5", "SPELLBOOK 5", "POWER CRYSTAL 3"])
-    add_build("GUARDIAN", 10, ["CROSS", "SPARK", "SPELLBOOK"])
-    add_build("AURA MASTER", 4, ["HOLY WATER 5", "FIREBALL 5", "DIVINE AURA 5", "AURA RING 3"])
-    add_build("AURAMANCER", 10, ["HOLY WATER", "FIREBALL", "DIVINE AURA"])
+    add_build("PRESERVER", 10, ["CROSS", "SPARK", "SPELLBOOK"])
+    add_build("ARCANE ORACLE", 4, ["HOLY WATER 5", "FIREBALL 5", "DIVINE AURA 5", "AURA RING 3"])
+    add_build("ORACLE", 10, ["HOLY WATER", "FIREBALL", "DIVINE AURA"])
     add_build("HOLY CRUSADER", 4, ["HOLY WATER 5", "CROSS 5", "DIVINE AURA 5", "BLESSED CUP 3"])
     add_build("CRUSADER", 10, ["HOLY WATER", "CROSS", "DIVINE AURA"])
 
-    add_build("WITCH", 10, ["SPARK 5"])
     add_build("PYROMANCER", 10, ["FIREBALL 5"])
     add_build("SAGE", 10, ["SPELLBOOK 5"])
-    add_build("ORACLE", 10, ["DIVINE AURA 5"])
     add_build("ALCHEMIST", 10, ["HOLY WATER 5"])
     add_build("CHAMPION", 10, ["CROSS 5"])
+    add_build("PALADIN", 10, ["DIVINE AURA 5"])
+    add_build("WIZARDESS", 10, ["SPARK 5"])
 
-    add_build("LIFEBINDER", 8, ["LIFE SHIELD", "FAIRY FEATHER"])
-    add_build("CRYSTALMANCER", 8, ["MAGIC FLASK", "POWER CRYSTAL"])
-    add_build("BATTLEMAGE", 8, ["MAGIC FLASK", "AURA RING"])
-    add_build("PRIESTESS", 8, ["MAGIC FLASK", "BLESSED CUP"])
-    add_build("CLERIC", 8, ["BLESSED CUP", "POWER CRYSTAL"])
-    add_build("MYSTIC", 8, ["BLESSED CUP", "AURA RING"])
-    add_build("ARTIFICER", 8, ["POWER CRYSTAL", "AURA RING"])
+    add_build("APPRENTICE", 8, ["MAGIC FLASK", "POWER CRYSTAL"])
+    add_build("ADEPT", 8, ["BLESSED CUP", "POWER CRYSTAL"])
+    add_build("MYSTIC", 8, ["MAGIC FLASK", "BLESSED CUP"])
+    add_build("AURAMANCER", 8, ["AURA RING"])
+    add_build("COLLECTOR", 8, ["GEM PRISM"])
+    add_build("DRUIDESS", 8, ["LIFE SHIELD"])
+    add_build("DANCER", 8, ["FAIRY FEATHER"])
 
     add_build("ADVENTURER", 15, [])
 }
