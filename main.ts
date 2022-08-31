@@ -61,8 +61,8 @@ const ENEMY_MAX_DAMAGE = 50
 
 const SPRAY_ANGLE_DELTA = 120 / 5
 
-const HERO_UPGRADE_CHOICES = 3
-const HERO_STARTING_CHOICES = 3
+const HERO_UPGRADE_CHOICES = 4
+const HERO_STARTING_CHOICES = 4
 const HERO_LEVEL_UP_SCALING = 8
 
 const ENEMY_KNOCKBACK_FRICTION = 15
@@ -604,7 +604,7 @@ function setup_upgrade_menu() {
     tracer_damage = 12
     custom.add_upgrade_to_list("SPARK 2", assets.image`icon-spark`, "damage up", "SPARK") // x1.5
     custom.add_upgrade_to_list("SPARK 3", assets.image`icon-spark`, "faster cast", "SPARK 2") // x1.25
-    custom.add_upgrade_to_list("SPARK 4", assets.image`icon-spark`, "damage doubled", "SPARK 3") // x2
+    custom.add_upgrade_to_list("SPARK 4", assets.image`icon-spark`, "damage up", "SPARK 3") // x1.5
     custom.add_upgrade_to_list("SPARK 5", assets.image`icon-spark`, "extra spark", "SPARK 4")
 
     custom.add_upgrade_to_list("FIREBALL", assets.image`icon-fireball`, "explode on impact", "WEAPON")
@@ -631,7 +631,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("SPELLBOOK 2", assets.image`icon-book`, "damage up", "SPELLBOOK") // x1.5
     custom.add_upgrade_to_list("SPELLBOOK 3", assets.image`icon-book`, "faster cast", "SPELLBOOK 2") // x1.25
     custom.add_upgrade_to_list("SPELLBOOK 4", assets.image`icon-book`, "extra book", "SPELLBOOK 3") // 18-54 *.75
-    custom.add_upgrade_to_list("SPELLBOOK 5", assets.image`icon-book`, "damage up", "SPELLBOOK 4") // x1.5
+    custom.add_upgrade_to_list("SPELLBOOK 5", assets.image`icon-book`, "damage doubled", "SPELLBOOK 4") // x2
 
     custom.add_upgrade_to_list("DIVINE AURA", assets.image`icon-aura`, "damage ring", "WEAPON")
     aura_spawn_count = 0
@@ -786,6 +786,7 @@ function perform_upgrade(name: string) {
             exploder_explosion_scale += 0.10
             aura_scale += 0.10
             molotov_flame_scale += 0.10
+            orbit_distance *= 1.10
             break
         case "AURA RING 2":
             exploder_explosion_damage *= 1.10
@@ -796,6 +797,7 @@ function perform_upgrade(name: string) {
             exploder_explosion_scale += 0.20
             aura_scale += 0.20
             molotov_flame_scale += 0.20
+            orbit_distance *= 1.10
             break
 
         case "GEM PRISM":
@@ -862,7 +864,7 @@ function perform_upgrade(name: string) {
             tracer_spawn_tick.rate *= 0.75
             break
         case "SPARK 4":
-            tracer_damage *= 2
+            tracer_damage *= 1.5
             break
         case "SPARK 5":
             tracer_spawn_count += 1
@@ -903,7 +905,7 @@ function perform_upgrade(name: string) {
             orbit_spawn_count += 1
             break
         case "SPELLBOOK 5":
-            orbit_damage *= 1.5
+            orbit_damage *= 2
             break
 
         case "DIVINE AURA":
