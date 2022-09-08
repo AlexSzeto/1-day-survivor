@@ -38,7 +38,7 @@ const HYPER_WAVE_TICKS = 4
 const HYPER_PHASE_TICKS = 50
 const HYPER_XP_MULTIPLIER = 2
 const HYPER_BOSS_HP_SCALE = 0.75
-const HYPER_HERO_SPEED = 100
+const HYPER_HERO_SPEED = 110
 
 const ENEMY_DAMAGE_HYPER_BASE = 1.15
 const ENEMY_HEALTH_HYPER_BASE = 1.00
@@ -792,6 +792,7 @@ function perform_upgrade(name: string) {
             exploder_explosion_damage *= 1.10
             aura_tick_damage *= 1.10
             molotov_damage *= 1.10
+            orbit_damage *= 1.10
             break
         case "AURA RING 3":
             exploder_explosion_scale += 0.20
