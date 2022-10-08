@@ -657,7 +657,7 @@ function setup_upgrade_menu() {
     custom.add_upgrade_to_list("HOLY WATER 2", assets.image`icon-water`, "longer burn", "HOLY WATER") // x1.5
     custom.add_upgrade_to_list("HOLY WATER 3", assets.image`icon-water`, "bigger fire", "HOLY WATER 2") // x1.5
     custom.add_upgrade_to_list("HOLY WATER 4", assets.image`icon-water`, "damage doubled", "HOLY WATER 3") // x2
-    custom.add_upgrade_to_list("HOLY WATER 5", assets.image`icon-water`, "intensity doubled", "HOLY WATER 4") // x2
+    custom.add_upgrade_to_list("HOLY WATER 5", assets.image`icon-water`, "burn time doubled", "HOLY WATER 4") // x2
 
     custom.add_upgrade_to_list("LIFE SHIELD", assets.image`icon-shield`, "healing up", "ACCESSORY")
     custom.add_upgrade_to_list("LIFE SHIELD 2", assets.image`icon-shield`, "max HP up", "LIFE SHIELD") // +100
@@ -786,19 +786,16 @@ function perform_upgrade(name: string) {
             exploder_explosion_scale += 0.10
             aura_scale += 0.10
             molotov_flame_scale += 0.10
-            orbit_distance *= 1.10
             break
         case "AURA RING 2":
             exploder_explosion_damage *= 1.10
             aura_tick_damage *= 1.10
             molotov_damage *= 1.10
-            orbit_damage *= 1.10
             break
         case "AURA RING 3":
             exploder_explosion_scale += 0.20
             aura_scale += 0.20
             molotov_flame_scale += 0.20
-            orbit_distance *= 1.10
             break
 
         case "GEM PRISM":
@@ -832,7 +829,7 @@ function perform_upgrade(name: string) {
             spray_damage *= 1.1
             break
         case "BLESSED CUP 3":
-            molotov_duration_max *= 0.5
+            molotov_aoe_tick.rate *= 0.5
             aura_aoe_tick.rate *= 0.5
             spray_inaccuracy = 0
             break
@@ -942,7 +939,8 @@ function perform_upgrade(name: string) {
             molotov_tick_damage *= 2
             break
         case "HOLY WATER 5":
-            molotov_aoe_tick.rate *= 0.5
+            molotov_flame_duration *= 2
+            molotov_spawn_tick.rate *= 2
             break
     }
     redraw_upgrades()
