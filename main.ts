@@ -927,7 +927,6 @@ function perform_upgrade(name: string) {
 
         case "HOLY WATER":
             molotov_spawn_count += 1
-            fire_on_next_tick(molotov_spawn_tick)
             break
         case "HOLY WATER 2":
             molotov_flame_duration *= 1.5
@@ -943,6 +942,7 @@ function perform_upgrade(name: string) {
             molotov_spawn_tick.rate *= 2
             break
     }
+    fire_on_next_tick(molotov_spawn_tick)
     redraw_upgrades()
 }
 
