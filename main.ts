@@ -2150,7 +2150,7 @@ function show_stats(show_hero_stats: boolean, show_enemy_stats: boolean, winning
     if(show_enemy_stats) {
         const losing_summary = new SummaryDialog(
             "MONSTER STATS",
-            `LV ${(enemy_phase+1).toString()}` + (enemy_extra_difficulty > 0 ? `(+${enemy_extra_difficulty})` : ""),
+            `${hyper_mode ? 'HYPER ' : ''}LV ${(enemy_phase+1).toString()}` + (enemy_extra_difficulty > 0 ? `(+${enemy_extra_difficulty})` : ""),
             15,
             `DAMAGE TAKEN: ${tracked_total_sum(wound_tracker)}`,
             3,
